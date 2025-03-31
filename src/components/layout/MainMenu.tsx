@@ -19,7 +19,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AdbIcon from "@mui/icons-material/Adb";
 
 const pages = [
-  { name: "Dashboard", path: "/dashboard" },
+  { name: "Dashboard", path: "/" },
   { name: "Preview", path: "/preview" },
   { name: "Collect", path: "/colect" },
   { name: "Jobs", path: "/jobs" },
