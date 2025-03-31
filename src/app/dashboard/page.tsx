@@ -1,5 +1,14 @@
+import { Box } from "@mui/material";
+
 const Dashboard = () => {
-    return <>this is a Dashboard</>;
+  return (
+    <>
+      <Box>
+
+        
+      </Box>
+    </>
+  );
 };
 
 export default Dashboard;
