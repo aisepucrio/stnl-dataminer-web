@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 // ---------------------------------------------------
 //  fake response - REMOVER
 // const response = null
-const fakeData = {
+const fakeDataGithub = {
   repositories: [
     "quiz-app",
     "task-manager",
@@ -94,6 +94,10 @@ const fakeData = {
   ],
 };
 
+const fakeDataJira = {
+  projects: ["stone", "flopo" , "apiMiner"]
+}
+
 // ---------------------------------------------------
 
 const row = {
@@ -109,7 +113,7 @@ const blue = { bgcolor: "blue" };
 const red = { bgcolor: "red" };
 
 const sources = {
-  github: { name: "GitHub", value: "github", fetchUrl: "/api/github" },
+  github: { name: "GitHub", value: "github", fetchUrl: "/api/github/dashboard/" },
   jira: { name: "Jira", value: "jira", fetchUrl: "/api/jira" },
   stackoverflow: {
     name: "Stack Overflow",
@@ -122,99 +126,173 @@ export default function Home() {
   const [selectedSource, setSelectedSource] = useState("github");
   const [items, setItems] = useState<string[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
+  const [repository, setRepository] = useState("");
+  const [project, setProject] = useState("");
 
-  const [qtyRepository, setQtyRepository] = useState<number>(0)
-  const [qtyIssue, setQtyIssue] = useState<number>(0)
-  const [qtyPullrequest, setQtyPullrequest] = useState<number>(0)
-  const [qtyCommit, setQtyCommit] = useState<number>(0)
-
+  const [qtyRepository, setQtyRepository] = useState<number>(0);
+  const [qtyIssue, setQtyIssue] = useState<number>(0);
+  const [qtyPullrequest, setQtyPullrequest] = useState<number>(0);
+  const [qtyCommit, setQtyCommit] = useState<number>(0);
+  const [qtyComment, setQtyComment] = useState<number>(0);
+  const [qtySprints, setQtySprints] = useState<number>(0);
 
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedSource(event.target.value as string);
+    fetchItems(selectedSource);
   };
-
-  
-
 
   const fetchItems = async (source: string) => {
     try {
-      // const response = await fetch(sources[source].fetchUrl);
+      // // const response = await fetch(sources[source].fetchUrl);
 
-      // const data = await response.json();
-      setItems(fakeData.repositories);
-      // setSelectedItem(data[0] || ""); // Seleciona o primeiro item se houver
-      window.alert(fakeData.repositories)
-      setQtyRepository(fakeData.repositories.length)
-      setQtyIssue(fakeData.issues.length)
-      setQtyPullrequest(fakeData.pullRequests.length)
-      setQtyCommit(fakeData.commits.length)
+      // // const data = await response.json();
+      // setItems(fakeDataGithub.repositories);
+      // // setSelectedItem(data[0] || ""); // Seleciona o primeiro item se houver
+      // // window.alert(fakeDataGithub.repositories);
+      // setQtyRepository(fakeDataGithub.repositories.length);
+      // setQtyIssue(fakeDataGithub.issues.length);
+      // setQtyPullrequest(fakeDataGithub.pullRequests.length);
+      // setQtyCommit(fakeDataGithub.commits.length);
+      if(selectedSource === "github" ){
+        // setItems(reposi)
+           setItems(fakeDataGithub.repositories);
+      } else if (selectedSource === "jira"){
+           setItems(fakeDataJira.projects);
+
+      }
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
     }
   };
 
   useEffect(() => {
+    setSelectedItem("");
+    setRepository("");
+    setProject("");
     fetchItems(selectedSource);
   }, [selectedSource]);
 
   return (
-    <Box sx={{ ...row }}>
-      <Box sx={{ ...column, ...red }}>
-        <Box sx={{ ...row }}>
-          select
-          <Box>
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <InputLabel id="source-select-label">Source</InputLabel>
-              <Select
-                labelId="source-select-label"
-                id="source-select"
-                value={selectedSource}
-                onChange={handleChange}
-                autoWidth
-                label="Source"
-              >
-                {Object.values(sources).map((source) => (
-                  <MenuItem key={source.value} value={source.value}>
-                    {source.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-          <Box>
-            {" "}
-            <FormControl
-              sx={{ m: 1, minWidth: 120 }}
-              disabled={items.length === 0}
+    // <Box sx={{ ...row }}>
+    //   <Box sx={{ ...column, ...red }}>
+    //     <Box sx={{ ...row }}>
+    //       select
+    //       <Box>
+    //         <FormControl sx={{ m: 1, minWidth: 120 }}>
+    //           <InputLabel id="source-select-label">Source</InputLabel>
+    //           <Select
+    //             labelId="source-select-label"
+    //             id="source-select"
+    //             value={selectedSource}
+    //             onChange={handleChange}
+    //             autoWidth
+    //             label="Source"
+    //           >
+    //             {Object.values(sources).map((source) => (
+    //               <MenuItem key={source.value} value={source.value}>
+    //                 {source.name}
+    //               </MenuItem>
+    //             ))}
+    //           </Select>
+    //         </FormControl>
+    //       </Box>
+    //       <Box>
+    //         {" "}
+    //         <FormControl
+    //           sx={{ m: 1, minWidth: 120 }}
+    //           disabled={items.length === 0}
+    //         >
+    //           <InputLabel id="items-select-label">Items</InputLabel>
+    //           <Select
+    //             labelId="items-select-label"
+    //             id="items-select"
+    //             value={selectedItem}
+    //             onChange={(e) => setSelectedItem(e.target.value)}
+    //             autoWidth
+    //             label="Items"
+    //           >
+    //             {items.map((item) => (
+    //               <MenuItem key={item} value={item}>
+    //                 {item}
+    //               </MenuItem>
+    //             ))}
+    //           </Select>
+    //         </FormControl>{" "}
+    //       </Box>
+    //     </Box>
+    //     <Box sx={{...row}}>
+    //             <Box>{qtyRepository}</Box>
+    //             <Box>{qtyIssue}</Box>
+    //             <Box>{qtyPullrequest}</Box>
+    //             <Box>{qtyCommit}</Box>
+    //     </Box>
+    //     <Box>chart</Box>
+    //   </Box>
+    //   <Box sx={{ ...row, ...blue }}> this is a filter</Box>
+    // </Box>
+    <Box>
+      <Box>
+        <Box>
+          <FormControl sx={{ m: 1, minWidth: 120 }}>
+            <InputLabel id="source-select-label">Source</InputLabel>
+            <Select
+              labelId="source-select-label"
+              id="source-select"
+              value={selectedSource}
+              onChange={handleChange}
+              autoWidth
+              label="Source"
             >
-              <InputLabel id="items-select-label">Items</InputLabel>
-              <Select
-                labelId="items-select-label"
-                id="items-select"
-                value={selectedItem}
-                onChange={(e) => setSelectedItem(e.target.value)}
-                autoWidth
-                label="Items"
-              >
-                {items.map((item) => (
-                  <MenuItem key={item} value={item}>
-                    {item}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>{" "}
-          </Box>
+              {Object.values(sources).map((source) => (
+                <MenuItem key={source.value} value={source.value}>
+                  {source.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
-        <Box sx={{...row}}>
-                <Box>{qtyRepository}</Box>
-                <Box>{qtyIssue}</Box>
-                <Box>{qtyPullrequest}</Box>
-                <Box>{qtyCommit}</Box>
+        <Box>
+          <FormControl
+            sx={{ m: 1, minWidth: 120 }}
+            disabled={items.length === 0}
+          >
+            <InputLabel id="items-select-label">Items</InputLabel>
+            <Select
+              labelId="items-select-label"
+              id="items-select"
+              value={selectedItem}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSelectedItem(value);
+                if (selectedSource === "github") {
+                  setRepository(value);
+                } else if (selectedSource === "jira") {
+                  setProject(value);
+                }
+              }}
+              autoWidth
+              label="Items"
+            >
+              {items.map((item) => (
+                <MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <button> view api docs</button>
         </Box>
-        <Box>chart</Box>
       </Box>
-      <Box sx={{ ...row, ...blue }}> this is a filter</Box>
+      {/* Se selectedSource == github renderiza <Box> A</Box>  */}
+      {/* se selectedSource == jira renderiza <Box>B</Box> */}
+      {selectedSource === "github" ? (
+        <Box>A</Box>
+      ) : selectedSource === "jira" ? (
+        <Box>B</Box>
+      ) : selectedSource === "stackoverflow" ? (
+        <Box>C</Box>
+      ) : null}
     </Box>
   );
 }
