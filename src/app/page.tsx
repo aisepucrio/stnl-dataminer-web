@@ -2,8 +2,9 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 // MUI
-import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select, Skeleton } from "@mui/material";
 import { useEffect, useState } from "react";
+import InfoCard from "@/components/common/InfoCard";
 
 // ---------------------------------------------------
 //  fake response - REMOVER
@@ -129,6 +130,8 @@ const sources = {
 export default function Home() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
+  const [loading, setLoading] = useState(true)
+
   const [selectedSource, setSelectedSource] = useState("github");
   const [items, setItems] = useState<string[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
@@ -152,6 +155,7 @@ export default function Home() {
   };
 
   const fetchItems = async (source: string) => {
+    setLoading(false)
     setItems(fakeDataGithub.repositories);
     const url = apiUrl + sources[source].fetchUrl;
 
@@ -335,8 +339,11 @@ export default function Home() {
                 Stars: {`${qtyStar}`}
               </>
             ) : (
-              <>
-                {" "}
+              <Box sx={{gap:"20px", ...row}}>
+                <InfoCard label="Repositories" value={0} isLoading={loading}/>
+                {/* <InfoCard label="Issues" value={0} isLoading={loading}/> */}
+                {/* <InfoCard label="Pull Requests" value={0} isLoading={loading}/> */}
+                <InfoCard label="Commits" value={0} isLoading={loading}/>
                 Repositories: {`${qtyRepository}`} <br />
                 Issues: {`${qtyIssue}`}
                 <br />
@@ -344,7 +351,7 @@ export default function Home() {
                 <br />
                 Commits {`${qtyCommit}`}
                 <br />
-              </>
+              </Box>
             )}
           </>
         ) : selectedSource == "jira" ? (
