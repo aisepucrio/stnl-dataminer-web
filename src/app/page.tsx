@@ -95,8 +95,8 @@ const fakeDataGithub = {
 };
 
 const fakeDataJira = {
-  projects: ["stone", "flopo" , "apiMiner"]
-}
+  projects: ["stone", "flopo", "apiMiner"],
+};
 
 // ---------------------------------------------------
 
@@ -113,7 +113,11 @@ const blue = { bgcolor: "blue" };
 const red = { bgcolor: "red" };
 
 const sources = {
-  github: { name: "GitHub", value: "github", fetchUrl: "/api/github/dashboard/" },
+  github: {
+    name: "GitHub",
+    value: "github",
+    fetchUrl: "/api/github/dashboard",
+  },
   jira: { name: "Jira", value: "jira", fetchUrl: "/api/jira" },
   stackoverflow: {
     name: "Stack Overflow",
@@ -123,19 +127,24 @@ const sources = {
 };
 
 export default function Home() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
   const [selectedSource, setSelectedSource] = useState("github");
   const [items, setItems] = useState<string[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
+
   const [repository, setRepository] = useState("");
   const [project, setProject] = useState("");
 
-  const [qtyRepository, setQtyRepository] = useState<number>(0);
-  const [qtyIssue, setQtyIssue] = useState<number>(0);
-  const [qtyPullrequest, setQtyPullrequest] = useState<number>(0);
-  const [qtyCommit, setQtyCommit] = useState<number>(0);
-  const [qtyComment, setQtyComment] = useState<number>(0);
-  const [qtySprints, setQtySprints] = useState<number>(0);
+  const [qtyRepository, setQtyRepository] = useState<number | null>(null);
+  const [qtyIssue, setQtyIssue] = useState<number | null>(0);
+  const [qtyPullrequest, setQtyPullrequest] = useState<number | null>(0);
+  const [qtyCommit, setQtyCommit] = useState<number | null>(0);
+  const [qtyComment, setQtyComment] = useState<number | null>(0);
+  const [qtyFork, setQtyFork] = useState<number | null>(0);
+  const [qtyStar, setStar] = useState<number | null>(0);
 
+  const [qtySprint, setQtySprints] = useState<number | null>(0);
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedSource(event.target.value as string);
@@ -143,24 +152,49 @@ export default function Home() {
   };
 
   const fetchItems = async (source: string) => {
+    setItems(fakeDataGithub.repositories);
+    const url = apiUrl + sources[source].fetchUrl;
+
     try {
-      // // const response = await fetch(sources[source].fetchUrl);
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar dados de ${source}`);
+      }
+
+      const data = await response.json();
+
+      const {
+        issues_count = 0,
+        pull_requests_count = 0,
+        commits_count = 0,
+        repositories_count = 0,
+      } = data;
+
+      if (selectedSource === "github") {
+        setQtyIssue(issues_count);
+        setQtyPullrequest(pull_requests_count);
+        setQtyCommit(commits_count);
+        setQtyRepository(repositories_count);
+
+        setQtyComment(0);
+        setQtySprints(0);
+      }
 
       // // const data = await response.json();
       // setItems(fakeDataGithub.repositories);
-      // // setSelectedItem(data[0] || ""); // Seleciona o primeiro item se houver
+      // setSelectedItem(data[0] || ""); // Seleciona o primeiro item se houver
       // // window.alert(fakeDataGithub.repositories);
       // setQtyRepository(fakeDataGithub.repositories.length);
       // setQtyIssue(fakeDataGithub.issues.length);
       // setQtyPullrequest(fakeDataGithub.pullRequests.length);
       // setQtyCommit(fakeDataGithub.commits.length);
-      if(selectedSource === "github" ){
-        // setItems(reposi)
-           setItems(fakeDataGithub.repositories);
-      } else if (selectedSource === "jira"){
-           setItems(fakeDataJira.projects);
-
-      }
+      // if (selectedSource === "github") {
+      //   // setItems(reposi)
+      // setItems(fakeDataGithub.repositories);
+      // } else if (selectedSource === "jira") {
+      //   setItems(fakeDataJira.projects);
+      // }
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
     }
@@ -284,15 +318,70 @@ export default function Home() {
           <button> view api docs</button>
         </Box>
       </Box>
+      <Box>
+        {selectedSource == "github" ? (
+          <>
+            "github"
+            {selectedItem ? (
+              <>
+                {" "}
+                Issues: {`${qtyIssue}`}
+                <br />
+                Pull Requests {`${qtyPullrequest}`}
+                <br />
+                Comments: {`${qtyComment}`}
+                <br />
+                forks: {`${qtyFork}`} <br />
+                Stars: {`${qtyStar}`}
+              </>
+            ) : (
+              <>
+                {" "}
+                Repositories: {`${qtyRepository}`} <br />
+                Issues: {`${qtyIssue}`}
+                <br />
+                Pull Requests {`${qtyPullrequest}`}
+                <br />
+                Commits {`${qtyCommit}`}
+                <br />
+              </>
+            )}
+          </>
+        ) : selectedSource == "jira" ? (
+          <>
+            "jira"
+            {selectedItem ? (
+              <>
+                Issues: {`${qtyIssue}`}
+                <br />
+                Comments: {`${qtyComment}`}
+                <br />
+                Sprints: {`${qtySprint}`}
+                <br />
+              </>
+            ) : (
+              <>
+                Issues: {`${qtyIssue}`}
+                <br />
+                Comments: {`${qtyComment}`}
+                <br />
+              </>
+            )}
+          </>
+        ) : (
+          <>"error"</>
+        )}
+      </Box>
+      <Box></Box>
       {/* Se selectedSource == github renderiza <Box> A</Box>  */}
       {/* se selectedSource == jira renderiza <Box>B</Box> */}
-      {selectedSource === "github" ? (
+      {/* {selectedSource === "github" ? (
         <Box>A</Box>
       ) : selectedSource === "jira" ? (
         <Box>B</Box>
       ) : selectedSource === "stackoverflow" ? (
         <Box>C</Box>
-      ) : null}
+      ) : null} */}
     </Box>
   );
 }
