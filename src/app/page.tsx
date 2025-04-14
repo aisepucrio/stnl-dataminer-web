@@ -2,7 +2,15 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 // MUI
-import { Box, FormControl, InputLabel, MenuItem, Select, Skeleton } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Skeleton,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import InfoCard from "@/components/common/InfoCard";
 
@@ -120,17 +128,17 @@ const sources = {
     fetchUrl: "/api/github/dashboard",
   },
   jira: { name: "Jira", value: "jira", fetchUrl: "/api/jira" },
-  stackoverflow: {
-    name: "Stack Overflow",
-    value: "stackoverflow",
-    fetchUrl: "/api/stackoverflow",
-  },
+  // stackoverflow: {
+  //   name: "Stack Overflow",
+  //   value: "stackoverflow",
+  //   fetchUrl: "/api/stackoverflow",
+  // },
 };
 
 export default function Home() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   const [selectedSource, setSelectedSource] = useState("github");
   const [items, setItems] = useState<string[]>([]);
@@ -139,7 +147,7 @@ export default function Home() {
   const [repository, setRepository] = useState("");
   const [project, setProject] = useState("");
 
-  const [qtyRepository, setQtyRepository] = useState<number | null>(null);
+  const [qtyRepository, setQtyRepository] = useState<number | null>(0);
   const [qtyIssue, setQtyIssue] = useState<number | null>(0);
   const [qtyPullrequest, setQtyPullrequest] = useState<number | null>(0);
   const [qtyCommit, setQtyCommit] = useState<number | null>(0);
@@ -149,13 +157,15 @@ export default function Home() {
 
   const [qtySprint, setQtySprints] = useState<number | null>(0);
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    const value = event.target.value;
     setSelectedSource(event.target.value as string);
     fetchItems(selectedSource);
   };
 
   const fetchItems = async (source: string) => {
-    setLoading(false)
+    // window.alert("fazendo o fetch")
+    setLoading(false);
     setItems(fakeDataGithub.repositories);
     const url = apiUrl + sources[source].fetchUrl;
 
@@ -176,29 +186,28 @@ export default function Home() {
       } = data;
 
       if (selectedSource === "github") {
+        const repositories = data.repositories.map(
+          (repo: any) => repo.repository
+        );
+
         setQtyIssue(issues_count);
         setQtyPullrequest(pull_requests_count);
         setQtyCommit(commits_count);
         setQtyRepository(repositories_count);
+        setItems(repositories);
 
         setQtyComment(0);
         setQtySprints(0);
+
+        return;
       }
 
-      // // const data = await response.json();
-      // setItems(fakeDataGithub.repositories);
-      // setSelectedItem(data[0] || ""); // Seleciona o primeiro item se houver
-      // // window.alert(fakeDataGithub.repositories);
-      // setQtyRepository(fakeDataGithub.repositories.length);
-      // setQtyIssue(fakeDataGithub.issues.length);
-      // setQtyPullrequest(fakeDataGithub.pullRequests.length);
-      // setQtyCommit(fakeDataGithub.commits.length);
-      // if (selectedSource === "github") {
-      //   // setItems(reposi)
-      // setItems(fakeDataGithub.repositories);
-      // } else if (selectedSource === "jira") {
-      //   setItems(fakeDataJira.projects);
-      // }
+      if (selectedSource === "jira") {
+        const projects = data.projects.map((proj: any) => proj.project);
+        setItems(projects)
+        return;
+      }
+
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
     }
@@ -270,7 +279,7 @@ export default function Home() {
     //   <Box sx={{ ...row, ...blue }}> this is a filter</Box>
     // </Box>
     <Box>
-      <Box>
+      <Box sx={{ ...row }}>
         <Box>
           <FormControl sx={{ m: 1, minWidth: 120 }}>
             <InputLabel id="source-select-label">Source</InputLabel>
@@ -339,18 +348,26 @@ export default function Home() {
                 Stars: {`${qtyStar}`}
               </>
             ) : (
-              <Box sx={{gap:"20px", ...row}}>
-                <InfoCard label="Repositories" value={0} isLoading={loading}/>
-                {/* <InfoCard label="Issues" value={0} isLoading={loading}/> */}
-                {/* <InfoCard label="Pull Requests" value={0} isLoading={loading}/> */}
-                <InfoCard label="Commits" value={0} isLoading={loading}/>
-                Repositories: {`${qtyRepository}`} <br />
+              <Box sx={{ gap: "20px", ...row }}>
+                <InfoCard
+                  label="Repositories"
+                  value={qtyRepository}
+                  isLoading={loading}
+                />
+                <InfoCard label="Issues" value={qtyIssue} isLoading={loading} />
+                <InfoCard
+                  label="Pull Requests"
+                  value={qtyPullrequest}
+                  isLoading={loading}
+                />
+                <InfoCard label="Commits" value={0} isLoading={loading} />
+                {/* Repositories: {`${qtyRepository}`} <br />
                 Issues: {`${qtyIssue}`}
                 <br />
                 Pull Requests {`${qtyPullrequest}`}
                 <br />
                 Commits {`${qtyCommit}`}
-                <br />
+                <br /> */}
               </Box>
             )}
           </>
@@ -358,21 +375,52 @@ export default function Home() {
           <>
             "jira"
             {selectedItem ? (
-              <>
-                Issues: {`${qtyIssue}`}
+              <Box sx={{ gap: "20px", ...row }}>
+                <InfoCard
+                  label="Issues"
+                  value={qtyIssue}
+                  isLoading={loading}
+                  color={"blue"}
+                />
+                <InfoCard
+                  label="Comments"
+                  value={qtyComment}
+                  isLoading={loading}
+                  color={"blue"}
+                />
+                <InfoCard
+                  label="Sprints"
+                  value={qtySprint}
+                  isLoading={loading}
+                  color={"blue"}
+                />
+
+                {/* Issues: {`${qtyIssue}`}
                 <br />
                 Comments: {`${qtyComment}`}
                 <br />
                 Sprints: {`${qtySprint}`}
-                <br />
-              </>
+                <br /> */}
+              </Box>
             ) : (
-              <>
-                Issues: {`${qtyIssue}`}
+              <Box sx={{ gap: "20px", ...row }}>
+                <InfoCard
+                  label="Issues"
+                  value={qtyIssue}
+                  isLoading={loading}
+                  color={"blue"}
+                />
+                <InfoCard
+                  label="Comments"
+                  value={qtyComment}
+                  isLoading={loading}
+                  color={"blue"}
+                />
+                {/* Issues: {`${qtyIssue}`}
                 <br />
                 Comments: {`${qtyComment}`}
-                <br />
-              </>
+                <br /> */}
+              </Box>
             )}
           </>
         ) : (

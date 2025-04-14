@@ -6,9 +6,10 @@ type InfoCardProps = {
   label: string;
   value: number | null;
   isLoading?: boolean;
+  color?:any
 };
 
-const InfoCard = ({ label, value, isLoading = false }: InfoCardProps) => {
+const InfoCard = ({ label, value, isLoading = false, color }: InfoCardProps) => {
   return (
     <>
       {isLoading ? (
@@ -26,17 +27,17 @@ const InfoCard = ({ label, value, isLoading = false }: InfoCardProps) => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              bgcolor: "pink",
+              bgcolor: color? color: "pink",
               boxSizing: "border-box",
               px: "0",
               py: "50px",
             }}
           >
-            <Typography variant="h4" color="text.secondary">
+            <Typography variant="h4" color="#1C4886">
               {label}
             </Typography>
 
-            <Typography variant="h2" color="text.primary">
+            <Typography variant="h2"color="#1C4886">
               {value}
             </Typography>
           </Box>
