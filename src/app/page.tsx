@@ -280,7 +280,7 @@ export default function Home() {
     // </Box>
     <Box>
       <Box sx={{ ...row }}>
-        <Box>
+        <Box sx={{flex:1}}>
           <FormControl sx={{ m: 1, minWidth: 120 }}>
             <InputLabel id="source-select-label">Source</InputLabel>
             <Select
@@ -299,7 +299,7 @@ export default function Home() {
             </Select>
           </FormControl>
         </Box>
-        <Box>
+        <Box sx={{flex:1}}>
           <FormControl
             sx={{ m: 1, minWidth: 120 }}
             disabled={items.length === 0}
@@ -408,13 +408,11 @@ export default function Home() {
                   label="Issues"
                   value={qtyIssue}
                   isLoading={loading}
-                  color={"blue"}
                 />
                 <InfoCard
                   label="Comments"
                   value={qtyComment}
                   isLoading={loading}
-                  color={"blue"}
                 />
                 {/* Issues: {`${qtyIssue}`}
                 <br />

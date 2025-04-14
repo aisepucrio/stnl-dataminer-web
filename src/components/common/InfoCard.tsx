@@ -27,10 +27,11 @@ const InfoCard = ({ label, value, isLoading = false, color }: InfoCardProps) => 
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              bgcolor: color? color: "pink",
+              bgcolor: color? color: "white",
               boxSizing: "border-box",
               px: "0",
               py: "50px",
+              borderRadius:"5px"
             }}
           >
             <Typography variant="h4" color="#1C4886">
