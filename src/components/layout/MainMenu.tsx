@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
@@ -11,6 +12,7 @@ import {
   Drawer,
   ListItemButton,
   ListItem,
+  ListItemText,
 } from "@mui/material";
 
 const pages = [
@@ -46,33 +48,37 @@ const MainMenu = () => {
         <Box sx={{ overflow: "auto" }}>
           <List>
             {pages.map(({ name, path }) => {
-              const isActive = pathname === path;
+                const isActive = pathname === path;
 
-              return (
-                <ListItem disablePadding>
-                  <ListItemButton
-                    component="a"
-                    sx={{
-                      backgroundColor: isActive ? "#1C488638" : "transparent",
-                      borderRadius: 2,
-                      margin:1.5,
-                    }}
-                  >
-                    <Typography
-                    sx={{
-                      fontSize: 18,
-                      fontWeight: 800,
-                      color: isActive ? "#1C4886" : "#BCBDBC",
-                    }}
+                return (
+                  <Link href={path} key={name} passHref legacyBehavior>
+                    <ListItem disablePadding>
+                    <ListItemButton
+                      component="a"
+                      sx={{
+                        borderRadius: 2,
+                        margin: 1.5,
+                        display: "block",
+                        backgroundColor: isActive ? "#1C488638" : "transparent",
+                        "&:hover": {
+                          backgroundColor: "action.hover",
+                        },
+                      }}
                     >
-                    {name}
-                  </Typography>  
-          
-                </ListItemButton>
-                </ListItem>
-                
-              );
+                      <ListItemText 
+                      primary={name} 
+                      primaryTypographyProps={{
+                        fontWeight: 700,
+                        fontSize: 17,
+                        color: isActive ? "#1C4886" : "#BCBDBC",
+                      }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                  </Link>
+                );
             })}
+
           </List>
         </Box>
       </Drawer>
