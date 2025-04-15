@@ -278,7 +278,7 @@ export default function Home() {
     //   </Box>
     //   <Box sx={{ ...row, ...blue }}> this is a filter</Box>
     // </Box>
-    <Box>
+    <Box  sx={{width:"100%"}}>
       <Box sx={{ ...row }}>
         <Box sx={{flex:1}}>
           <FormControl sx={{ m: 1, minWidth: 120 }}>
