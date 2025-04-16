@@ -81,7 +81,6 @@ export default function Home() {
   const fetchItems = async (source: string) => {
     // window.alert("fazendo o fetch")
     setLoading(false);
-    setItems(fakeDataGithub.repositories);
     const url = apiUrl + sources[source].fetchUrl;
 
     try {
