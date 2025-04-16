@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 import {
@@ -44,7 +45,18 @@ const MainMenu = () => {
         }}
         >
         <Toolbar />
-        
+        <Box
+          sx={{ display: "flex", justifyContent: "center", mb: 2 }}
+          >
+          <Image
+            src="/images/logo.png"
+            alt="Logo"
+            width={150}
+            height={60}
+            style={{ objectFit: "contain" }}
+          />
+          
+        </Box>
         <Box sx={{ overflow: "auto" }}>
           <List>
             {pages.map(({ name, path }) => {
