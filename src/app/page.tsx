@@ -127,7 +127,7 @@ const sources = {
     value: "github",
     fetchUrl: "/api/github/dashboard",
   },
-  jira: { name: "Jira", value: "jira", fetchUrl: "/api/jira" },
+  jira: { name: "Jira", value: "jira", fetchUrl: "/api/jira/dashboard/" },
   // stackoverflow: {
   //   name: "Stack Overflow",
   //   value: "stackoverflow",
@@ -160,7 +160,7 @@ export default function Home() {
   const handleChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
     setSelectedSource(event.target.value as string);
-    fetchItems(selectedSource);
+    // fetchItems(selectedSource);
   };
 
   const fetchItems = async (source: string) => {
@@ -172,11 +172,13 @@ export default function Home() {
     try {
       const response = await fetch(url);
 
+      const data = await response.json();
+
+      console.log(data);
+
       if (!response.ok) {
         throw new Error(`Erro ao buscar dados de ${source}`);
       }
-
-      const data = await response.json();
 
       const {
         issues_count = 0,
@@ -204,10 +206,9 @@ export default function Home() {
 
       if (selectedSource === "jira") {
         const projects = data.projects.map((proj: any) => proj.project);
-        setItems(projects)
+        setItems(projects);
         return;
       }
-
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
     }
@@ -221,66 +222,9 @@ export default function Home() {
   }, [selectedSource]);
 
   return (
-    // <Box sx={{ ...row }}>
-    //   <Box sx={{ ...column, ...red }}>
-    //     <Box sx={{ ...row }}>
-    //       select
-    //       <Box>
-    //         <FormControl sx={{ m: 1, minWidth: 120 }}>
-    //           <InputLabel id="source-select-label">Source</InputLabel>
-    //           <Select
-    //             labelId="source-select-label"
-    //             id="source-select"
-    //             value={selectedSource}
-    //             onChange={handleChange}
-    //             autoWidth
-    //             label="Source"
-    //           >
-    //             {Object.values(sources).map((source) => (
-    //               <MenuItem key={source.value} value={source.value}>
-    //                 {source.name}
-    //               </MenuItem>
-    //             ))}
-    //           </Select>
-    //         </FormControl>
-    //       </Box>
-    //       <Box>
-    //         {" "}
-    //         <FormControl
-    //           sx={{ m: 1, minWidth: 120 }}
-    //           disabled={items.length === 0}
-    //         >
-    //           <InputLabel id="items-select-label">Items</InputLabel>
-    //           <Select
-    //             labelId="items-select-label"
-    //             id="items-select"
-    //             value={selectedItem}
-    //             onChange={(e) => setSelectedItem(e.target.value)}
-    //             autoWidth
-    //             label="Items"
-    //           >
-    //             {items.map((item) => (
-    //               <MenuItem key={item} value={item}>
-    //                 {item}
-    //               </MenuItem>
-    //             ))}
-    //           </Select>
-    //         </FormControl>{" "}
-    //       </Box>
-    //     </Box>
-    //     <Box sx={{...row}}>
-    //             <Box>{qtyRepository}</Box>
-    //             <Box>{qtyIssue}</Box>
-    //             <Box>{qtyPullrequest}</Box>
-    //             <Box>{qtyCommit}</Box>
-    //     </Box>
-    //     <Box>chart</Box>
-    //   </Box>
-    //   <Box sx={{ ...row, ...blue }}> this is a filter</Box>
-    // </Box>
-    <Box  sx={{width:"100%"}}>
+    <Box sx={{ width: "100%" }}>
       <Box sx={{ ...row }}>
-        <Box sx={{flex:1}}>
+        <Box sx={{ flex: 1 }}>
           <FormControl sx={{ m: 1, minWidth: 120 }}>
             <InputLabel id="source-select-label">Source</InputLabel>
             <Select
@@ -299,7 +243,7 @@ export default function Home() {
             </Select>
           </FormControl>
         </Box>
-        <Box sx={{flex:1}}>
+        <Box sx={{ flex: 1 }}>
           <FormControl
             sx={{ m: 1, minWidth: 120 }}
             disabled={items.length === 0}
@@ -404,11 +348,7 @@ export default function Home() {
               </Box>
             ) : (
               <Box sx={{ gap: "20px", ...row }}>
-                <InfoCard
-                  label="Issues"
-                  value={qtyIssue}
-                  isLoading={loading}
-                />
+                <InfoCard label="Issues" value={qtyIssue} isLoading={loading} />
                 <InfoCard
                   label="Comments"
                   value={qtyComment}
