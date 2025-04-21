@@ -15,8 +15,6 @@ import { useEffect, useState } from "react";
 import InfoCard from "@/components/common/InfoCard";
 
 // ---------------------------------------------------
-//  fake response - REMOVER
-// const response = null
 
 const fakeDataJira = {
   projects: ["stone", "flopo", "apiMiner"],
@@ -76,7 +74,6 @@ export default function Home() {
   const handleChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
     setSelectedSource(event.target.value as string);
-    // fetchItems(selectedSource);
   };
 
   const fetchItems = async (source: string) => {
@@ -119,18 +116,15 @@ export default function Home() {
         return;
       }
 
-      if (selectedSource === "jira") {  
-        // console.log(data)
+      if (selectedSource === "jira") {
         const projects = data.projects.map((project: string) => project);
 
         setQtyIssue(issues_count);
         // setQtyComment();
-        setQtyProject(projects_count)
+        setQtyProject(projects_count);
 
-
-
-        console.log("this is a projects")
-        console.log(projects)
+        console.log("this is a projects");
+        console.log(projects);
         setItems(projects);
         return;
       }
@@ -235,13 +229,6 @@ export default function Home() {
                     isLoading={loading}
                   />
                   <InfoCard label="Commits" value={0} isLoading={loading} />
-                  {/* Repositories: {`${qtyRepository}`} <br />
-                Issues: {`${qtyIssue}`}
-                <br />
-                Pull Requests {`${qtyPullrequest}`}
-                <br />
-                Commits {`${qtyCommit}`}
-                <br /> */}
                 </Box>
               )}
             </>
@@ -268,13 +255,6 @@ export default function Home() {
                     isLoading={loading}
                     color={"blue"}
                   />
-
-                  {/* Issues: {`${qtyIssue}`}
-                <br />
-                Comments: {`${qtyComment}`}
-                <br />
-                Sprints: {`${qtySprint}`}
-                <br /> */}
                 </Box>
               ) : (
                 <Box sx={{ gap: "20px", ...row }}>
@@ -288,10 +268,6 @@ export default function Home() {
                     value={qtyProject}
                     isLoading={loading}
                   />
-                  {/* Issues: {`${qtyIssue}`}
-                <br />
-                Comments: {`${qtyComment}`}
-                <br /> */}
                 </Box>
               )}
             </>
@@ -302,10 +278,8 @@ export default function Home() {
       </Box>
 
       <Box sx={{ bgcolor: "yellow", width: "40vw" }}>
-        
         {/*  Colocar o filtro aqui*/}
-        
-        </Box>
+      </Box>
     </Box>
   );
 }
