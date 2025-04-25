@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import styles from "./page.module.css";
+
 // MUI
 import {
   Box,
@@ -13,12 +14,6 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import InfoCard from "@/components/common/InfoCard";
-
-// ---------------------------------------------------
-
-const fakeDataJira = {
-  projects: ["stone", "flopo", "apiMiner"],
-};
 
 // ---------------------------------------------------
 
@@ -54,8 +49,11 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const [selectedSource, setSelectedSource] = useState("github");
-  const [items, setItems] = useState<string[]>([]);
-  const [selectedItem, setSelectedItem] = useState("");
+  // const [items, setItems] = useState<string[]>([]);
+  // const [items, setItems] = useState<{ id: number; repository: string }[] | string[]>([]);
+  const [items, setItems] = useState<any[]>([]);
+
+  const [selectedItem, setSelectedItem] = useState(""); // usado no select
 
   const [repository, setRepository] = useState("");
   const [project, setProject] = useState("");
@@ -67,7 +65,7 @@ export default function Home() {
   const [qtyCommit, setQtyCommit] = useState<number | null>(0);
   const [qtyComment, setQtyComment] = useState<number | null>(0);
   const [qtyFork, setQtyFork] = useState<number | null>(0);
-  const [qtyStar, setStar] = useState<number | null>(0);
+  const [qtyStar, setQtyStar] = useState<number | null>(0);
 
   const [qtySprint, setQtySprints] = useState<number | null>(0);
 
@@ -76,7 +74,7 @@ export default function Home() {
     setSelectedSource(event.target.value as string);
   };
 
-  const fetchItems = async (source: string) => {
+  const fetchSource = async (source: string) => {
     setLoading(false);
     const url = apiUrl + sources[source].fetchUrl;
 
@@ -100,9 +98,8 @@ export default function Home() {
       } = data;
 
       if (selectedSource === "github") {
-        const repositories = data.repositories.map(
-          (repo: any) => repo.repository
-        );
+        const repositories = data.repositories.map((repo: any) => repo);
+        console.log(repositories);
 
         setQtyIssue(issues_count);
         setQtyPullrequest(pull_requests_count);
@@ -133,12 +130,62 @@ export default function Home() {
     }
   };
 
+  const fetchItem = async (value: any) => {
+    let path = "";
+
+    if (selectedSource == "github") {
+      path = "/api/github/dashboard?repository_id=" + value;
+    } else if (selectedSource == "jira") {
+      path = "/api/jira/dashboard?project_name=" + value;
+    } else {
+      return;
+    }
+
+    try {
+      const response = await fetch(apiUrl + path);
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar dados: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Dados recebidos:", data);
+
+      const {
+        repositories_count = 0,
+        projects_count = 0,
+        issues_count = 0,
+        pull_requests_count = 0,
+        commits_count = 0,
+        comments_count = 0,
+        forks_count = 0,
+        stars_count = 0,
+        sprints_count = 0,
+      } = data;
+
+      setQtyRepository(repositories_count);
+      setQtyProject(projects_count);
+      setQtyIssue(issues_count);
+      setQtyPullrequest(pull_requests_count);
+      setQtyCommit(commits_count);
+      setQtyComment(comments_count);
+      setQtyFork(forks_count);
+      setQtyStar(stars_count);
+      // time mined here
+      setQtySprints(sprints_count);
+
+      return;
+    } catch (error) {
+      console.error("Erro ao buscar items:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     setSelectedItem("");
     setRepository("");
     setProject("");
-    fetchItems(selectedSource);
+    fetchSource(selectedSource);
   }, [selectedSource]);
+
 
   return (
     <Box sx={{ width: "100%", ...row }}>
@@ -175,21 +222,24 @@ export default function Home() {
                 value={selectedItem}
                 onChange={(e) => {
                   const value = e.target.value;
+                  // window.alert(value);
                   setSelectedItem(value);
-                  if (selectedSource === "github") {
-                    setRepository(value);
-                  } else if (selectedSource === "jira") {
-                    setProject(value);
-                  }
+                  fetchItem(value);
                 }}
                 autoWidth
                 label="Items"
               >
-                {items.map((item) => (
-                  <MenuItem key={item} value={item}>
-                    {item}
-                  </MenuItem>
-                ))}
+                {items.map((item) =>
+                  selectedSource === "github" ? (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.repository}
+                    </MenuItem>
+                  ) : (
+                    <MenuItem key={item} value={item}>
+                      {item}
+                    </MenuItem>
+                  )
+                )}
               </Select>
             </FormControl>
             <button> view api docs</button>
@@ -200,17 +250,25 @@ export default function Home() {
             <>
               "github"
               {selectedItem ? (
-                <>
-                  {" "}
-                  Issues: {`${qtyIssue}`}
-                  <br />
-                  Pull Requests {`${qtyPullrequest}`}
-                  <br />
-                  Comments: {`${qtyComment}`}
-                  <br />
-                  forks: {`${qtyFork}`} <br />
-                  Stars: {`${qtyStar}`}
-                </>
+                <Box sx={{ gap: "20px", ...row }}>
+                  <InfoCard
+                    label="Issues"
+                    value={qtyIssue}
+                    isLoading={loading}
+                  />
+                  <InfoCard
+                    label="Pull Requests"
+                    value={qtyPullrequest}
+                    isLoading={loading}
+                  />
+                  <InfoCard
+                    label="Comments"
+                    value={qtyComment}
+                    isLoading={loading}
+                  />
+                  <InfoCard label="Forks" value={qtyFork} isLoading={loading} />
+                  <InfoCard label="Stars" value={qtyStar} isLoading={loading} />
+                </Box>
               ) : (
                 <Box sx={{ gap: "20px", ...row }}>
                   <InfoCard
@@ -228,7 +286,11 @@ export default function Home() {
                     value={qtyPullrequest}
                     isLoading={loading}
                   />
-                  <InfoCard label="Commits" value={0} isLoading={loading} />
+                  <InfoCard
+                    label="Commits"
+                    value={qtyCommit}
+                    isLoading={loading}
+                  />
                 </Box>
               )}
             </>
@@ -241,19 +303,16 @@ export default function Home() {
                     label="Issues"
                     value={qtyIssue}
                     isLoading={loading}
-                    color={"blue"}
                   />
                   <InfoCard
                     label="Comments"
                     value={qtyComment}
                     isLoading={loading}
-                    color={"blue"}
                   />
                   <InfoCard
                     label="Sprints"
                     value={qtySprint}
                     isLoading={loading}
-                    color={"blue"}
                   />
                 </Box>
               ) : (
