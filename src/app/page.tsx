@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import InfoCard from "@/components/common/InfoCard";
+import Filter from "@/components/common/Filter";
 
 // ---------------------------------------------------
 
@@ -45,6 +46,10 @@ const sources = {
 
 export default function Home() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+const [startDate, setStartDate] = useState<string>(""); // ou data inicial padrão
+const [endDate, setEndDate] = useState<string>("");     // ou data final padrão
+
 
   const [loading, setLoading] = useState(true);
 
@@ -185,7 +190,6 @@ export default function Home() {
     setProject("");
     fetchSource(selectedSource);
   }, [selectedSource]);
-
 
   return (
     <Box sx={{ width: "100%", ...row }}>
@@ -338,6 +342,14 @@ export default function Home() {
 
       <Box sx={{ bgcolor: "yellow", width: "40vw" }}>
         {/*  Colocar o filtro aqui*/}
+        <Filter
+          source={"c"}
+          item={"c"}
+          startDate={startDate}
+          endDate={endDate}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+        />
       </Box>
     </Box>
   );
