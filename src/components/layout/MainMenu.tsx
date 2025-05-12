@@ -7,8 +7,6 @@ import { usePathname } from "next/navigation";
 
 import {
   Box,
-  Toolbar,
-  Typography,
   List,
   Drawer,
   ListItemButton,
@@ -24,6 +22,7 @@ const pages = [
 ];
 
 const MainMenu = () => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const pathname = usePathname();
 
   return (
@@ -56,13 +55,17 @@ const MainMenu = () => {
             height={70}
             style={{ 
               objectFit: "contain", 
+              marginTop: 15
                
             }}
           />
           
         </Box>
         <Box sx={{ overflow: "auto", flexGrow : 1}}>
-          <List>
+          <List
+          sx={{
+            marginTop: 10
+          }}>
             {pages.map(({ name, path }) => {
                 const isActive = pathname === path;
 
@@ -73,7 +76,8 @@ const MainMenu = () => {
                       component="a"
                       sx={{
                         borderRadius: 2,
-                        margin: 1.5,
+                        marginLeft: 1.5,
+                        marginRight: 1.5,
                         display: "block",
                         "&:hover": {
                           backgroundColor: "action.hover",
@@ -97,6 +101,8 @@ const MainMenu = () => {
           </List>
         </Box>
         <Box 
+        component="a"
+        href={apiUrl}
         sx={{
           border: "3px solid #1C4886",
           fontSize: 20,
@@ -108,7 +114,7 @@ const MainMenu = () => {
           paddingTop: "10px",
           paddingBottom: "10px", 
           marginBottom: 5,
-          
+          textDecoration: "none"
         }}>
           View API Docs
         </Box>
