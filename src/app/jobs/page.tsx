@@ -18,7 +18,7 @@ const Jobs = () => {
 
   const stopJob = async (taskId : string) =>{
     try{
-      const response = await fetch(`http://localhost:8000/api/jobs/tasks/${taskId}`, {
+      const response = await fetch(`${apiUrl}/api/jobs/tasks/${taskId}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -34,7 +34,7 @@ const Jobs = () => {
 
   const fetchJobs = async () => {
     try{
-      const response = await fetch("http://localhost:8000/api/jobs/");
+      const response = await fetch(`${apiUrl}/api/jobs/`);
       const data = await response.json();
       setJobs(data.results);
     }
