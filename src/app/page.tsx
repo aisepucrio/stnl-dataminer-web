@@ -5,6 +5,7 @@ import styles from "./page.module.css";
 // MUI
 import {
   Box,
+  Container,
   FormControl,
   InputLabel,
   MenuItem,
@@ -47,9 +48,8 @@ const sources = {
 export default function Home() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const [startDate, setStartDate] = useState<string>(""); // ou data inicial padrão
-const [endDate, setEndDate] = useState<string>("");     // ou data final padrão
-
+  const [startDate, setStartDate] = useState<string>(""); // ou data inicial padrão
+  const [endDate, setEndDate] = useState<string>(""); // ou data final padrão
 
   const [loading, setLoading] = useState(true);
 
@@ -192,165 +192,211 @@ const [endDate, setEndDate] = useState<string>("");     // ou data final padrão
   }, [selectedSource]);
 
   return (
-    <Box sx={{ width: "100%", ...row }}>
-      <Box>
-        <Box sx={{ ...row, bgcolor: "orange", width: "60vw" }}>
-          <Box sx={{ flex: 1 }}>
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <InputLabel id="source-select-label">Source</InputLabel>
-              <Select
-                labelId="source-select-label"
-                id="source-select"
-                value={selectedSource}
-                onChange={handleChange}
-                autoWidth
-                label="Source"
+    <Box
+      sx={{
+        ...row,
+        width: "100%",
+        height: "100vh",
+        bgcolor: "gray",
+        boxSizing: "border-box",
+        alignContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Container
+        disableGutters
+        sx={{
+          border: 1,
+          borderColor: "blue",
+          display: "flex",
+          justifyContent: "space-between",
+          height: "93vh",
+        }}
+      >
+        <Box
+          sx={{
+            width: "72%",
+            justifyContent: "center",
+            height: "100%",
+            bgcolor: "yellowgreen",
+            gap: "20px",
+          }}
+        >
+          <Box sx={{ ...row, bgcolor: "orange", width: "55vw" }}>
+            <Box sx={{ flex: 1 }}>
+              <FormControl sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="source-select-label">Source</InputLabel>
+                <Select
+                  labelId="source-select-label"
+                  id="source-select"
+                  value={selectedSource}
+                  onChange={handleChange}
+                  autoWidth
+                  label="Source"
+                >
+                  {Object.values(sources).map((source) => (
+                    <MenuItem key={source.value} value={source.value}>
+                      {source.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Box sx={{ flex: 1, bgcolor: "green" }}>
+              <FormControl
+                sx={{ m: 1, minWidth: 120 }}
+                disabled={items.length === 0}
               >
-                {Object.values(sources).map((source) => (
-                  <MenuItem key={source.value} value={source.value}>
-                    {source.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                <InputLabel id="items-select-label">Items</InputLabel>
+                <Select
+                  labelId="items-select-label"
+                  id="items-select"
+                  value={selectedItem}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // window.alert(value);
+                    setSelectedItem(value);
+                    fetchItem(value);
+                  }}
+                  autoWidth
+                  label="Items"
+                >
+                  {items.map((item) =>
+                    selectedSource === "github" ? (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.repository}
+                      </MenuItem>
+                    ) : (
+                      <MenuItem key={item} value={item}>
+                        {item}
+                      </MenuItem>
+                    )
+                  )}
+                </Select>
+              </FormControl>
+            </Box>
           </Box>
-          <Box sx={{ flex: 1 }}>
-            <FormControl
-              sx={{ m: 1, minWidth: 120 }}
-              disabled={items.length === 0}
-            >
-              <InputLabel id="items-select-label">Items</InputLabel>
-              <Select
-                labelId="items-select-label"
-                id="items-select"
-                value={selectedItem}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  // window.alert(value);
-                  setSelectedItem(value);
-                  fetchItem(value);
-                }}
-                autoWidth
-                label="Items"
-              >
-                {items.map((item) =>
-                  selectedSource === "github" ? (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.repository}
-                    </MenuItem>
-                  ) : (
-                    <MenuItem key={item} value={item}>
-                      {item}
-                    </MenuItem>
-                  )
+          <Box sx={{ bgcolor: "red" }}>
+            {selectedSource == "github" ? (
+              <>
+                "github"
+                {selectedItem ? (
+                  <Box sx={{ gap: "20px", ...row }}>
+                    <InfoCard
+                      label="Issues"
+                      value={qtyIssue}
+                      isLoading={loading}
+                    />
+                    <InfoCard
+                      label="Pull Requests"
+                      value={qtyPullrequest}
+                      isLoading={loading}
+                    />
+                    <InfoCard
+                      label="Comments"
+                      value={qtyComment}
+                      isLoading={loading}
+                    />
+                    <InfoCard
+                      label="Forks"
+                      value={qtyFork}
+                      isLoading={loading}
+                    />
+                    <InfoCard
+                      label="Stars"
+                      value={qtyStar}
+                      isLoading={loading}
+                    />
+                  </Box>
+                ) : (
+                  <Box sx={{ gap: "20px", ...row }}>
+                    <InfoCard
+                      label="Repositories"
+                      value={qtyRepository}
+                      isLoading={loading}
+                    />
+                    <InfoCard
+                      label="Issues"
+                      value={qtyIssue}
+                      isLoading={loading}
+                    />
+                    <InfoCard
+                      label="Pull Requests"
+                      value={qtyPullrequest}
+                      isLoading={loading}
+                    />
+                    <InfoCard
+                      label="Commits"
+                      value={qtyCommit}
+                      isLoading={loading}
+                    />
+                  </Box>
                 )}
-              </Select>
-            </FormControl>
-            <button> view api docs</button>
+              </>
+            ) : selectedSource == "jira" ? (
+              <>
+                "jira"
+                {selectedItem ? (
+                  <Box sx={{ gap: "20px", ...row }}>
+                    <InfoCard
+                      label="Issues"
+                      value={qtyIssue}
+                      isLoading={loading}
+                    />
+                    <InfoCard
+                      label="Comments"
+                      value={qtyComment}
+                      isLoading={loading}
+                    />
+                    <InfoCard
+                      label="Sprints"
+                      value={qtySprint}
+                      isLoading={loading}
+                    />
+                  </Box>
+                ) : (
+                  <Box sx={{ gap: "20px", ...row }}>
+                    <InfoCard
+                      label="Issues"
+                      value={qtyIssue}
+                      isLoading={loading}
+                    />
+                    <InfoCard
+                      label="Projects"
+                      value={qtyProject}
+                      isLoading={loading}
+                    />
+                  </Box>
+                )}
+              </>
+            ) : (
+              <>"error"</>
+            )}
           </Box>
+          {/* nivo line */}
+          <Box sx={{ bgcolor: "white" }}>sdf</Box>
         </Box>
-        <Box sx={{ bgcolor: "red" }}>
-          {selectedSource == "github" ? (
-            <>
-              "github"
-              {selectedItem ? (
-                <Box sx={{ gap: "20px", ...row }}>
-                  <InfoCard
-                    label="Issues"
-                    value={qtyIssue}
-                    isLoading={loading}
-                  />
-                  <InfoCard
-                    label="Pull Requests"
-                    value={qtyPullrequest}
-                    isLoading={loading}
-                  />
-                  <InfoCard
-                    label="Comments"
-                    value={qtyComment}
-                    isLoading={loading}
-                  />
-                  <InfoCard label="Forks" value={qtyFork} isLoading={loading} />
-                  <InfoCard label="Stars" value={qtyStar} isLoading={loading} />
-                </Box>
-              ) : (
-                <Box sx={{ gap: "20px", ...row }}>
-                  <InfoCard
-                    label="Repositories"
-                    value={qtyRepository}
-                    isLoading={loading}
-                  />
-                  <InfoCard
-                    label="Issues"
-                    value={qtyIssue}
-                    isLoading={loading}
-                  />
-                  <InfoCard
-                    label="Pull Requests"
-                    value={qtyPullrequest}
-                    isLoading={loading}
-                  />
-                  <InfoCard
-                    label="Commits"
-                    value={qtyCommit}
-                    isLoading={loading}
-                  />
-                </Box>
-              )}
-            </>
-          ) : selectedSource == "jira" ? (
-            <>
-              "jira"
-              {selectedItem ? (
-                <Box sx={{ gap: "20px", ...row }}>
-                  <InfoCard
-                    label="Issues"
-                    value={qtyIssue}
-                    isLoading={loading}
-                  />
-                  <InfoCard
-                    label="Comments"
-                    value={qtyComment}
-                    isLoading={loading}
-                  />
-                  <InfoCard
-                    label="Sprints"
-                    value={qtySprint}
-                    isLoading={loading}
-                  />
-                </Box>
-              ) : (
-                <Box sx={{ gap: "20px", ...row }}>
-                  <InfoCard
-                    label="Issues"
-                    value={qtyIssue}
-                    isLoading={loading}
-                  />
-                  <InfoCard
-                    label="Projects"
-                    value={qtyProject}
-                    isLoading={loading}
-                  />
-                </Box>
-              )}
-            </>
-          ) : (
-            <>"error"</>
-          )}
-        </Box>
-      </Box>
 
-      <Box sx={{ bgcolor: "yellow", width: "40vw" }}>
-        {/*  Colocar o filtro aqui*/}
-        <Filter
-          source={"c"}
-          item={"c"}
-          startDate={startDate}
-          endDate={endDate}
-          setStartDate={setStartDate}
-          setEndDate={setEndDate}
-        />
-      </Box>
+        <Box
+          sx={{
+            bgcolor: "purple",
+            display: "flex",
+            justifyContent: "center", // Centraliza horizontalmente
+            alignItems: "center", // Mantém o alinhamento no topo (não altera a vertical)
+            boxSizing: "border-box",
+          }}
+        >
+          {/*  Colocar o filtro aqui*/}
+          <Filter
+            source={selectedSource}
+            item={selectedItem}
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
+          />
+        </Box>
+      </Container>
     </Box>
   );
 }

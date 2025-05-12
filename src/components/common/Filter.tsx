@@ -1,4 +1,4 @@
-import { BorderColor, Height } from "@mui/icons-material";
+import { BorderColor } from "@mui/icons-material";
 import {
   Box,
   MenuItem,
@@ -18,15 +18,24 @@ interface FilterProps {
   setEndDate: (value: string) => void;
 }
 
+const filter = {
+  bgcolor: "white",
+  width: "20vw",
+  height: "100%",
+  boxSizing: "border-box",
+  borderRadius: "10px",
+  px: "27px",
+  pt: "20px",
+};
+
 const color = "#1C4886";
 
 const title = { color, fontSize: "32px" };
 
 const label = { color, fontSize: "24px" };
 
-const date = {
-  //   border: "none",
-  //   bgcolor: "green",
+const input = {
+  width: "90%",
   BorderColor: color,
   border: "none", // remove completamente a borda
   borderRadius: 0,
@@ -37,7 +46,7 @@ const date = {
 
 const button = {
   bgcolor: "#1c4886",
-  width: "218px",
+  minWidth: "218px",
   height: "76px",
   fontWeight: 700,
   color: "white",
@@ -51,35 +60,62 @@ const Filter = ({
   setStartDate,
   setEndDate,
 }: FilterProps) => {
-  //   const [startDate, setStartDate] = useState(item);
-  //   const [endDate, setEndDate] = useState(source);
+  const [startHash, setStartHash] = useState<string>("");
+  const [endHash, setEndHash] = useState<string>("");
 
   return (
-    <Box>
-      <Box>
+    <Box sx={filter}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         <Typography sx={title}>Filters</Typography>
 
         <Typography sx={label}>Start</Typography>
 
         <TextField
           type="date"
-          sx={date}
+          sx={input}
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
-          // InputLabelProps={{ shrink: true }}
         />
 
+        {/* A customização é aqui */}
+        {/* {source} */}
+        {source === "github" && item && (
+          // <Typography>tem item de github</Typography>
+          <TextField
+            sx={input}
+            type="text"
+            onChange={(e) => setStartHash(e.target.value)}
+            placeholder="Hash or tag"
+          />
+        )}
+
+        {source === "jira" && item && <Typography>tem item do jira</Typography>}
+
+        {/* ------------------------------------ */}
         <Typography sx={label}>Finish</Typography>
 
         <TextField
-          sx={date}
+          sx={input}
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
           // InputLabelProps={{ shrink: true }}
         />
-      </Box>
 
+        {source === "github" && item && (
+          // <Typography>tem item de github</Typography>
+          <TextField
+            sx={input}
+            type="text"
+            onChange={(e) => setEndHash(e.target.value)}
+            placeholder="Hash or tag"
+          />
+        )}
+
+        {source === "jira" && item && <Typography>tem item do jira</Typography>}
+      </Box>
+      <br />
+      <br />
       <Box>
         <Button sx={button}>Apply filters</Button>
       </Box>
