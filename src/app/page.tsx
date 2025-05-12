@@ -216,13 +216,13 @@ export default function Home() {
         <Box
           sx={{
             width: "72%",
-            justifyContent: "center",
+            justifyContent: "space-between",
             height: "100%",
             bgcolor: "yellowgreen",
             gap: "20px",
           }}
         >
-          <Box sx={{ ...row, bgcolor: "orange", width: "55vw" }}>
+          <Box sx={{ ...row, bgcolor: "orange" }}>
             <Box sx={{ flex: 1 }}>
               <FormControl sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel id="source-select-label">Source</InputLabel>
@@ -233,6 +233,11 @@ export default function Home() {
                   onChange={handleChange}
                   autoWidth
                   label="Source"
+                  sx={{
+                    width: "330px",
+                    height: "50px",
+                    boxSizing: "border-box",
+                  }}
                 >
                   {Object.values(sources).map((source) => (
                     <MenuItem key={source.value} value={source.value}>
@@ -260,6 +265,11 @@ export default function Home() {
                   }}
                   autoWidth
                   label="Items"
+                  sx={{
+                    width: "330px",
+                    height: "50px",
+                    boxSizing: "border-box",
+                  }}
                 >
                   {items.map((item) =>
                     selectedSource === "github" ? (
@@ -374,7 +384,9 @@ export default function Home() {
             )}
           </Box>
           {/* nivo line */}
-          <Box sx={{ bgcolor: "white" }}>sdf</Box>
+          <Box flexGrow={1} sx={{ bgcolor: "white" }}>
+            sdf
+          </Box>
         </Box>
 
         <Box
