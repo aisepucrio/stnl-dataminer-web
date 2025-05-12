@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import styles from "./page.module.css";
+import ChartLine from "@/components/common/ChartLine";
 
 // MUI
 import {
@@ -384,8 +385,8 @@ export default function Home() {
             )}
           </Box>
           {/* nivo line */}
-          <Box flexGrow={1} sx={{ bgcolor: "white" }}>
-            sdf
+          <Box flexGrow={1}  sx={{ bgcolor: "white"}}>
+            <ChartLine/>
           </Box>
         </Box>
 
