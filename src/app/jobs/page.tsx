@@ -13,10 +13,11 @@ type Job = {
 };
 
 const Jobs = () => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [jobs, setJobs] = useState<Job[]>([]);
 
   const handleStopJob = (taskId : string) =>{
-    fetch(`http://localhost:8000/api/jobs/tasks/${taskId}/`, {
+    fetch(`${apiUrl}/api/jobs/tasks/${taskId}/`, {
       method: "DELETE",
     })
     .then((res =>{
@@ -35,7 +36,7 @@ const Jobs = () => {
   }
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/jobs/")
+    fetch(`${apiUrl}/api/jobs/`)
       .then((res) => res.json())
       .then((data) =>{
         console.log("Resposta da API", data);
