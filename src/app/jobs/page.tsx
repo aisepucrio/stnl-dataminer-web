@@ -16,39 +16,39 @@ const Jobs = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [jobs, setJobs] = useState<Job[]>([]);
 
-  const handleStopJob = (taskId : string) =>{
-    fetch(`${apiUrl}/api/jobs/tasks/${taskId}/`, {
-      method: "DELETE",
-    })
-    .then((res =>{
-      if(!res.ok) throw new Error("Erro ao parar o processo");
-      return res.json();
-    }))
-    //.then(() => {
-      // Atualiza a lista depois de parar
-      //setJobs((prev) =>
-        //prev.map((job) =>
-          //job.task_id === taskId ? { ...job, status: "stopped" } : job
-        //)
-      //);
-    //})
-    .catch((err) => console.error(err));
+  const stopJob = async (taskId : string) =>{
+    try{
+      const response = await fetch(`http://localhost:8000/api/jobs/tasks/${taskId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        await fetchJobs(); // Atualiza após parar
+      } else {
+        console.error("Erro ao parar job:", await response.text());
+      }
+    }
+    catch(error){
+      console.error("Erro ao parar a task");
+    }
   }
 
+  const fetchJobs = async () => {
+    try{
+      const response = await fetch("http://localhost:8000/api/jobs/");
+      const data = await response.json();
+      setJobs(data.results);
+    }
+    catch (error){
+      console.error("Erro ao buscar tasks: ", error);
+    }
+}
+
   useEffect(() => {
-    fetch(`${apiUrl}/api/jobs/`)
-      .then((res) => res.json())
-      .then((data) =>{
-        console.log("Resposta da API", data);
-        if (Array.isArray(data.results)) {
-            setJobs(data.results); 
-        }
-        else {
-            console.error("Formato inesperado de resposta:", data);
-        }
-      })
-      .catch(console.error);
-  }, []);
+    fetchJobs();
+    const interval = setInterval(() =>{
+      fetchJobs();
+    }, 10000);
+  })
 
   const headerCellStyle = {
     color: "#1C4886",
@@ -98,11 +98,11 @@ const Jobs = () => {
                 <TableCell>{job.status}</TableCell>
                 <TableCell>{job.operation}</TableCell>
                 <TableCell>
-                  {job.status === "PENDING" && (
+                  {job.status === "STARTED" && (
                   <Button
                   variant="contained"
                   color="inherit"
-                  onClick={() => handleStopJob(job.task_id)}
+                  onClick={() => stopJob(job.task_id)}
                   >
                   Parar
                   </Button>

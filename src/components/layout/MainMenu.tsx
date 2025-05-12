@@ -33,31 +33,35 @@ const MainMenu = () => {
         variant="permanent"
         anchor="left"
         sx={{
+          
           width: 240,
           flexShrink: 0,
-          padding: 10,
           "& .MuiDrawer-paper": {
             width: 240,
             boxSizing: "border-box",
             backgroundColor: "#ffffff",
-
+            display: "flex", 
+            justifyContent: "space-between", 
+            flexDirection: "column"
           },
         }}
         >
-        <Toolbar />
         <Box
-          sx={{ display: "flex", justifyContent: "center", mb: 2 }}
+          sx={{ display: "flex", justifyContent: "center" }}
           >
           <Image
             src="/images/logo.png"
             alt="Logo"
-            width={150}
-            height={60}
-            style={{ objectFit: "contain" }}
+            width={170}
+            height={70}
+            style={{ 
+              objectFit: "contain", 
+               
+            }}
           />
           
         </Box>
-        <Box sx={{ overflow: "auto" }}>
+        <Box sx={{ overflow: "auto", flexGrow : 1}}>
           <List>
             {pages.map(({ name, path }) => {
                 const isActive = pathname === path;
@@ -71,7 +75,6 @@ const MainMenu = () => {
                         borderRadius: 2,
                         margin: 1.5,
                         display: "block",
-                        backgroundColor: isActive ? "#1C488638" : "transparent",
                         "&:hover": {
                           backgroundColor: "action.hover",
                         },
@@ -81,7 +84,7 @@ const MainMenu = () => {
                       primary={name} 
                       primaryTypographyProps={{
                         fontWeight: 700,
-                        fontSize: 17,
+                        fontSize: 28,
                         color: isActive ? "#1C4886" : "#BCBDBC",
                       }}
                       />
@@ -92,6 +95,22 @@ const MainMenu = () => {
             })}
 
           </List>
+        </Box>
+        <Box 
+        sx={{
+          border: "3px solid #1C4886",
+          fontSize: 20,
+          fontWeight: 600,
+          color: "#1C4886",
+          borderRadius: 2,
+          margin: 1.5,
+          textAlign: "center", 
+          paddingTop: "10px",
+          paddingBottom: "10px", 
+          marginBottom: 5,
+          
+        }}>
+          View API Docs
         </Box>
       </Drawer>
     </Box>
