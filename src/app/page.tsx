@@ -46,6 +46,17 @@ const sources = {
   // },
 };
 
+const chartData = [
+  {
+    id: "Série A",
+    data: [
+      { x: "Jan", y: 10 },
+      { x: "Fev", y: 20 },
+      { x: "Mar", y: 15 },
+    ],
+  },
+];
+
 export default function Home() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -252,6 +263,7 @@ export default function Home() {
                     height: "50px",
                     boxSizing: "border-box",
                     bgcolor: "white",
+                    color: "#1C4886",
                   }}
                 >
                   {Object.values(sources).map((source) => (
@@ -272,7 +284,9 @@ export default function Home() {
                 sx={{ m: 1, minWidth: 120 }}
                 disabled={items.length === 0}
               >
-                <InputLabel id="items-select-label">Items</InputLabel>
+                <InputLabel id="items-select-label" sx={{ color: "#1C4886" }}>
+                  Items
+                </InputLabel>
                 <Select
                   labelId="items-select-label"
                   id="items-select"
@@ -290,11 +304,17 @@ export default function Home() {
                     height: "50px",
                     boxSizing: "border-box",
                     bgcolor: "white",
+                    color: "#1C4886",
+                    // fontSize: "26px"
                   }}
                 >
                   {items.map((item) =>
                     selectedSource === "github" ? (
-                      <MenuItem key={item.id} value={item.id}>
+                      <MenuItem
+                        key={item.id}
+                        value={item.id}
+                        // sx={{ color: "#1C4886" }}
+                      >
                         {item.repository}
                       </MenuItem>
                     ) : (
@@ -410,7 +430,8 @@ export default function Home() {
           </Box>
           {/* nivo line */}
           <Box flexGrow={1} sx={{ bgcolor: "white", borderRadius: "5px" }}>
-            <ChartLine />
+            {/* <ChartLine /> */}
+            <ChartLine data={chartData} />
           </Box>
         </Box>
 
