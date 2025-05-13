@@ -52,6 +52,12 @@ export default function Home() {
   const [startDate, setStartDate] = useState<string>(""); // ou data inicial padrão
   const [endDate, setEndDate] = useState<string>(""); // ou data final padrão
 
+  const [startHash, setStartHash] = useState<string>("");
+  const [endHash, setEndHash] = useState<string>("");
+
+  const [startSprint, setStartSprint] = useState<string>("");
+  const [endSprint, setEndSprint] = useState<string>("");
+
   const [loading, setLoading] = useState(true);
 
   const [selectedSource, setSelectedSource] = useState("github");
@@ -198,7 +204,7 @@ export default function Home() {
         ...row,
         width: "100%",
         height: "100vh",
-        bgcolor: "gray",
+        // bgcolor: "gray",
         boxSizing: "border-box",
         alignContent: "center",
         alignItems: "center",
@@ -207,8 +213,8 @@ export default function Home() {
       <Container
         disableGutters
         sx={{
-          border: 1,
-          borderColor: "blue",
+          // border: 1,
+          // borderColor: "blue",
           display: "flex",
           justifyContent: "space-between",
           height: "93vh",
@@ -217,13 +223,20 @@ export default function Home() {
         <Box
           sx={{
             width: "72%",
+            display: "flex",
+            flexDirection: "column",
             justifyContent: "space-between",
             height: "100%",
-            bgcolor: "yellowgreen",
+            // bgcolor: "yellowgreen",
             gap: "20px",
           }}
         >
-          <Box sx={{ ...row, bgcolor: "orange" }}>
+          <Box
+            sx={{
+              ...row,
+              // bgcolor: "orange"
+            }}
+          >
             <Box sx={{ flex: 1 }}>
               <FormControl sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel id="source-select-label">Source</InputLabel>
@@ -238,6 +251,7 @@ export default function Home() {
                     width: "330px",
                     height: "50px",
                     boxSizing: "border-box",
+                    bgcolor: "white",
                   }}
                 >
                   {Object.values(sources).map((source) => (
@@ -248,7 +262,12 @@ export default function Home() {
                 </Select>
               </FormControl>
             </Box>
-            <Box sx={{ flex: 1, bgcolor: "green" }}>
+            <Box
+              sx={{
+                flex: 1,
+                // bgcolor: "green"
+              }}
+            >
               <FormControl
                 sx={{ m: 1, minWidth: 120 }}
                 disabled={items.length === 0}
@@ -270,6 +289,7 @@ export default function Home() {
                     width: "330px",
                     height: "50px",
                     boxSizing: "border-box",
+                    bgcolor: "white",
                   }}
                 >
                   {items.map((item) =>
@@ -287,10 +307,15 @@ export default function Home() {
               </FormControl>
             </Box>
           </Box>
-          <Box sx={{ bgcolor: "red" }}>
+          <Box
+            sx={
+              {
+                //  bgcolor: "red"
+              }
+            }
+          >
             {selectedSource == "github" ? (
               <>
-                "github"
                 {selectedItem ? (
                   <Box sx={{ gap: "20px", ...row }}>
                     <InfoCard
@@ -385,14 +410,13 @@ export default function Home() {
             )}
           </Box>
           {/* nivo line */}
-          <Box flexGrow={1}  sx={{ bgcolor: "white"}}>
-            <ChartLine/>
+          <Box flexGrow={1} sx={{ bgcolor: "white", borderRadius: "5px" }}>
+            <ChartLine />
           </Box>
         </Box>
 
         <Box
           sx={{
-            bgcolor: "purple",
             display: "flex",
             justifyContent: "center", // Centraliza horizontalmente
             alignItems: "center", // Mantém o alinhamento no topo (não altera a vertical)
@@ -407,6 +431,14 @@ export default function Home() {
             endDate={endDate}
             setStartDate={setStartDate}
             setEndDate={setEndDate}
+            startHash={startHash}
+            setStartHash={setStartHash}
+            endHash={endHash}
+            setEndHash={setEndHash}
+            startSprint={startSprint}
+            setStartSprint={setStartSprint}
+            endSprint={endSprint}
+            setEndSprint={setEndSprint}
           />
         </Box>
       </Container>

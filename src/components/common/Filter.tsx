@@ -1,4 +1,3 @@
-import { BorderColor } from "@mui/icons-material";
 import {
   Box,
   MenuItem,
@@ -13,9 +12,21 @@ interface FilterProps {
   source: string;
   item: string;
   startDate: string;
-  endDate: string;
   setStartDate: (value: string) => void;
+  endDate: string;
   setEndDate: (value: string) => void;
+
+  startHash: string;
+  setStartHash: (value: string) => void;
+
+  endHash: string;
+  setEndHash: (value: string) => void;
+
+  startSprint: string;
+  setStartSprint: (value: string) => void;
+
+  endSprint: string;
+  setEndSprint: (value: string) => void;
 }
 
 const filter = {
@@ -25,7 +36,7 @@ const filter = {
   boxSizing: "border-box",
   borderRadius: "10px",
   px: "27px",
-  pt: "20px",
+  pt: "15px",
 };
 
 const color = "#1C4886";
@@ -35,12 +46,14 @@ const title = { color, fontSize: "32px" };
 const label = { color, fontSize: "24px" };
 
 const input = {
+  height: "45px",
   width: "90%",
   BorderColor: color,
   border: "none", // remove completamente a borda
   borderRadius: 0,
   "& .MuiOutlinedInput-root": {
     borderRadius: 0, // zera o border-radius do contorno
+    height: "40px",
   },
 };
 
@@ -59,9 +72,24 @@ const Filter = ({
   endDate,
   setStartDate,
   setEndDate,
+
+  startHash,
+  setStartHash,
+
+  endHash,
+  setEndHash,
+
+  startSprint,
+  setStartSprint,
+
+  endSprint,
+  setEndSprint,
 }: FilterProps) => {
-  const [startHash, setStartHash] = useState<string>("");
-  const [endHash, setEndHash] = useState<string>("");
+  // const [startHash, setStartHash] = useState<string>("");
+  // const [endHash, setEndHash] = useState<string>("");
+
+  // const [startSprint, setStartSprint] = useState<string>("");
+  // const [endSprint, setEndSprint] = useState<string>("");
 
   return (
     <Box sx={filter}>
@@ -89,7 +117,14 @@ const Filter = ({
           />
         )}
 
-        {source === "jira" && item && <Typography>tem item do jira</Typography>}
+        {source === "jira" && item && (
+          <TextField
+            sx={input}
+            type="text"
+            onChange={(e) => setEndHash(e.target.value)}
+            placeholder="# Sprint"
+          />
+        )}
 
         {/* ------------------------------------ */}
         <Typography sx={label}>Finish</Typography>
@@ -112,7 +147,14 @@ const Filter = ({
           />
         )}
 
-        {source === "jira" && item && <Typography>tem item do jira</Typography>}
+        {source === "jira" && item && (
+          <TextField
+            sx={input}
+            type="text"
+            onChange={(e) => setEndHash(e.target.value)}
+            placeholder="# Sprint"
+          />
+        )}
       </Box>
       <br />
       <br />

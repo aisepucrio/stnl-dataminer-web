@@ -6,15 +6,20 @@ type InfoCardProps = {
   label: string;
   value: number | null;
   isLoading?: boolean;
-  color?:any
+  color?: any;
 };
 
-const InfoCard = ({ label, value, isLoading = false, color }: InfoCardProps) => {
+const InfoCard = ({
+  label,
+  value,
+  isLoading = false,
+  color,
+}: InfoCardProps) => {
   return (
     <>
       {isLoading ? (
         <>
-          <Skeleton variant="rectangular" height={"16vh"} sx={{flex:1}}/>
+          <Skeleton variant="rectangular" height={"16vh"} sx={{ flex: 1 }} />
         </>
       ) : (
         <>
@@ -27,18 +32,18 @@ const InfoCard = ({ label, value, isLoading = false, color }: InfoCardProps) => 
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              bgcolor: color? color: "white",
+              bgcolor: color ? color : "white",
               boxSizing: "border-box",
               px: "0",
               py: "50px",
-              borderRadius:"5px"
+              borderRadius: "5px",
             }}
           >
-            <Typography variant="h4" color="#1C4886">
+            <Typography variant="h5" color="#1C4886">
               {label}
             </Typography>
-
-            <Typography variant="h2"color="#1C4886">
+            <br />
+            <Typography variant="h4" color="#1C4886">
               {value}
             </Typography>
           </Box>
