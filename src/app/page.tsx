@@ -371,7 +371,6 @@ export default function Home() {
               </>
             ) : selectedSource == "jira" ? (
               <>
-                "jira"
                 {selectedItem ? (
                   <Box sx={{ gap: "20px", ...row }}>
                     <InfoCard
