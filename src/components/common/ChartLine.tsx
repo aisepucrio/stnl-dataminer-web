@@ -23,7 +23,7 @@ const ChartLine = ({ data }: any) => {
         <Typography sx={{color, fontSize: "32px",pt:"7px",px:"16px", fontWeight: 500,bgcolor:"green"}}>Charts Geral</Typography>
         <Typography>Select</Typography>
       </Box>
-      <Box  sx={{ height: 400 , bgcolor:"pink"}}>
+      <Box  sx={{ height: 400  , bgcolor:"pink", alignItems: "center", justifyContent: "center", marginLeft:"50px"}}>
         <ResponsiveLine
           data={data}
           margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
@@ -48,7 +48,6 @@ const ChartLine = ({ data }: any) => {
           enableSlices="x"
           useMesh={true}
         />
-        this si a chart line lll
       </Box>
     </>
   );
