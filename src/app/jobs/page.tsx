@@ -1,6 +1,9 @@
 "use client"
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography , Paper, Button} from "@mui/material";
 import { useEffect, useState } from "react";
+import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
+import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined';
+
 
 type Job = {
   task_id: string;
@@ -45,10 +48,7 @@ const Jobs = () => {
 
   useEffect(() => {
     fetchJobs();
-    const interval = setInterval(() =>{
-      fetchJobs();
-    }, 10000);
-  })
+  }, [])
 
   const headerCellStyle = {
     color: "#1C4886",
@@ -69,13 +69,30 @@ const Jobs = () => {
   }}>
 
     <Box p={3}>
-    <Typography variant="h4" gutterBottom
+    <Box 
     sx={{
-        color: "#1C4886",
-        fontWeight: "600"
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%"
+      
     }}>
-        Jobs
-    </Typography>
+      <Typography variant="h4" gutterBottom
+      sx={{
+          color: "#1C4886",
+          fontWeight: "600"
+      }}>
+          Jobs
+      </Typography>
+      <RefreshOutlinedIcon 
+      onClick = {() =>fetchJobs()}
+      sx={{
+        color: "#1C4886",
+        fontSize: 30
+      }} 
+      ></RefreshOutlinedIcon>
+    </Box>
+    
 
     <TableContainer component={Paper}>
         <Table>
@@ -97,15 +114,16 @@ const Jobs = () => {
                 <TableCell>{job.task_id}</TableCell>
                 <TableCell>{job.status}</TableCell>
                 <TableCell>{job.operation}</TableCell>
-                <TableCell>
+                <TableCell sx={{
+                  width: "10%"
+                }}>
                   {job.status === "STARTED" && (
-                  <Button
-                  variant="contained"
-                  color="inherit"
+                  <StopCircleOutlinedIcon 
                   onClick={() => stopJob(job.task_id)}
-                  >
-                  Parar
-                  </Button>
+                  sx={{
+                    color: "#1C4886",
+                    
+                  }}></StopCircleOutlinedIcon>
                   )}
                 </TableCell>
             </TableRow>
