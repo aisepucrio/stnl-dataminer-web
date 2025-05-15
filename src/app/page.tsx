@@ -215,20 +215,22 @@ export default function Home() {
         ...row,
         width: "100%",
         height: "100vh",
-        // bgcolor: "gray",
+        bgcolor: "gray",
         boxSizing: "border-box",
-        alignContent: "center",
-        alignItems: "center",
+        // alignContent: "center",
+        // alignItems: "center",
       }}
     >
       <Container
         disableGutters
         sx={{
-          // border: 1,
-          // borderColor: "blue",
+          border: 1,
+          borderColor: "blue",
           display: "flex",
           justifyContent: "space-between",
           height: "93vh",
+          gap: 2,
+          width: "90%"
         }}
       >
         <Box
@@ -238,14 +240,14 @@ export default function Home() {
             flexDirection: "column",
             justifyContent: "space-between",
             height: "100%",
-            // bgcolor: "yellowgreen",
+            bgcolor: "yellowgreen",
             gap: "20px",
           }}
         >
           <Box
             sx={{
               ...row,
-              // bgcolor: "orange"
+              bgcolor: "orange"
             }}
           >
             <Box sx={{ flex: 1 }}>

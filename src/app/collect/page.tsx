@@ -12,7 +12,9 @@ import {
   Checkbox,
 } from "@mui/material";
 
-const source = "github"; // ou "jira"
+let source = "github"; // ou "jira"
+
+let item = "facebook/react";
 
 const Collect = () => {
   const [open, setOpen] = useState(false);
@@ -22,7 +24,7 @@ const Collect = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
-    const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
+  const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
 
   const handleCheckboxChange = (option: string) => {
     setCheckedOptions((prev) =>
@@ -43,6 +45,53 @@ const Collect = () => {
       setInputValue("");
       setOpen(false);
     }
+  };
+
+  const handleCollect = () => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    // const payload = {}; // Substituir depois pelo objeto que você vai especificar
+    const payload = {
+      repositories: [item],
+      start_date: "2025-05-16T13:42:00.888Z",
+      end_date: "2025-05-15T13:42:00.888Z",
+      depth: "basic",
+      collect_types: ["commits"],
+    };
+
+    let endpoint = "";
+
+    switch (source) {
+      case "github":
+        endpoint = apiUrl + "/api/github/collect-all/";
+        break;
+      case "jira":
+        endpoint = apiUrl + "/api/jira/collect-all/";
+        break;
+      // Outros cases no futuro
+      default:
+        console.error("Fonte desconhecida:", source);
+        return;
+    }
+
+    fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Erro na requisição: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Sucesso:", data);
+      })
+      .catch((error) => {
+        console.error("Erro ao coletar dados:", error);
+      });
   };
 
   return (
@@ -156,7 +205,7 @@ const Collect = () => {
             />
           ))}
         </FormGroup>
-        <Button>Collect</Button>
+        <Button onClick={handleCollect}>Collect</Button>
       </Box>
     </Box>
   );
