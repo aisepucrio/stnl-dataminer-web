@@ -13,6 +13,7 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
+import SourceSwitcher from "../ui/SourceSwitcher";
 
 const pages = [
   { name: "Dashboard", path: "/" },
@@ -61,6 +62,7 @@ const MainMenu = () => {
           />
           
         </Box>
+          <SourceSwitcher/>
         <Box sx={{ overflow: "auto", flexGrow : 1}}>
           <List
           sx={{
