@@ -246,54 +246,73 @@ const Collect = () => {
       </Modal> */}
       {/* Modal */}
       <Modal open={open} onClose={() => setOpen(false)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 3,
-            borderRadius: 2,
-            width: 400,
-          }}
-        >
-          {source === "github" && (
-            <>
-              {/* Box superior: Input */}
-              <Box mb={3}>
-                <TextField
-                  fullWidth
-                  label="Repository URL"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleAdd();
-                    }
-                  }}
-                />
-              </Box>
-
-              {/* Box inferior: Botões alinhados à direita */}
-              <Box display="flex" justifyContent="flex-end" gap={1}>
-                <Button onClick={() => setOpen(false)} color="inherit">
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleAdd}
-                  variant="contained"
-                  disabled={!inputValue.trim()}
-                >
-                  Add
-                </Button>
-              </Box>
-            </>
-          )}
+  <Box
+    sx={{
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      bgcolor: "background.paper",
+      boxShadow: 24,
+      p: 4,
+      borderRadius: 2,
+      width: 300,
+    }}
+  >
+    {source === "github" ? (
+      <>
+        <Box mb={3}>
+          <TextField
+            fullWidth
+            label="Repository URL"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAdd();
+              }
+            }}
+          />
         </Box>
-      </Modal>
+        <Box display="flex" justifyContent="flex-end" gap={1}>
+          <Button variant="outlined" onClick={() => setOpen(false)}>
+            Cancelar
+          </Button>
+          <Button variant="contained" onClick={handleAdd}>
+            Add
+          </Button>
+        </Box>
+      </>
+    ) : source === "jira" ? (
+      <>
+        <Box mb={3} display="flex" flexDirection="column" gap={2}>
+          <TextField
+            fullWidth
+            label="Domain"
+            value={inputValue} // substitua por um estado específico, se necessário
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+          <TextField
+            fullWidth
+            label="Project"
+            value={inputValue} // substitua por um estado específico, se necessário
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+        </Box>
+        <Box display="flex" justifyContent="flex-end" gap={1}>
+          <Button variant="outlined" onClick={() => setOpen(false)}>
+            Cancelar
+          </Button>
+          <Button variant="contained" onClick={handleAdd}>
+            Add
+          </Button>
+        </Box>
+      </>
+    ) : null}
+  </Box>
+</Modal>
+
 
       {/* Essa é a box B */}
       <Box
