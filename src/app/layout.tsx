@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import MainMenu from "@/components/layout/MainMenu";
-import { Styledroot } from "./Styledroot";
 import { Box } from "@mui/material";
+import { Providers } from "./Providers";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -11,16 +11,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body>
-        <Box sx={{ display: "flex", flexDirection: "row" }}>
-          <MainMenu />
-          <Styledroot> {children}</Styledroot>
-        </Box>
+        <Providers>
+          <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <MainMenu />
+            {children}
+          </Box>
+        </Providers>
       </body>
     </html>
   );
