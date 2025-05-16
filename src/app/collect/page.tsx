@@ -83,8 +83,7 @@ const Collect = () => {
     console.log("payload é :");
     console.log(payload);
 
-
-    return ;
+    // return ;
     let endpoint = "";
 
     switch (source) {
