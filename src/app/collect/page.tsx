@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -54,16 +54,27 @@ const Collect = () => {
     }
   };
 
+
+  const formatDate = (dateStr: string): string => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    date.setHours(13, 42, 0, 888);
+    return date.toISOString();
+  };
+
   const handleCollect = () => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     // const payload = {}; // Substituir depois pelo objeto que você vai especificar
-    const payload = {
+    const payload: any = {
       repositories: [item],
-      start_date: "2025-05-16T13:42:00.888Z",
-      end_date: "2025-05-15T13:42:00.888Z",
       depth: "basic",
       collect_types: ["commits"],
+      ...(startDate && { start_date: formatDate(startDate) }),
+      ...(endDate && { end_date: formatDate(endDate) }),
     };
+
+    console.log("payload é :")
+    console.log(payload)
 
     let endpoint = "";
 
@@ -246,73 +257,72 @@ const Collect = () => {
       </Modal> */}
       {/* Modal */}
       <Modal open={open} onClose={() => setOpen(false)}>
-  <Box
-    sx={{
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      bgcolor: "background.paper",
-      boxShadow: 24,
-      p: 4,
-      borderRadius: 2,
-      width: 300,
-    }}
-  >
-    {source === "github" ? (
-      <>
-        <Box mb={3}>
-          <TextField
-            fullWidth
-            label="Repository URL"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAdd();
-              }
-            }}
-          />
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+            width: 300,
+          }}
+        >
+          {source === "github" ? (
+            <>
+              <Box mb={3}>
+                <TextField
+                  fullWidth
+                  label="Repository URL"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAdd();
+                    }
+                  }}
+                />
+              </Box>
+              <Box display="flex" justifyContent="flex-end" gap={1}>
+                <Button variant="outlined" onClick={() => setOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button variant="contained" onClick={handleAdd}>
+                  Add
+                </Button>
+              </Box>
+            </>
+          ) : source === "jira" ? (
+            <>
+              <Box mb={3} display="flex" flexDirection="column" gap={2}>
+                <TextField
+                  fullWidth
+                  label="Domain"
+                  value={inputValue} // substitua por um estado específico, se necessário
+                  onChange={(e) => setInputValue(e.target.value)}
+                />
+                <TextField
+                  fullWidth
+                  label="Project"
+                  value={inputValue} // substitua por um estado específico, se necessário
+                  onChange={(e) => setInputValue(e.target.value)}
+                />
+              </Box>
+              <Box display="flex" justifyContent="flex-end" gap={1}>
+                <Button variant="outlined" onClick={() => setOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button variant="contained" onClick={handleAdd}>
+                  Add
+                </Button>
+              </Box>
+            </>
+          ) : null}
         </Box>
-        <Box display="flex" justifyContent="flex-end" gap={1}>
-          <Button variant="outlined" onClick={() => setOpen(false)}>
-            Cancelar
-          </Button>
-          <Button variant="contained" onClick={handleAdd}>
-            Add
-          </Button>
-        </Box>
-      </>
-    ) : source === "jira" ? (
-      <>
-        <Box mb={3} display="flex" flexDirection="column" gap={2}>
-          <TextField
-            fullWidth
-            label="Domain"
-            value={inputValue} // substitua por um estado específico, se necessário
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="Project"
-            value={inputValue} // substitua por um estado específico, se necessário
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-        </Box>
-        <Box display="flex" justifyContent="flex-end" gap={1}>
-          <Button variant="outlined" onClick={() => setOpen(false)}>
-            Cancelar
-          </Button>
-          <Button variant="contained" onClick={handleAdd}>
-            Add
-          </Button>
-        </Box>
-      </>
-    ) : null}
-  </Box>
-</Modal>
-
+      </Modal>
 
       {/* Essa é a box B */}
       <Box
