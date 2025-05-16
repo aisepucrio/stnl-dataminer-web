@@ -120,7 +120,7 @@ const Collect = () => {
         }}
       >
         {/* Essa é a box A */}
-        {source === "github" ? (
+        {/* {source === "github" ? (
           <Typography sx={{ fontSize: "24px", fontWeight: 600 }}>
             Repository URLs
           </Typography>
@@ -128,7 +128,10 @@ const Collect = () => {
           <Typography sx={{ fontSize: "24px", fontWeight: 600 }}>
             Projects URLS
           </Typography>
-        ) : null}
+        ) : null} */}
+        <Typography sx={{ fontSize: "24px", fontWeight: 600 }}>
+          {source === "github" ? "Repository URLs" : "Projects URLS"}
+        </Typography>
 
         {/* Container com tags e caixa de entrada */}
         <Box
