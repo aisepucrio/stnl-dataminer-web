@@ -11,6 +11,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
+import SourceSwitcher from "@/components/ui/SourceSwitcher";
 
 let source = "github"; // ou "jira"
 
@@ -96,6 +97,7 @@ const Collect = () => {
 
   return (
     <Box p={2}>
+      <SourceSwitcher/>
       <Box mb={2}>
         {/* Essa é a box A */}
         {source === "github" ? (
