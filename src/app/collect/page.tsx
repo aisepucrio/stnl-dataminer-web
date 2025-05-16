@@ -54,7 +54,12 @@ const Collect = () => {
     }
   };
 
-
+  const collectTypeMap: Record<string, string> = {
+    commit: "commits",
+    comment: "comments",
+    "pull request": "pull_requests",
+    issue: "issues",
+  };
   const formatDate = (dateStr: string): string => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
@@ -65,17 +70,21 @@ const Collect = () => {
   const handleCollect = () => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     // const payload = {}; // Substituir depois pelo objeto que você vai especificar
+    const collectTypes = checkedOptions.map((opt) => collectTypeMap[opt]);
+
     const payload: any = {
       repositories: [item],
       depth: "basic",
-      collect_types: ["commits"],
+      collect_types: collectTypes,
       ...(startDate && { start_date: formatDate(startDate) }),
       ...(endDate && { end_date: formatDate(endDate) }),
     };
 
-    console.log("payload é :")
-    console.log(payload)
+    console.log("payload é :");
+    console.log(payload);
 
+
+    return ;
     let endpoint = "";
 
     switch (source) {
