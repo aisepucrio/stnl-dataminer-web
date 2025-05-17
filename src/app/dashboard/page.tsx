@@ -2,6 +2,8 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import ChartLine from "@/components/common/ChartLine";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/app/store";
 
 // MUI
 import {
@@ -59,6 +61,7 @@ const chartData = [
 
 export default function Dashboard() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const source = useSelector((state: RootState) => state.source.value);
 
   const [startDate, setStartDate] = useState<string>(""); // ou data inicial padrão
   const [endDate, setEndDate] = useState<string>(""); // ou data final padrão
@@ -120,7 +123,7 @@ export default function Dashboard() {
         projects_count,
       } = data;
 
-      if (selectedSource === "github") {
+      if (source === "github") {
         const repositories = data.repositories.map((repo: any) => repo);
         console.log(repositories);
 
@@ -136,7 +139,7 @@ export default function Dashboard() {
         return;
       }
 
-      if (selectedSource === "jira") {
+      if (source === "jira") {
         const projects = data.projects.map((project: string) => project);
 
         setQtyIssue(issues_count);
@@ -156,9 +159,9 @@ export default function Dashboard() {
   const fetchItem = async (value: any) => {
     let path = "";
 
-    if (selectedSource == "github") {
+    if (source == "github") {
       path = "/api/github/dashboard?repository_id=" + value;
-    } else if (selectedSource == "jira") {
+    } else if (source == "jira") {
       path = "/api/jira/dashboard?project_name=" + value;
     } else {
       return;
@@ -206,8 +209,8 @@ export default function Dashboard() {
     setSelectedItem("");
     setRepository("");
     setProject("");
-    fetchSource(selectedSource);
-  }, [selectedSource]);
+    fetchSource(source);
+  }, [source]);
 
   return (
     <Box
@@ -215,23 +218,24 @@ export default function Dashboard() {
         ...row,
         width: "100%",
         height: "100vh",
-        bgcolor: "gray",
+        bgcolor: "#c8deff",
         boxSizing: "border-box",
         justifyContent: "center",
         // alignContent: "center",
         alignItems: "center",
       }}
     >
+      {source}
       <Box
         // disableGutters
         sx={{
-          border: 1,
-          borderColor: "blue",
+          // border: 1,
+          // borderColor: "blue",
           display: "flex",
           justifyContent: "space-between",
           height: "93vh",
           gap: 2,
-          width: "90%"
+          width: "90%",
         }}
       >
         <Box
@@ -241,18 +245,18 @@ export default function Dashboard() {
             flexDirection: "column",
             justifyContent: "space-between",
             height: "100%",
-            bgcolor: "yellowgreen",
+            bgcolor: "",
             gap: "20px",
           }}
         >
           <Box
             sx={{
               ...row,
-              bgcolor: "orange"
+              bgcolor: "",
             }}
           >
             <Box sx={{ flex: 1 }}>
-              <FormControl sx={{ m: 1, minWidth: 120 }}>
+              {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel id="source-select-label">Source</InputLabel>
                 <Select
                   labelId="source-select-label"
@@ -275,7 +279,7 @@ export default function Dashboard() {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl>
+              </FormControl> */}
             </Box>
             <Box
               sx={{
@@ -311,21 +315,19 @@ export default function Dashboard() {
                     // fontSize: "26px"
                   }}
                 >
-                  {items.map((item) =>
-                    selectedSource === "github" ? (
-                      <MenuItem
-                        key={item.id}
-                        value={item.id}
-                        // sx={{ color: "#1C4886" }}
-                      >
+                  {source === "github" &&
+                    items.map((item) => (
+                      <MenuItem key={item.id} value={item.id}>
                         {item.repository}
                       </MenuItem>
-                    ) : (
+                    ))}
+
+                  {source === "jira" &&
+                    items.map((item) => (
                       <MenuItem key={item} value={item}>
                         {item}
                       </MenuItem>
-                    )
-                  )}
+                    ))}
                 </Select>
               </FormControl>
             </Box>
@@ -337,7 +339,7 @@ export default function Dashboard() {
               }
             }
           >
-            {selectedSource == "github" ? (
+            {source == "github" ? (
               <>
                 {selectedItem ? (
                   <Box sx={{ gap: "20px", ...row }}>
@@ -392,7 +394,7 @@ export default function Dashboard() {
                   </Box>
                 )}
               </>
-            ) : selectedSource == "jira" ? (
+            ) : source == "jira" ? (
               <>
                 {selectedItem ? (
                   <Box sx={{ gap: "20px", ...row }}>
@@ -448,7 +450,7 @@ export default function Dashboard() {
         >
           {/*  Colocar o filtro aqui*/}
           <Filter
-            source={selectedSource}
+            source={source}
             item={selectedItem}
             startDate={startDate}
             endDate={endDate}

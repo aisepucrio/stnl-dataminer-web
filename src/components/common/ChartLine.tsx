@@ -20,10 +20,10 @@ const ChartLine = ({ data }: any) => {
   return (
     <>
       <Box sx={{ ...row, justifyContent: "space-between" }}>
-        <Typography sx={{color, fontSize: "32px",pt:"7px",px:"16px", fontWeight: 500,bgcolor:"green"}}>Charts Geral</Typography>
+        <Typography sx={{color, fontSize: "32px",pt:"7px",px:"16px", fontWeight: 500,bgcolor:""}}>Charts Geral</Typography>
         <Typography>Select</Typography>
       </Box>
-      <Box  sx={{ height: 400  , bgcolor:"pink", alignItems: "center", justifyContent: "center", marginLeft:"50px"}}>
+      <Box  sx={{ height: 400  , bgcolor:"", alignItems: "center", justifyContent: "center", marginLeft:"50px"}}>
         <ResponsiveLine
           data={data}
           margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
