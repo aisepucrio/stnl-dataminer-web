@@ -21,6 +21,7 @@ let item = "facebook/react";
 
 const Collect = () => {
   const source = useSelector((state: RootState) => state.source.value);
+  const [loading, setLoading] = useState(true);
 
   const [open, setOpen] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
@@ -66,6 +67,16 @@ const Collect = () => {
     date.setHours(13, 42, 0, 888);
     return date.toISOString();
   };
+
+  useEffect(() => {
+    if (source) {
+      setLoading(false);
+    }
+  }, [source]);
+
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
 
   const handleCollect = () => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;

@@ -15,7 +15,7 @@ import { setSource } from "../../features/source/sourceSlice";
 import type { RootState, AppDispatch } from "../../app/store";
 import { styled } from "@mui/material/styles";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Select estilizado
 const CustomSelect = styled((props: SelectProps<string>) => (
@@ -50,12 +50,23 @@ const SourceSwitcher = () => {
   const source = useSelector((state: RootState) => state.source.value);
   const dispatch = useDispatch<AppDispatch>();
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleChange = (event: SelectChangeEvent) => {
     dispatch(
       setSource(event.target.value as "github" | "jira" | "stackoverflow")
     );
   };
+
+  useEffect(() => {
+    if (source) {
+      setLoading(false);
+    }
+  }, [source]);
+
+  if (loading) {
+    return <div></div>;
+  }
 
   return (
     <FormControl fullWidth variant="outlined" size="small">
