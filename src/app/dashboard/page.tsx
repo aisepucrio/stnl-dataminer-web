@@ -109,7 +109,7 @@ export default function Dashboard() {
 
       const data = await response.json();
 
-      console.log(data);
+      // console.log(data);
 
       if (!response.ok) {
         throw new Error(`Erro ao buscar dados de ${source}`);
@@ -125,7 +125,7 @@ export default function Dashboard() {
 
       if (source === "github") {
         const repositories = data.repositories.map((repo: any) => repo);
-        console.log(repositories);
+        // console.log(repositories);
 
         setQtyIssue(issues_count);
         setQtyPullrequest(pull_requests_count);
@@ -146,8 +146,8 @@ export default function Dashboard() {
         // setQtyComment();
         setQtyProject(projects_count);
 
-        console.log("this is a projects");
-        console.log(projects);
+        // console.log("this is a projects");
+        // console.log(projects);
         setItems(projects);
         return;
       }
@@ -173,7 +173,7 @@ export default function Dashboard() {
         throw new Error(`Erro ao buscar dados: ${response.status}`);
       }
       const data = await response.json();
-      console.log("Dados recebidos:", data);
+      // console.log("Dados recebidos:", data);
 
       const {
         repositories_count = 0,
