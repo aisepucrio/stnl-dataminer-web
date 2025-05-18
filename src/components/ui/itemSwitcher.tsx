@@ -29,11 +29,12 @@ const ItemSwitcher = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const source = useSelector((state: RootState) => state.source.value);
+  const item = useSelector((state: RootState) => state.item.value);
   const dispatch = useDispatch<AppDispatch>();
+
 
   const [items, setItems] = useState<any[]>([]);
   const [selectedItem, setSelectedItem] = useState(""); // usado no select
-
   const [loading, setLoading] = useState(true);
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -57,13 +58,11 @@ const ItemSwitcher = () => {
       if (source === "github") {
         const repositories = data.repositories.map((repo: any) => repo);
         setItems(repositories);
-
         return;
       }
 
       if (source === "jira") {
         const projects = data.projects.map((project: string) => project);
-
         setItems(projects);
         return;
       }
