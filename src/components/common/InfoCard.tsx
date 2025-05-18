@@ -27,25 +27,35 @@ const InfoCard = ({
             sx={{
               //   width: "100%",
               flex: 1,
-              height: "16vh",
+              height: "112px",
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
               bgcolor: color ? color : "white",
               boxSizing: "border-box",
-              px: "0",
-              py: "50px",
-              borderRadius: "5px",
+              // px: 0,
+              padding: "24px",
+              borderRadius: "16px",
+              gap: "8px",
             }}
           >
-            <Typography variant="h5" color="#1C4886">
-              {label}
-            </Typography>
-            <br />
-            <Typography variant="h4" color="#1C4886">
-              {value}
-            </Typography>
+            <Box sx={{ bgcolor: "", width: "100%" }}>
+              <Typography
+                sx={{ fontSize: "16px", bgcolor: "", fontWeight: 600 }}
+                // color="#1C4886"
+              >
+                {label}
+              </Typography>
+            </Box>
+            <Box sx={{ bgcolor: "", width: "100%" }}>
+              <Typography
+                sx={{ fontSize: "24px", bgcolor: "", fontWeight: 600 }}
+                // color="#1C4886"
+              >
+                {value}
+              </Typography>
+            </Box>
           </Box>
         </>
       )}
