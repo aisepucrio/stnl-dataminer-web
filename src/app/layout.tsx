@@ -3,6 +3,7 @@ import "./globals.css";
 import MainMenu from "@/components/layout/MainMenu";
 import { Box } from "@mui/material";
 import { Providers } from "./Providers";
+import Header from "@/components/layout/Header";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,7 +21,17 @@ export default function RootLayout({
         <Providers>
           <Box sx={{ display: "flex", flexDirection: "row" }}>
             <MainMenu />
-            {children}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                bgcolor: "",
+                width: "100%",
+              }}
+            >
+              <Header />
+              {children}
+            </Box>
           </Box>
         </Providers>
       </body>
