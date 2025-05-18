@@ -212,6 +212,10 @@ export default function Dashboard() {
     fetchSource(source);
   }, [source]);
 
+  if (loading) {
+    return <div></div>;
+  }
+
   return (
     <Box
       sx={{
@@ -255,35 +259,12 @@ export default function Dashboard() {
             }}
           >
             <Box sx={{ flex: 1 }}>
-              {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="source-select-label">Source</InputLabel>
-                <Select
-                  labelId="source-select-label"
-                  id="source-select"
-                  value={selectedSource}
-                  onChange={handleChange}
-                  autoWidth
-                  label="Source"
-                  sx={{
-                    width: "330px",
-                    height: "50px",
-                    boxSizing: "border-box",
-                    bgcolor: "white",
-                    color: "#1C4886",
-                  }}
-                >
-                  {Object.values(sources).map((source) => (
-                    <MenuItem key={source.value} value={source.value}>
-                      {source.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl> */}
+
             </Box>
             <Box
               sx={{
                 flex: 1,
-                // bgcolor: "green"
+                bgcolor: "green"
               }}
             >
               <FormControl

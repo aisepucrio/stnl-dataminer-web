@@ -29,7 +29,6 @@ const ItemSwitcher = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const source = useSelector((state: RootState) => state.source.value);
-  const item = useSelector((state: RootState) => state.item.value);
   const dispatch = useDispatch<AppDispatch>();
 
 
