@@ -5,7 +5,7 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     background: {
-      default: '#f8fbff', // cor de fundo padrão
+      default: '#fff', // cor de fundo padrão
     },
   },
 });
