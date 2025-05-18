@@ -5,26 +5,11 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  SelectProps,
-  Box,
-  Typography,
-  InputLabel,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { setItem } from "../../features/items/itemSlice";
 import type { RootState, AppDispatch } from "../../app/store";
-import { styled } from "@mui/material/styles";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useEffect, useState } from "react";
-
-// const apiUrl = "https://sua-api.com/";
-// const sources: Record<string, { fetchUrl: string }> = {
-//   github: { fetchUrl: "github/data" },
-//   jira: { fetchUrl: "jira/data" },
-//   stackoverflow: { fetchUrl: "so/data" },
-// };
-
-// Select estilizado
 
 const sources = {
   github: {
@@ -53,9 +38,7 @@ const ItemSwitcher = () => {
 
   const handleChange = (event: SelectChangeEvent) => {
     const value = event.target.value;
-    // window.alert(value);
     setSelectedItem(value);
-    fetchItem(value);
     dispatch(setItem(event.target.value));
   };
 
@@ -64,37 +47,16 @@ const ItemSwitcher = () => {
 
     try {
       const response = await fetch(url);
-
       const data = await response.json();
-
-      // console.log(data);
 
       if (!response.ok) {
         throw new Error(`Erro ao buscar dados de ${source}`);
       }
-
       setLoading(false);
-
-      const {
-        issues_count = 0,
-        pull_requests_count = 0,
-        commits_count = 0,
-        repositories_count = 0,
-        projects_count,
-      } = data;
 
       if (source === "github") {
         const repositories = data.repositories.map((repo: any) => repo);
-        // console.log(repositories);
-
-        // setQtyIssue(issues_count);
-        // setQtyPullrequest(pull_requests_count);
-        // setQtyCommit(commits_count);
-        // setQtyRepository(repositories_count);
         setItems(repositories);
-
-        // setQtyComment(0);
-        // setQtySprints(0);
 
         return;
       }
@@ -102,12 +64,6 @@ const ItemSwitcher = () => {
       if (source === "jira") {
         const projects = data.projects.map((project: string) => project);
 
-        // setQtyIssue(issues_count);
-        // setQtyComment();
-        // setQtyProject(projects_count);
-
-        // console.log("this is a projects");
-        // console.log(projects);
         setItems(projects);
         return;
       }
@@ -147,16 +103,6 @@ const ItemSwitcher = () => {
         sprints_count = 0,
       } = data;
 
-      //   setQtyRepository(repositories_count);
-      //   setQtyProject(projects_count);
-      //   setQtyIssue(issues_count);
-      //   setQtyPullrequest(pull_requests_count);
-      //   setQtyCommit(commits_count);
-      //   setQtyComment(comments_count);
-      //   setQtyFork(forks_count);
-      //   setQtyStar(stars_count);
-      // time mined here
-      //   setQtySprints(sprints_count);
 
       return;
     } catch (error) {
@@ -169,7 +115,7 @@ const ItemSwitcher = () => {
     if (source) {
       setLoading(false);
     }
-
+    console.log("ola nundo");
     setSelectedItem("");
     fetchSource(source);
   }, [source]);
@@ -183,32 +129,29 @@ const ItemSwitcher = () => {
       sx={{ width: "100%", height: "100%" }}
       disabled={items.length === 0}
     >
-      {/* <InputLabel id="items-select-label" sx={{ color: "#fff", height: "100%", bgcolor: "pink",  }}>
-        Items
-      </InputLabel> */}
       <Select
         labelId="items-select-label"
         id="items-select"
         value={selectedItem}
-        onChange={(e) => {
-          const value = e.target.value;
-          // window.alert(value);
-          setSelectedItem(value);
-          fetchItem(value);
-        }}
+        onChange={handleChange}
+        displayEmpty
         autoWidth
-        label="Items"
         sx={{
-          //   width: "330px",
           height: "100%",
           boxSizing: "border-box",
-          //   bgcolor: "white",
           bgcolor: "#1C4886",
-          color: "#1C4886",
+          color: "#fff",
           borderRadius: "12px",
-          // fontSize: "26px"
         }}
       >
+        <MenuItem value="" disabled sx={{ color: "#" }}>
+          {source === "github"
+            ? "Select repository"
+            : source === "jira"
+            ? "Select project"
+            : "Select item"}
+        </MenuItem>
+
         {source === "github" &&
           items.map((item) => (
             <MenuItem
