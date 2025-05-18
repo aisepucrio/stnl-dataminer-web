@@ -218,14 +218,13 @@ export default function Dashboard() {
         ...row,
         width: "100%",
         height: "100vh",
-        bgcolor: "#c8deff",
+        bgcolor: "#fff",
         boxSizing: "border-box",
         justifyContent: "center",
         // alignContent: "center",
         alignItems: "center",
       }}
     >
-      {source}
       <Box
         // disableGutters
         sx={{
@@ -375,21 +374,25 @@ export default function Dashboard() {
                       label="Repositories"
                       value={qtyRepository}
                       isLoading={loading}
+                      color={"#e2edfe"}
                     />
                     <InfoCard
                       label="Issues"
                       value={qtyIssue}
                       isLoading={loading}
+                      color={"#e6ecf5"}
                     />
                     <InfoCard
                       label="Pull Requests"
                       value={qtyPullrequest}
                       isLoading={loading}
+                      color={"#e2edfe"}
                     />
                     <InfoCard
                       label="Commits"
                       value={qtyCommit}
                       isLoading={loading}
+                      color={"#e6ecf5"}
                     />
                   </Box>
                 )}
@@ -434,7 +437,7 @@ export default function Dashboard() {
             )}
           </Box>
           {/* nivo line */}
-          <Box flexGrow={1} sx={{ bgcolor: "white", borderRadius: "5px" }}>
+          <Box flexGrow={1} sx={{ bgcolor: "#f7f9fb", borderRadius: "16px" }}>
             {/* <ChartLine /> */}
             <ChartLine data={chartData} />
           </Box>
