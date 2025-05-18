@@ -30,7 +30,7 @@ interface FilterProps {
 }
 
 const filter = {
-  bgcolor: "white",
+  bgcolor: "#e8f2fe",
   width: "20vw",
   height: "100%",
   boxSizing: "border-box",
@@ -59,10 +59,13 @@ const input = {
 
 const button = {
   bgcolor: "#1c4886",
-  minWidth: "218px",
+  borderRadius: "12px",
+  width: "100%",
   height: "76px",
   fontWeight: 700,
   color: "white",
+  fontSize: "20px",
+  textTransform: "none",
 };
 
 const Filter = ({
