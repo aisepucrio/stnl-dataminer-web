@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import sourceReducer from '../features/source/sourceSlice'
-import itemsReducer from "../features/items/itemSlice";
+import itemReducer from "../features/items/itemSlice";
 
 import {
   persistStore,
@@ -18,7 +18,7 @@ import { combineReducers } from 'redux'
 
 const rootReducer = combineReducers({
   source: sourceReducer,
-    items: itemsReducer, // <-- adicionado aqui
+    item: itemReducer, // <-- adicionado aqui
 })
 
 const persistedReducer = persistReducer(
