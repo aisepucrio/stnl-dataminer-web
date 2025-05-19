@@ -41,9 +41,7 @@ const Collect = () => {
   };
 
   const options =
-    source === "github"
-      ? ["issue", "comment", "pull request", "commit"]
-      : ["commit"];
+    source === "github" ? ["issue", "comment", "pull request", "commit"] : [];
 
   const handleAdd = () => {
     if (inputValue.trim()) {
@@ -132,7 +130,7 @@ const Collect = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: "", width: "100%", height: "100vh", p: 3 }}>
+    <Box sx={{ bgcolor: "", width: "100%", height: "", p: 4 }}>
       {/* <SourceSwitcher/>;
        */}
       {/* {source} */}
@@ -217,19 +215,7 @@ const Collect = () => {
           ))}
 
           {/* Caixa que abre o modal */}
-          {/* <Box
-            onClick={() => setOpen(true)}
-            sx={{
-              border: "1px dashed #aaa",
-              padding: "6px 12px",
-              borderRadius: 1,
-              cursor: "pointer",
-              color: "#777",
-              flexShrink: 0,
-            }}
-          >
-            + Add
-          </Box> */}
+
           {/* Campo visual que abre o modal ao clicar */}
           <TextField
             label="Adicionar"
@@ -247,33 +233,6 @@ const Collect = () => {
         </Box>
       </Box>
 
-      {/* Modal */}
-      {/* <Modal open={open} onClose={() => setOpen(false)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-            width: 300,
-          }}
-        >
-          <TextField
-            fullWidth
-            label="Digite o valor"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Button variant="contained" fullWidth onClick={handleAdd}>
-            Add
-          </Button>
-        </Box>
-      </Modal> */}
       {/* Modal */}
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box
@@ -348,13 +307,8 @@ const Collect = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          // width: "224px",
-          // minWidth: "200px",
-          // height: "95px",
-          // padding: "24px",
           gap: "8px",
           flexShrink: 0,
-          // mb: 2,
           bgcolor: "",
           width: "100%",
         }}
@@ -398,25 +352,7 @@ const Collect = () => {
       </Box>
 
       {/* Essa é a box C */}
-      {/* <Box>
-        <Typography mb={1}>Select Types</Typography>
-        <FormGroup row>
-          {options.map((option) => (
-            <FormControlLabel
-              key={option}
-              control={
-                <Checkbox
-                  checked={checkedOptions.includes(option)}
-                  onChange={() => handleCheckboxChange(option)}
-                />
-              }
-              label={option}
-            />
-          ))}
-        </FormGroup>
-        <Button onClick={handleCollect}>Collect</Button>
-      </Box> */}
-      <Box sx={{ width: "50%" }}>
+      <Box sx={{ width: "50%", bgcolor: "", py: "40px" }}>
         <FormGroup
           sx={{
             display: "grid",
@@ -448,9 +384,11 @@ const Collect = () => {
             bgcolor: "#1C4886",
             height: "76px",
             width: "225px",
-            fontsize: "20px",
+            fontsize: "22px",
             textTransform: "none",
             boxSizing: "border-box",
+            borderRadius: "12px",
+            fontWeight: 600,
           }}
         >
           Collect
