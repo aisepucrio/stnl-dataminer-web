@@ -37,7 +37,6 @@ const MainMenu = () => {
     switch (source) {
       case "github":
         return [
-          { title: "Repository", to: "/preview/github/repository" },
           { title: "Issue", to: "/preview/github/issue" },
           { title: "Pull Request", to: "/preview/github/pullrequest" },
           { title: "Comment", to: "/preview/github/comment" },
