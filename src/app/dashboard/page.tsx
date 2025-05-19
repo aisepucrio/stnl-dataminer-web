@@ -212,6 +212,10 @@ export default function Dashboard() {
     fetchSource(source);
   }, [source]);
 
+  if (loading) {
+    return <div></div>;
+  }
+
   return (
     <Box
       sx={{
@@ -255,35 +259,12 @@ export default function Dashboard() {
             }}
           >
             <Box sx={{ flex: 1 }}>
-              {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="source-select-label">Source</InputLabel>
-                <Select
-                  labelId="source-select-label"
-                  id="source-select"
-                  value={selectedSource}
-                  onChange={handleChange}
-                  autoWidth
-                  label="Source"
-                  sx={{
-                    width: "330px",
-                    height: "50px",
-                    boxSizing: "border-box",
-                    bgcolor: "white",
-                    color: "#1C4886",
-                  }}
-                >
-                  {Object.values(sources).map((source) => (
-                    <MenuItem key={source.value} value={source.value}>
-                      {source.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl> */}
+
             </Box>
             <Box
               sx={{
                 flex: 1,
-                // bgcolor: "green"
+                bgcolor: "green"
               }}
             >
               <FormControl
@@ -346,26 +327,31 @@ export default function Dashboard() {
                       label="Issues"
                       value={qtyIssue}
                       isLoading={loading}
+                      color={"#e2edfe"}
                     />
                     <InfoCard
                       label="Pull Requests"
                       value={qtyPullrequest}
                       isLoading={loading}
+                      color={"#e6ecf5"}
                     />
                     <InfoCard
                       label="Comments"
                       value={qtyComment}
                       isLoading={loading}
+                      color={"#e2edfe"}
                     />
                     <InfoCard
                       label="Forks"
                       value={qtyFork}
                       isLoading={loading}
+                      color={"#e6ecf5"}
                     />
                     <InfoCard
                       label="Stars"
                       value={qtyStar}
                       isLoading={loading}
+                      color={"#e2edfe"}
                     />
                   </Box>
                 ) : (
@@ -405,16 +391,19 @@ export default function Dashboard() {
                       label="Issues"
                       value={qtyIssue}
                       isLoading={loading}
+                      color={"#e2edfe"}
                     />
                     <InfoCard
                       label="Comments"
                       value={qtyComment}
                       isLoading={loading}
+                      color={"#e6ecf5"}
                     />
                     <InfoCard
                       label="Sprints"
                       value={qtySprint}
                       isLoading={loading}
+                      color={"#e2edfe"}
                     />
                   </Box>
                 ) : (
@@ -423,11 +412,13 @@ export default function Dashboard() {
                       label="Issues"
                       value={qtyIssue}
                       isLoading={loading}
+                      color={"#e2edfe"}
                     />
                     <InfoCard
                       label="Projects"
                       value={qtyProject}
                       isLoading={loading}
+                      color={"#e6ecf5"}
                     />
                   </Box>
                 )}
