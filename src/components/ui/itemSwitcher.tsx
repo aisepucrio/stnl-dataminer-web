@@ -2,6 +2,7 @@
 
 import {
   FormControl,
+  IconButton,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -9,7 +10,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { setItem } from "../../features/items/itemSlice";
 import type { RootState, AppDispatch } from "../../app/store";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import ClearIcon from "@mui/icons-material/Clear";
 
 const sources = {
   github: {
@@ -29,8 +31,10 @@ const ItemSwitcher = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const source = useSelector((state: RootState) => state.source.value);
-  const dispatch = useDispatch<AppDispatch>();
+  const item = useSelector((state: RootState) => state.item.value);
+  const prevSourceRef = useRef<string | null>(null);
 
+  const dispatch = useDispatch<AppDispatch>();
 
   const [items, setItems] = useState<any[]>([]);
   const [selectedItem, setSelectedItem] = useState(""); // usado no select
@@ -41,6 +45,10 @@ const ItemSwitcher = () => {
     setSelectedItem(value);
     dispatch(setItem(event.target.value));
   };
+
+  const onClear = () => {
+      dispatch(setItem(""));
+  }
 
   const fetchSource = async (source: string) => {
     const url = apiUrl + sources[source].fetchUrl;
@@ -101,7 +109,6 @@ const ItemSwitcher = () => {
         sprints_count = 0,
       } = data;
 
-
       return;
     } catch (error) {
       console.error("Erro ao buscar items:", error);
@@ -110,9 +117,15 @@ const ItemSwitcher = () => {
   };
 
   useEffect(() => {
+    const prevSource = prevSourceRef.current;
+
     if (source) {
       setLoading(false);
     }
+    if (prevSource !== null && prevSource !== source) {
+      dispatch(setItem(""));
+    }
+    prevSourceRef.current = source;
     console.log("ola nundo");
     setSelectedItem("");
     fetchSource(source);
@@ -130,10 +143,18 @@ const ItemSwitcher = () => {
       <Select
         labelId="items-select-label"
         id="items-select"
-        value={selectedItem}
+        value={item}
         onChange={handleChange}
         displayEmpty
         autoWidth
+        endAdornment={
+          (
+            item &&
+            <IconButton size="small" onClick={onClear}>
+              <ClearIcon sx={{color: "white", fontSize: "17px", marginRight: "15px"}}/>
+            </IconButton>
+            )
+        }
         sx={{
           height: "100%",
           boxSizing: "border-box",
