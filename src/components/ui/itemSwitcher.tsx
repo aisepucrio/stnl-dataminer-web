@@ -47,8 +47,8 @@ const ItemSwitcher = () => {
   };
 
   const onClear = () => {
-      dispatch(setItem(""));
-  }
+    dispatch(setItem(""));
+  };
 
   const fetchSource = async (source: string) => {
     const url = apiUrl + sources[source].fetchUrl;
@@ -58,6 +58,7 @@ const ItemSwitcher = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        setItems([]);
         throw new Error(`Erro ao buscar dados de ${source}`);
       }
       setLoading(false);
@@ -148,12 +149,13 @@ const ItemSwitcher = () => {
         displayEmpty
         autoWidth
         endAdornment={
-          (
-            item &&
+          item && (
             <IconButton size="small" onClick={onClear}>
-              <ClearIcon sx={{color: "white", fontSize: "17px", marginRight: "15px"}}/>
+              <ClearIcon
+                sx={{ color: "white", fontSize: "17px", marginRight: "15px" }}
+              />
             </IconButton>
-            )
+          )
         }
         sx={{
           height: "100%",
