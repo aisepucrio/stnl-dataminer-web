@@ -122,6 +122,7 @@ const Jobs = () => {
                   onClick={() => stopJob(job.task_id)}
                   sx={{
                     color: "#1C4886",
+                    cursor: "pointer",
                     
                   }}></StopCircleOutlinedIcon>
                   )}
