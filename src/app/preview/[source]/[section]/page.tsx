@@ -43,16 +43,12 @@ const Preview = () => {
 
   if (error) return <Typography color="error">Erro: {error}</Typography>;
   if (!data) return <Typography>Carregando...</Typography>;
-  if (data.length === 0) return <Typography>Nenhum dado encontrado.</Typography>;
+  if (data.length === 0) return <Typography>  Nenhum dado encontrado.</Typography>;
 
   const columns = Object.keys(data[0]); // Pegamos os campos da primeira linha
 
   return (
     <Box p={2}>
-      <Typography variant="h6" mb={2}>
-        Fonte: {source} / Seção: {section}
-      </Typography>
-
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
