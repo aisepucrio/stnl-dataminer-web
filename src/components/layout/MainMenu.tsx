@@ -17,6 +17,7 @@ import {
   Icon,
   Button,
 } from "@mui/material";
+import SourceSwitcher from "../ui/SourceSwitcher";
 
 // import icons 
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
@@ -160,7 +161,7 @@ const MainMenu = () => {
           )}
           
         </Box>
-        
+          <SourceSwitcher/>
         <Box sx={{ overflow: "auto", flexGrow : 1}}>
           <List sx={{ marginTop: 10 }}>
             {pages.map(({ name, path, icon, children }) => {
