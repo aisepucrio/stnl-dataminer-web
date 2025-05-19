@@ -37,19 +37,18 @@ const MainMenu = () => {
     switch (source) {
       case "github":
         return [
-          { title: "Repository", to: "/preview/github/repository" },
-          { title: "Issue", to: "/preview/github/issue" },
-          { title: "Pull Request", to: "/preview/github/pullrequest" },
-          { title: "Comment", to: "/preview/github/comment" },
-          { title: "Commit", to: "/preview/github/commit" },
+          { title: "Issue", to: "/preview/github/issues" },
+          { title: "Pull Request", to: "/preview/github/pull-requests" },
+          { title: "Comment", to: "/preview/github/comments" },
+          { title: "Commit", to: "/preview/github/commits" },
         ];
       case "jira":
         return [
           { title: "Users", to: "/preview/jira/users" },
-          { title: "Issue", to: "/preview/jira/issue" },
-          { title: "Pull Request", to: "/preview/jira/pullrequest" },
-          { title: "Comment", to: "/preview/jira/comment" },
-          { title: "Commit", to: "/preview/jira/commit" },
+          { title: "Issue", to: "/preview/jira/issues" },
+          { title: "Pull Request", to: "/preview/jira/pull-requests" },
+          { title: "Comment", to: "/preview/jira/comments" },
+          { title: "Commit", to: "/preview/jira/commits" },
         ];
       default:
         return null;
