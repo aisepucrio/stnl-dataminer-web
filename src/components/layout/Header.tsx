@@ -29,6 +29,7 @@ const Header = () => {
         alignItems: "center",
         ...row,
         px: "28px",
+        boxSizing : "border-box"
       }}
     >
       <Box
@@ -91,7 +92,7 @@ const Header = () => {
           src="/icons/sidebar.svg"
           alt="Sidebar"
           width={25}
-          height={2520}
+          height={25}
         />
       </Box>
     </Box>
