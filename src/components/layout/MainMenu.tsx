@@ -46,9 +46,9 @@ const MainMenu = () => {
         return [
           { title: "Users", to: "/preview/jira/users" },
           { title: "Issue", to: "/preview/jira/issues" },
-          { title: "Pull Request", to: "/preview/jira/pullrequest" },
-          { title: "Comment", to: "/preview/jira/comment" },
-          { title: "Commit", to: "/preview/jira/commit" },
+          { title: "Pull Request", to: "/preview/jira/pull-requests" },
+          { title: "Comment", to: "/preview/jira/comments" },
+          { title: "Commit", to: "/preview/jira/commits" },
         ];
       default:
         return null;
