@@ -1,21 +1,10 @@
 "use client";
-import Image from "next/image";
-import styles from "./page.module.css";
 import ChartLine from "@/components/common/ChartLine";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 
 // MUI
-import {
-  Box,
-  Container,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Skeleton,
-} from "@mui/material";
+import { Box, Button, SelectChangeEvent } from "@mui/material";
 import { useEffect, useState } from "react";
 import InfoCard from "@/components/common/InfoCard";
 import Filter from "@/components/common/Filter";
@@ -30,9 +19,6 @@ const column = {
   display: "flex",
   flexDirection: "column",
 };
-
-const blue = { bgcolor: "blue" };
-const red = { bgcolor: "red" };
 
 const sources = {
   github: {
@@ -62,6 +48,7 @@ const chartData = [
 export default function Dashboard() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const source = useSelector((state: RootState) => state.source.value);
+  const item = useSelector((state: RootState) => state.item.value);
 
   const [startDate, setStartDate] = useState<string>(""); // ou data inicial padrão
   const [endDate, setEndDate] = useState<string>(""); // ou data final padrão
@@ -74,9 +61,6 @@ export default function Dashboard() {
 
   const [loading, setLoading] = useState(true);
 
-  const [selectedSource, setSelectedSource] = useState("github");
-  // const [items, setItems] = useState<string[]>([]);
-  // const [items, setItems] = useState<{ id: number; repository: string }[] | string[]>([]);
   const [items, setItems] = useState<any[]>([]);
 
   const [selectedItem, setSelectedItem] = useState(""); // usado no select
@@ -92,13 +76,7 @@ export default function Dashboard() {
   const [qtyComment, setQtyComment] = useState<number | null>(0);
   const [qtyFork, setQtyFork] = useState<number | null>(0);
   const [qtyStar, setQtyStar] = useState<number | null>(0);
-
   const [qtySprint, setQtySprints] = useState<number | null>(0);
-
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    const value = event.target.value;
-    setSelectedSource(event.target.value as string);
-  };
 
   const fetchSource = async (source: string) => {
     setLoading(false);
@@ -108,8 +86,6 @@ export default function Dashboard() {
       const response = await fetch(url);
 
       const data = await response.json();
-
-      // console.log(data);
 
       if (!response.ok) {
         throw new Error(`Erro ao buscar dados de ${source}`);
@@ -146,8 +122,6 @@ export default function Dashboard() {
         // setQtyComment();
         setQtyProject(projects_count);
 
-        // console.log("this is a projects");
-        // console.log(projects);
         setItems(projects);
         return;
       }
@@ -173,7 +147,6 @@ export default function Dashboard() {
         throw new Error(`Erro ao buscar dados: ${response.status}`);
       }
       const data = await response.json();
-      // console.log("Dados recebidos:", data);
 
       const {
         repositories_count = 0,
@@ -212,6 +185,12 @@ export default function Dashboard() {
     fetchSource(source);
   }, [source]);
 
+  useEffect(() => {
+    if (item) {
+      fetchItem(item);
+    }
+  }, [item]);
+
   if (loading) {
     return <div></div>;
   }
@@ -221,24 +200,29 @@ export default function Dashboard() {
       sx={{
         ...row,
         width: "100%",
-        height: "100vh",
-        bgcolor: "#fff",
+        height: "100%",
+        bgcolor: "",
         boxSizing: "border-box",
         justifyContent: "center",
-        // alignContent: "center",
         alignItems: "center",
+        paddingTop: "20px",
       }}
     >
+      {/* <Button
+        onClick={(e) => {
+          window.alert(item);
+        }}
+      >
+        print item
+      </Button> */}
       <Box
-        // disableGutters
         sx={{
-          // border: 1,
-          // borderColor: "blue",
           display: "flex",
           justifyContent: "space-between",
           height: "93vh",
           gap: 2,
           width: "90%",
+          bgcolor: "",
         }}
       >
         <Box
@@ -254,74 +238,14 @@ export default function Dashboard() {
         >
           <Box
             sx={{
-              ...row,
               bgcolor: "",
+              ...column,
+              justifyContent: "center",
             }}
-          >
-            <Box sx={{ flex: 1 }}>
-
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                bgcolor: "green"
-              }}
-            >
-              <FormControl
-                sx={{ m: 1, minWidth: 120 }}
-                disabled={items.length === 0}
-              >
-                <InputLabel id="items-select-label" sx={{ color: "#1C4886" }}>
-                  Items
-                </InputLabel>
-                <Select
-                  labelId="items-select-label"
-                  id="items-select"
-                  value={selectedItem}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // window.alert(value);
-                    setSelectedItem(value);
-                    fetchItem(value);
-                  }}
-                  autoWidth
-                  label="Items"
-                  sx={{
-                    width: "330px",
-                    height: "50px",
-                    boxSizing: "border-box",
-                    bgcolor: "white",
-                    color: "#1C4886",
-                    // fontSize: "26px"
-                  }}
-                >
-                  {source === "github" &&
-                    items.map((item) => (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.repository}
-                      </MenuItem>
-                    ))}
-
-                  {source === "jira" &&
-                    items.map((item) => (
-                      <MenuItem key={item} value={item}>
-                        {item}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            </Box>
-          </Box>
-          <Box
-            sx={
-              {
-                //  bgcolor: "red"
-              }
-            }
           >
             {source == "github" ? (
               <>
-                {selectedItem ? (
+                {item ? (
                   <Box sx={{ gap: "20px", ...row }}>
                     <InfoCard
                       label="Issues"
@@ -385,7 +309,7 @@ export default function Dashboard() {
               </>
             ) : source == "jira" ? (
               <>
-                {selectedItem ? (
+                {item ? (
                   <Box sx={{ gap: "20px", ...row }}>
                     <InfoCard
                       label="Issues"
@@ -427,9 +351,7 @@ export default function Dashboard() {
               <>"error"</>
             )}
           </Box>
-          {/* nivo line */}
           <Box flexGrow={1} sx={{ bgcolor: "#f7f9fb", borderRadius: "16px" }}>
-            {/* <ChartLine /> */}
             <ChartLine data={chartData} />
           </Box>
         </Box>
@@ -442,10 +364,9 @@ export default function Dashboard() {
             boxSizing: "border-box",
           }}
         >
-          {/*  Colocar o filtro aqui*/}
           <Filter
             source={source}
-            item={selectedItem}
+            item={item}
             startDate={startDate}
             endDate={endDate}
             setStartDate={setStartDate}
