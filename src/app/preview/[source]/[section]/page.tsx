@@ -13,9 +13,144 @@ import {
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
+type github_commits={
+  id: string,
+  author: {
+    name: string,
+    email: string,
+  },
+  committer: {
+    name: string,
+    email: string,
+  },
+  modified_files: [
+    {
+      filename: string,
+      change_type: string,
+      added_lines: string,
+      deleted_lines: string,
+      complexity: string,
+      methods: [
+        {
+          name: string,
+          complexity: string,
+          max_nesting: string,
+        }
+      ]
+    }
+  ],
+  repository: string,
+  sha: string,
+  message: string,
+  date: string,
+  insertions: string,
+  deletions: string,
+  files_changed: string,
+  in_main_branch: string,
+  merge: string,
+  dmm_unit_size: string,
+  dmm_unit_complexity: string,
+  dmm_unit_interfacing: string,
+  time_mined: string
+  }
+
+
+type github_issues={
+  id: string,
+  created_at_formatted: string,
+  updated_at_formatted: string,
+  closed_at_formatted: string,
+  merged_at_formatted: string,
+  repository: string,
+  record_id: string,
+  number: string,
+  title: string,
+  state: string,
+  creator: string,
+  assignees: string,
+  labels: string,
+  milestone: string,
+  locked: string,
+  created_at: string,
+  updated_at: string,
+  closed_at: string,
+  body: string,
+  comments: string,
+  timeline_events: string,
+  merged_at: string,
+  commits: string,
+  is_pull_request: true,
+  author_association: string,
+  reactions: string,
+  data_type: string,
+  time_mined: string, 
+}
+
+type github_pullrequests = {
+  id: string,
+  created_at_formatted: string,
+  updated_at_formatted: string,
+  closed_at_formatted: string,
+  merged_at_formatted: string,
+  repository: string,
+  record_id: string,
+  number: string,
+  title: string,
+  state: string,
+  creator: string,
+  assignees: string,
+  labels: string,
+  milestone: string,
+  locked: string,
+  created_at: string,
+  updated_at: string,
+  closed_at: string,
+  body: string,
+  comments: string,
+  timeline_events: string,
+  merged_at: string,
+  commits: string,
+  is_pull_request: string,
+  author_association: string,
+  reactions: string,
+  data_type: string,
+  time_mined: string,
+}
+
+
+
+type jira_issues={ 
+  count: string,
+  next: string,
+  previous: string,
+  results: [
+    {
+      issue_id: string,
+      issue_key: string,
+      issuetype: string,
+      project: string,
+      priority: string,
+      status: string,
+      assignee: string,
+      creator: string,
+      created: string,
+      updated: string,
+      summary: string,
+      description: string,
+      history: string,
+      activity_log: string,
+      checklist: string,
+      history_formatted: string,
+      activity_log_formatted: string,
+      checklist_formatted: string,
+    }
+  ]
+  
+}
+
 const Preview = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const [data, setData] = useState<Record<string, any>[] | null>(null);
+  const [data, setData] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
   const source = params.source;
@@ -24,15 +159,20 @@ const Preview = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${apiUrl}/api/${source}/${section}`, {
-            method:"GET",
-        });
-        console.log("Fetching:", apiUrl);
+        const realSection = section === "comments" ? "issues" : section;
 
+        const res = await fetch(`${apiUrl}/api/${source}/${realSection}`, {
+          method: "GET",
+        });
 
         if (!res.ok) throw new Error("Erro ao buscar dados");
         const json = await res.json();
-        setData(json);
+
+        const formattedData = source === "jira" && realSection === "issues" ? json.results : json;
+        console.log(formattedData);
+
+        setData(formattedData);
+        console.log("data formatada");
       } catch (err: any) {
         setError(err.message || "Erro desconhecido");
       }
@@ -43,9 +183,19 @@ const Preview = () => {
 
   if (error) return <Typography color="error">Erro: {error}</Typography>;
   if (!data) return <Typography>Carregando...</Typography>;
-  if (data.length === 0) return <Typography>  Nenhum dado encontrado.</Typography>;
+  if (data.length === 0) return <Typography>Nenhum dado encontrado.</Typography>;
 
-  const columns = Object.keys(data[0]); // Pegamos os campos da primeira linha
+  // exibição diferente para o comments ( que tem os dados vindos dos issues )
+  const filteredData =
+    section === "comments"
+      ? data.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          comments: item.comments,
+        }))
+      : data;
+
+  const columns = Object.keys(filteredData[0]);
 
   return (
     <Box p={2}>
@@ -61,11 +211,15 @@ const Preview = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((item, i) => (
+            {filteredData.map((item, i) => (
               <TableRow key={i}>
                 {columns.map((col) => (
-                  <TableCell key={col}>{String(item[col])}</TableCell>
-                ))}
+                <TableCell key={col}>
+                   {typeof item[col] === "object" && item[col] !== null 
+                   ? JSON.stringify(item[col], null, 2)
+                   : String(item[col])}
+                </TableCell>))}
+
               </TableRow>
             ))}
           </TableBody>
