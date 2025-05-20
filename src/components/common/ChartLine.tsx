@@ -126,6 +126,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
           pointBorderColor={{ from: "serieColor" }}
           enableSlices="x"
           useMesh={true}
+          curve="monotoneX"
         />
       </Box>
     </>
