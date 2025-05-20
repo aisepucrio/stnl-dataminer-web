@@ -131,6 +131,7 @@ const Jobs = () => {
             <TableHead>
               <TableRow>
                 <TableCell sx={headerCellStyle}>Job ID</TableCell>
+                <TableCell sx={headerCellStyle}>Projects</TableCell>
                 <TableCell sx={headerCellStyle}>Description</TableCell>
                 <TableCell sx={headerCellStyle}>Date</TableCell>
                 <TableCell sx={headerCellStyle}>Status</TableCell>
@@ -145,6 +146,9 @@ const Jobs = () => {
                   <TableRow key={job.task_id}>
                     <TableCell sx={{ fontSize: "1rem" }}>
                       {job.task_id}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: "1rem" }}>
+                      {job.repository}
                     </TableCell>
                     <TableCell sx={{ fontSize: "1rem" }}>
                       {job.operation
