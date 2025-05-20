@@ -183,7 +183,7 @@ const Jobs = () => {
                       {job.status === "STARTED" && (
                         <StopCircleOutlinedIcon
                           onClick={() => stopJob(job.task_id)}
-                          sx={{ color: "#1C4886", cursor: "pointer" }}
+                          sx={{ cursor: "pointer" }}
                         />
                       )}
                     </TableCell>
@@ -199,7 +199,7 @@ const Jobs = () => {
                   rowsPerPage={rowsPerPage}
                   onPageChange={handleChangePage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
-                  rowsPerPageOptions={[1, 5, 10, 25, 50]}
+                  rowsPerPageOptions={[10, 25, 50, 100]}
                   labelRowsPerPage="Linhas por página"
                   labelDisplayedRows={({ from, to, count }) =>
                     `${from}-${to} de ${count}`
