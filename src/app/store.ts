@@ -1,42 +1,59 @@
-import { configureStore } from '@reduxjs/toolkit'
-import sourceReducer from '../features/source/sourceSlice'
+import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers } from "redux";
+import sourceReducer from "../features/source/sourceSlice";
 import itemReducer from "../features/items/itemSlice";
 
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from 'redux-persist'
-import storage from 'redux-persist/lib/storage' // usa localStorage
+// ⬇️ Só importe persist libs no client
+const isClient = typeof window !== "undefined";
 
-import { combineReducers } from 'redux'
+let store: ReturnType<typeof configureAppStore>;
+let persistor: any = null;
 
 const rootReducer = combineReducers({
   source: sourceReducer,
-    item: itemReducer, // <-- adicionado aqui
-})
+  item: itemReducer,
+});
 
-const persistedReducer = persistReducer(
-  { key: 'root', storage },
-  rootReducer
-)
+function configureAppStore() {
+  if (isClient) {
+    const {
+      persistStore,
+      persistReducer,
+      FLUSH,
+      REHYDRATE,
+      PAUSE,
+      PERSIST,
+      PURGE,
+      REGISTER,
+    } = require("redux-persist");
+    const storage = require("redux-persist/lib/storage").default;
 
-export const store = configureStore({
-  reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
-})
+    const persistedReducer = persistReducer(
+      { key: "root", storage },
+      rootReducer
+    );
 
-export const persistor = persistStore(store)
+    const _store = configureStore({
+      reducer: persistedReducer,
+      middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+          serializableCheck: {
+            ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+          },
+        }),
+    });
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+    persistor = persistStore(_store);
+    return _store;
+  } else {
+    return configureStore({
+      reducer: rootReducer,
+    });
+  }
+}
+
+store = configureAppStore();
+
+export { store, persistor };
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
