@@ -198,12 +198,15 @@ export default function Dashboard() {
       sx={{
         ...row,
         width: "100%",
-        height: "100%",
+        height: "752px",
+        // height: "100%",
         bgcolor: "",
         boxSizing: "border-box",
         justifyContent: "center",
         alignItems: "center",
-        paddingTop: "20px",
+        gap: "20px",
+        py: 3
+        // paddingTop: "20px",
       }}
     >
       {/* <Button
@@ -213,16 +216,7 @@ export default function Dashboard() {
       >
         print item
       </Button> */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          height: "93vh",
-          gap: 2,
-          width: "90%",
-          bgcolor: "",
-        }}
-      >
+
         <Box
           sx={{
             width: "72%",
@@ -349,7 +343,7 @@ export default function Dashboard() {
               <>"error"</>
             )}
           </Box>
-          <Box flexGrow={1} sx={{ bgcolor: "#f7f9fb", borderRadius: "16px" }}>
+          <Box flexGrow={1} sx={{ bgcolor: "#f7f9fb", borderRadius: "16px", height: "100%" }}>
             <ChartLine  startDate={startDate} endDate={endDate} />
           </Box>
         </Box>
@@ -360,6 +354,7 @@ export default function Dashboard() {
             justifyContent: "center", // Centraliza horizontalmente
             alignItems: "center", // Mantém o alinhamento no topo (não altera a vertical)
             boxSizing: "border-box",
+            height: "100%"
           }}
         >
           <Filter
@@ -379,7 +374,7 @@ export default function Dashboard() {
             setEndSprint={setEndSprint}
           />
         </Box>
-      </Box>
+
     </Box>
   );
 }
