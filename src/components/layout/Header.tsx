@@ -29,7 +29,7 @@ const Header = () => {
         alignItems: "center",
         ...row,
         px: "28px",
-        boxSizing : "border-box"
+        boxSizing: "border-box",
       }}
     >
       <Box
@@ -74,22 +74,18 @@ const Header = () => {
         {/* sdf */}
         <ItemSwitcher />
       </Box>
-      <Box sx={{ height: "28px", width: "160px", bgcolor: "", ...row }}>
+      <Box
+        sx={{
+          height: "28px",
+          width: "180px",
+          bgcolor: "",
+          ...row,
+
+          justifyContent: "flex-end",
+        }}
+      >
         <Image
           src="/icons/themeMode.svg"
-          alt="Sidebar"
-          width={25}
-          height={25}
-        />
-        <Image src="/icons/refresh.svg" alt="Sidebar" width={25} height={25} />
-        <Image
-          src="/icons/notification.svg"
-          alt="Sidebar"
-          width={25}
-          height={25}
-        />
-        <Image
-          src="/icons/sidebar.svg"
           alt="Sidebar"
           width={25}
           height={25}
