@@ -1,9 +1,31 @@
-"use client"
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography , Paper, Button} from "@mui/material";
+"use client";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableFooter,
+  TablePagination,
+  Typography,
+  Paper,
+} from "@mui/material";
 import { useEffect, useState } from "react";
-import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
-import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined';
+import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
+import StopCircleOutlinedIcon from "@mui/icons-material/StopCircleOutlined";
+import { darken } from "@mui/material/styles";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
+const statusConfig: Record<string, { color: string; label: string }> = {
+  STARTED: { color: "#8A8CD9", label: "Started" },
+  PENDING: { color: "#FFC555", label: "Pending" },
+  SUCCESS: { color: "#A1E3CB", label: "Success" },
+  FAILURE: { color: "#FF5555", label: "Failure" },
+  REVOKED: { color: "#A3A3A3", label: "Revoked" },
+  PROGRESS: { color: "#D3E3A1", label: "In Progress" },
+};
 
 type Job = {
   task_id: string;
@@ -18,121 +40,179 @@ type Job = {
 const Jobs = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const stopJob = async (taskId : string) =>{
-    try{
+  const stopJob = async (taskId: string) => {
+    try {
       const response = await fetch(`${apiUrl}/api/jobs/tasks/${taskId}`, {
         method: "DELETE",
       });
-      if (response.ok) {
-        await fetchJobs(); // Atualiza após parar
-      } else {
-        console.error("Erro ao parar job:", await response.text());
-      }
-    }
-    catch(error){
+      if (response.ok) fetchJobs();
+    } catch {
       console.error("Erro ao parar a task");
     }
-  }
+  };
 
   const fetchJobs = async () => {
-    try{
-      const response = await fetch(`${apiUrl}/api/jobs/`);
-      const data = await response.json();
+    try {
+      const resp = await fetch(`${apiUrl}/api/jobs/`);
+      const data = await resp.json();
       setJobs(data.results);
+    } catch (err) {
+      console.error("Erro ao buscar tasks:", err);
     }
-    catch (error){
-      console.error("Erro ao buscar tasks: ", error);
-    }
-}
+  };
 
   useEffect(() => {
     fetchJobs();
-  }, [])
+  }, []);
 
   const headerCellStyle = {
-    color: "#1C4886",
-    fontWeight: "700",
-    fontSize: "20px",
-  }
+    color: "#9e9e9e",
+    fontWeight: 500,
+    fontSize: "1rem",
+  };
 
-  return  (
-  <Box 
-  sx={{
-    minHeight:"90vh",
-    width:"80vw",
-    backgroundColor: "white",
-    marginTop:"5vh",
-    marginLeft:"2vw",
-    marginRight:"2vw",
-    borderRadius:"10px",
-  }}>
+  const handleChangePage = (_: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+  const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(+e.target.value);
+    setPage(0);
+  };
 
-    <Box p={3}>
-    <Box 
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      width: "100%"
-      
-    }}>
-      <Typography variant="h4" gutterBottom
+  return (
+    <Box
       sx={{
-          color: "#1C4886",
-          fontWeight: "600"
-      }}>
-          Jobs
-      </Typography>
-      <RefreshOutlinedIcon 
-      onClick = {() =>fetchJobs()}
-      sx={{
-        color: "#1C4886",
-        fontSize: 30
-      }} 
-      ></RefreshOutlinedIcon>
-    </Box>
-    
+        minHeight: "90vh",
+        width: "80vw",
+        backgroundColor: "white",
+        m: "5vh 2vw 0",
+        borderRadius: "10px",
+      }}
+    >
+      <Box p={3}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography
+            variant="h4"
+            sx={{ color: "#1C4886", fontWeight: 600, mb: 4 }}
+          >
+            Jobs
+          </Typography>
+          <RefreshOutlinedIcon
+            onClick={fetchJobs}
+            sx={{ color: "#1C4886", fontSize: 30, cursor: "pointer" }}
+          />
+        </Box>
 
-    <TableContainer component={Paper}>
-        <Table>
-        <TableHead
-        sx={{
-          backgroundColor: "#1C488636",
-          color: "#1C4886",
-        }}>  
-            <TableRow>
-            <TableCell sx={headerCellStyle}>Job ID</TableCell>
-            <TableCell sx={headerCellStyle}>Status</TableCell>
-            <TableCell sx={headerCellStyle}>Description</TableCell>
-            <TableCell></TableCell>
-            </TableRow>
-        </TableHead>
-        <TableBody>
-            {jobs.map((job) => (
-            <TableRow key={job.task_id}>
-                <TableCell>{job.task_id}</TableCell>
-                <TableCell>{job.status}</TableCell>
-                <TableCell>{job.operation}</TableCell>
-                <TableCell sx={{
-                  width: "10%"
-                }}>
-                  {job.status === "STARTED" && (
-                  <StopCircleOutlinedIcon 
-                  onClick={() => stopJob(job.task_id)}
-                  sx={{
-                    color: "#1C4886",
-                    cursor: "pointer",
-                    
-                  }}></StopCircleOutlinedIcon>
-                  )}
-                </TableCell>
-            </TableRow>
-            ))}
-        </TableBody>
-        </Table>
-    </TableContainer>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={headerCellStyle}>Job ID</TableCell>
+                <TableCell sx={headerCellStyle}>Description</TableCell>
+                <TableCell sx={headerCellStyle}>Date</TableCell>
+                <TableCell sx={headerCellStyle}>Status</TableCell>
+                <TableCell sx={headerCellStyle}></TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {jobs
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((job) => (
+                  <TableRow key={job.task_id}>
+                    <TableCell sx={{ fontSize: "1rem" }}>
+                      {job.task_id}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: "1rem" }}>
+                      {job.operation
+                        .replace(/_/g, " ")
+                        .replace(/^\w/, (c) => c.toUpperCase())}
+                    </TableCell>
+
+                    <TableCell sx={{ fontSize: "1rem" }}>
+                      <Box display="flex" alignItems="center">
+                        <CalendarTodayIcon fontSize="small" sx={{ mr: 1 }} />
+                        {new Date(job.created_at_formatted).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}
+                      </Box>
+                    </TableCell>
+
+                    <TableCell>
+                      <Box display="flex" alignItems="center">
+                        <Box
+                          component="span"
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            backgroundColor:
+                              statusConfig[job.status]?.color ?? "#000",
+                            mr: 1,
+                          }}
+                        />
+                        <Typography
+                          sx={{
+                            fontWeight: 600,
+                            color: darken(
+                              statusConfig[job.status]?.color ?? "#000",
+                              0.2
+                            ),
+                          }}
+                        >
+                          {statusConfig[job.status]?.label ?? job.status}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+
+                    <TableCell sx={{ width: "10%" }}>
+                      {job.status === "STARTED" && (
+                        <StopCircleOutlinedIcon
+                          onClick={() => stopJob(job.task_id)}
+                          sx={{ color: "#1C4886", cursor: "pointer" }}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  count={jobs.length}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  rowsPerPageOptions={[1, 5, 10, 25, 50]}
+                  labelRowsPerPage="Linhas por página"
+                  labelDisplayedRows={({ from, to, count }) =>
+                    `${from}-${to} de ${count}`
+                  }
+                  colSpan={10}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </TableContainer>
+      </Box>
     </Box>
-</Box>
-)}
+  );
+};
+
 export default Jobs;
