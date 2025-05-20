@@ -111,7 +111,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
 
     if (diffInDays < 15) {
       setInterval("day");
-    } else if (diffInDays < 120) {
+    } else if (diffInDays < 90) {
       setInterval("week");
     } else {
       setInterval("month");
@@ -163,17 +163,18 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
           }}
           axisLeft={{
             // orient: "left",
-            legend: "Y",
+            legend: "count",
             legendOffset: -40,
             legendPosition: "middle",
           }}
           pointSize={10}
           pointColor={{ theme: "background" }}
-          pointBorderWidth={2}
+          pointBorderWidth={3}
           pointBorderColor={{ from: "serieColor" }}
           enableSlices="x"
           useMesh={true}
           curve="monotoneX"
+          enablePoints={true}
           // curve="linear"
         />
       </Box>

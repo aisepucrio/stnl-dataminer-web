@@ -34,16 +34,6 @@ const sources = {
   // },
 };
 
-const chartData = [
-  {
-    id: "Série A",
-    data: [
-      { x: "Jan", y: 10 },
-      { x: "Fev", y: 20 },
-      { x: "Mar", y: 15 },
-    ],
-  },
-];
 
 export default function Dashboard() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -69,7 +59,7 @@ export default function Dashboard() {
 
   const [loading, setLoading] = useState(true);
 
-  const [items, setItems] = useState<any[]>([]);
+  // const [items, setItems] = useState<any[]>([]);
 
   const [selectedItem, setSelectedItem] = useState(""); // usado no select
 
@@ -115,7 +105,7 @@ export default function Dashboard() {
         setQtyPullrequest(pull_requests_count);
         setQtyCommit(commits_count);
         setQtyRepository(repositories_count);
-        setItems(repositories);
+        // setItems(repositories);
 
         setQtyComment(0);
         setQtySprints(0);
@@ -130,7 +120,7 @@ export default function Dashboard() {
         // setQtyComment();
         setQtyProject(projects_count);
 
-        setItems(projects);
+        // setItems(projects);
         return;
       }
     } catch (error) {
@@ -360,7 +350,7 @@ export default function Dashboard() {
             )}
           </Box>
           <Box flexGrow={1} sx={{ bgcolor: "#f7f9fb", borderRadius: "16px" }}>
-            <ChartLine data={chartData} startDate={startDate} endDate={endDate} />
+            <ChartLine  startDate={startDate} endDate={endDate} />
           </Box>
         </Box>
 
