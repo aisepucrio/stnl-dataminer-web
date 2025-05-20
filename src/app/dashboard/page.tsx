@@ -147,15 +147,15 @@ export default function Dashboard() {
       const data = await response.json();
 
       const {
-        repositories_count = 0,
-        projects_count = 0,
-        issues_count = 0,
-        pull_requests_count = 0,
-        commits_count = 0,
-        comments_count = 0,
-        forks_count = 0,
-        stars_count = 0,
-        sprints_count = 0,
+        repositories_count = qtyRepository,
+        projects_count = qtyProject ,
+        issues_count = qtyIssue,
+        pull_requests_count  = qtyPullrequest,
+        commits_count = qtyCommit,
+        comments_count = qtyComment,
+        forks_count = qtyFork ,
+        stars_count = qtyStar ,
+        sprints_count = qtySprint ,
       } = data;
 
       setQtyRepository(repositories_count);
