@@ -131,7 +131,7 @@ const Jobs = () => {
             <TableHead>
               <TableRow>
                 <TableCell sx={headerCellStyle}>Job ID</TableCell>
-                <TableCell sx={headerCellStyle}>Projects</TableCell>
+                <TableCell sx={headerCellStyle}>Project</TableCell>
                 <TableCell sx={headerCellStyle}>Description</TableCell>
                 <TableCell sx={headerCellStyle}>Date</TableCell>
                 <TableCell sx={headerCellStyle}>Status</TableCell>
