@@ -17,6 +17,8 @@ import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import StopCircleOutlinedIcon from "@mui/icons-material/StopCircleOutlined";
 import { darken } from "@mui/material/styles";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
+import IconButton from "@mui/material/IconButton";
 
 const statusConfig: Record<string, { color: string; label: string }> = {
   STARTED: { color: "#8A8CD9", label: "Started" },
@@ -82,6 +84,9 @@ const Jobs = () => {
     setPage(0);
   };
 
+  const [rev, setRev] = useState(false);
+  const orderedJobs = rev ? [...jobs].reverse() : jobs;
+
   return (
     <Box
       sx={{
@@ -106,17 +111,27 @@ const Jobs = () => {
           >
             Jobs
           </Typography>
-          <RefreshOutlinedIcon
-            onClick={fetchJobs}
-            sx={{ color: "#1C4886", fontSize: 30, cursor: "pointer" }}
-          />
-        </Box>
 
+          <Box>
+            <IconButton onClick={() => setRev(!rev)} sx={{ color: "#1C4886" }}>
+              <SwapVertIcon
+                sx={{ color: "#1C4886", fontSize: 40, cursor: "pointer" }}
+              />
+            </IconButton>
+
+            <IconButton onClick={fetchJobs} sx={{ color: "#1C4886" }}>
+              <RefreshOutlinedIcon
+                sx={{ color: "#1C4886", fontSize: 38, cursor: "pointer" }}
+              />
+            </IconButton>
+          </Box>
+        </Box>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell sx={headerCellStyle}>Job ID</TableCell>
+                <TableCell sx={headerCellStyle}>Project</TableCell>
                 <TableCell sx={headerCellStyle}>Description</TableCell>
                 <TableCell sx={headerCellStyle}>Date</TableCell>
                 <TableCell sx={headerCellStyle}>Status</TableCell>
@@ -125,12 +140,15 @@ const Jobs = () => {
             </TableHead>
 
             <TableBody>
-              {jobs
+              {orderedJobs
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((job) => (
                   <TableRow key={job.task_id}>
                     <TableCell sx={{ fontSize: "1rem" }}>
                       {job.task_id}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: "1rem" }}>
+                      {job.repository}
                     </TableCell>
                     <TableCell sx={{ fontSize: "1rem" }}>
                       {job.operation
