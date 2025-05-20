@@ -106,7 +106,7 @@ const Collect = () => {
       source === "github"
         ? `${apiUrl}/api/github/collect-all/`
         : source === "jira"
-        ? `${apiUrl}/api/jira/collect-all/`
+        ? `${apiUrl}/api/jira/issues/collect/`
         : "";
 
     fetch(endpoint, {
