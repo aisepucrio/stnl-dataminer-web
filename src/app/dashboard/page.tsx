@@ -50,8 +50,16 @@ export default function Dashboard() {
   const source = useSelector((state: RootState) => state.source.value);
   const item = useSelector((state: RootState) => state.item.value);
 
-  const [startDate, setStartDate] = useState<string>(""); // ou data inicial padrão
-  const [endDate, setEndDate] = useState<string>(""); // ou data final padrão
+  // date -----------------------------
+  const today = new Date();
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(today.getFullYear() - 1);
+  
+  const formatDate = (date: Date) => date.toISOString().split("T")[0];
+  
+  const [startDate, setStartDate] = useState<string>(formatDate(oneYearAgo));
+  const [endDate, setEndDate] = useState<string>(formatDate(today));
+  // date -----------------------------
 
   const [startHash, setStartHash] = useState<string>("");
   const [endHash, setEndHash] = useState<string>("");
