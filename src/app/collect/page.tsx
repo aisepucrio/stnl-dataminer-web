@@ -85,6 +85,11 @@ const Collect = () => {
   }
 
   const handleCollect = () => {
+    // Validação
+    if (tags.length === 0) {
+      alert("Adicione ao menos uma tag antes de coletar.");
+      return;
+    }
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     const payload: any = {
@@ -160,7 +165,11 @@ const Collect = () => {
           {tags.map((tag, idx) => (
             <Chip
               key={idx}
-              label={source === "github" ? tag : `${tag.jira_domain}/${tag.project_key}`}
+              label={
+                source === "github"
+                  ? tag
+                  : `${tag.jira_domain}/${tag.project_key}`
+              }
               onDelete={() =>
                 setTags((prev) => prev.filter((_, i) => i !== idx))
               }
@@ -342,6 +351,7 @@ const Collect = () => {
         <Button
           onClick={handleCollect}
           variant="contained"
+          disabled={tags.length === 0}
           sx={{
             color: "white",
             bgcolor: "#1C4886",
