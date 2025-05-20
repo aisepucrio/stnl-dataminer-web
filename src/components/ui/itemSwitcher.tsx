@@ -127,7 +127,6 @@ const ItemSwitcher = () => {
       dispatch(setItem(""));
     }
     prevSourceRef.current = source;
-    console.log("ola nundo");
     setSelectedItem("");
     fetchSource(source);
   }, [source]);

@@ -30,6 +30,14 @@ const chartData = [
       { x: "Mar", y: 15 },
     ],
   },
+  {
+    id: "Série B",
+    data: [
+      { x: "Jan", y: 20 },
+      { x: "Fev", y: 18 },
+      { x: "Mar", y: 15 },
+    ],
+  },
 ];
 
 const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
@@ -37,16 +45,37 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const [interval, setInterval] = useState<string>("month");
   const source = useSelector((state: RootState) => state.source.value);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const [lineData, setLineData] = useState<any>([]);
+
+  const formatLineData = (data: any) => {
+    const labels = data.time_series.labels;
+    const issues = data.time_series.issues;
+    const pullRequests = data.time_series.pull_requests;
+    const commits = data.time_series.commits;
+
+    const formatSeries = (id, values) => ({
+      id,
+      data: labels.map((label, index) => ({
+        x: label,
+        y: values[index],
+      })),
+    });
+
+    const issuesData = formatSeries("issues", issues);
+    const pullRequestsData = formatSeries("pull_requests", pullRequests);
+    const commitsData = formatSeries("commits", commits);
+
+    return [issuesData, pullRequestsData, commitsData];
+  };
 
   const fetchData = async () => {
     let endpoint = "";
     if (source === "github") {
-      endpoint = `${apiUrl}/api/github/dashboard/graph/`;
+      endpoint = `${apiUrl}/api/github/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}`;
     } else if (source === "jira") {
       endpoint = `${apiUrl}`; // substitua pelo endpoint correto quando souber
     }
 
-    window.alert("vai dar fetch");
     setLoading(true);
 
     try {
@@ -60,7 +89,10 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       }
 
       const data = await response.json();
-      console.log("dados são:", data);
+      const formatted = formatLineData(data);
+
+      setLineData(formatted);
+
       // Aqui você pode usar os dados, por exemplo: setData(data);
     } catch (err) {
       console.error("Erro ao buscar dados do gráfico:", err);
@@ -70,6 +102,21 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   };
 
   useEffect(() => {
+    if (!startDate || !endDate) return;
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffInMs = end.getTime() - start.getTime();
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+    if (diffInDays < 15) {
+      setInterval("day");
+    } else if (diffInDays < 120) {
+      setInterval("week");
+    } else {
+      setInterval("month");
+    }
+
     fetchData();
   }, [startDate, endDate]);
 
@@ -104,13 +151,13 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
         }}
       >
         <ResponsiveLine
-          data={chartData}
+          data={lineData}
           margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
           xScale={{ type: "point" }}
           yScale={{ type: "linear", min: "auto", max: "auto", stacked: false }}
           axisBottom={{
-            // orient: "bottom",
-            legend: "X",
+            tickRotation: -45, // coloca os textos em diagonal
+            // legend: "Data",
             legendOffset: 36,
             legendPosition: "middle",
           }}
@@ -127,6 +174,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
           enableSlices="x"
           useMesh={true}
           curve="monotoneX"
+          // curve="linear"
         />
       </Box>
     </>
