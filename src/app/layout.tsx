@@ -4,6 +4,7 @@ import MainMenu from "@/components/layout/MainMenu";
 import { Box } from "@mui/material";
 import { Providers } from "./Providers";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -31,6 +32,7 @@ export default function RootLayout({
             >
               <Header />
               {children}
+              <Footer />
             </Box>
           </Box>
         </Providers>
