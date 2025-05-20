@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Filter from "@/components/common/Filter";
 
 type github_commits={
   id: string,
@@ -198,7 +199,9 @@ const Preview = () => {
   const columns = Object.keys(filteredData[0]);
 
   return (
-    <Box p={2}>
+    <Box p={2} sx={{
+      display: "flex",
+    }}>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -214,7 +217,9 @@ const Preview = () => {
             {filteredData.map((item, i) => (
               <TableRow key={i}>
                 {columns.map((col) => (
-                <TableCell key={col}>
+                <TableCell key={col} sx={{ 
+                  fontSize: 14,
+                }}>
                    {typeof item[col] === "object" && item[col] !== null 
                    ? JSON.stringify(item[col], null, 2)
                    : String(item[col])}
@@ -225,6 +230,16 @@ const Preview = () => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Box sx={{
+        marginLeft: 10,
+        backgroundColor: "#E7F2FF",
+        width: 80,
+        height: "100%",
+      }}> 
+
+      </Box>
+
     </Box>
   );
 };
