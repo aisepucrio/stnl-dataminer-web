@@ -50,7 +50,7 @@ const Collect = () => {
       if (domainValue.trim() && inputValue.trim()) {
         setTags((prev) => [
           ...prev,
-          { domain: domainValue.trim(), project: inputValue.trim() },
+          { jira_domain: domainValue.trim(), project_key: inputValue.trim() },
         ]);
         setDomainValue("");
         setInputValue("");
@@ -160,7 +160,7 @@ const Collect = () => {
           {tags.map((tag, idx) => (
             <Chip
               key={idx}
-              label={source === "github" ? tag : `${tag.domain}/${tag.project}`}
+              label={source === "github" ? tag : `${tag.jira_domain}/${tag.project_key}`}
               onDelete={() =>
                 setTags((prev) => prev.filter((_, i) => i !== idx))
               }
