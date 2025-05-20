@@ -360,7 +360,7 @@ export default function Dashboard() {
             )}
           </Box>
           <Box flexGrow={1} sx={{ bgcolor: "#f7f9fb", borderRadius: "16px" }}>
-            <ChartLine data={chartData} />
+            <ChartLine data={chartData} startDate={startDate} endDate={endDate} />
           </Box>
         </Box>
 

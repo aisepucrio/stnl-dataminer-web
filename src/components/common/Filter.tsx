@@ -75,24 +75,27 @@ const Filter = ({
   endDate,
   setStartDate,
   setEndDate,
-
   startHash,
   setStartHash,
-
   endHash,
   setEndHash,
-
   startSprint,
   setStartSprint,
-
   endSprint,
   setEndSprint,
 }: FilterProps) => {
+  const [localStartDate, setLocalStartDate] = useState(startDate);
+  const [localEndDate, setLocalEndDate] = useState(endDate);
   // const [startHash, setStartHash] = useState<string>("");
   // const [endHash, setEndHash] = useState<string>("");
 
   // const [startSprint, setStartSprint] = useState<string>("");
   // const [endSprint, setEndSprint] = useState<string>("");
+
+  const handleApply = () => {
+    setStartDate(localStartDate);
+    setEndDate(localEndDate);
+  };
 
   return (
     <Box sx={filter}>
@@ -104,8 +107,8 @@ const Filter = ({
         <TextField
           type="date"
           sx={input}
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
+          value={localStartDate}
+          onChange={(e) => setLocalStartDate(e.target.value)}
         />
 
         {/* A customização é aqui */}
@@ -135,8 +138,8 @@ const Filter = ({
         <TextField
           sx={input}
           type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
+          value={localEndDate}
+          onChange={(e) => setLocalEndDate(e.target.value)}
           // InputLabelProps={{ shrink: true }}
         />
 
@@ -162,7 +165,9 @@ const Filter = ({
       <br />
       <br />
       <Box>
-        <Button sx={button}>Apply filters</Button>
+        <Button sx={button} onClick={handleApply}>
+          Apply filters
+        </Button>
       </Box>
     </Box>
   );
