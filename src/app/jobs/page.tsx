@@ -91,7 +91,7 @@ const Jobs = () => {
     <Box
       sx={{
         minHeight: "90vh",
-        width: "80vw",
+        width: "95%",
         backgroundColor: "white",
         m: "5vh 2vw 0",
         borderRadius: "10px",
