@@ -3,7 +3,6 @@ import ChartLine from "@/components/common/ChartLine";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 
-// MUI
 import { Box, Button, SelectChangeEvent } from "@mui/material";
 import { useEffect, useState } from "react";
 import InfoCard from "@/components/common/InfoCard";
