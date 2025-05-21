@@ -10,6 +10,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Alert,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
@@ -286,7 +287,12 @@ const Collect = () => {
 
       {/* Essa é a box B */}
       {/* Box B - Datas */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "30px" }}>
+        {(!startDate && !endDate) && (
+          <Alert variant="outlined" severity="warning" sx={{ width: "30vw" }}>
+            Leaving the date fields empty will mine data from the entire period.
+          </Alert>
+        )}
         <TextField
           label="Start"
           type="date"
