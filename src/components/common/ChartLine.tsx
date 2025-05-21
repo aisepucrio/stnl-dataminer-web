@@ -56,7 +56,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const options = ["commits", "issues", "pull requests"];
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>(options);
 
   const open = Boolean(anchorEl);
 
@@ -169,7 +169,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
         </Typography>
       </Box>
       <Box>
-        {/* select aqui */}
+        {/* select aqui CHART select*/}
 
         <Button
           onClick={handleClick}
@@ -181,7 +181,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
             gap: 1,
             alignItems: "center",
             // bgcolor: "green",
-            marginLeft: "10px"
+            marginLeft: "10px",
           }}
         >
           <Image
