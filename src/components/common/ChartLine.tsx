@@ -257,7 +257,32 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
               ? option?.color ?? "#ccc"
               : "rgba(0,0,0,0)";
           }}
-
+          legends={[
+            {
+              anchor: "bottom-right", // posição da legenda
+              direction: "column", // coluna vertical
+              justify: false,
+              translateX: 90,
+              translateY: -60,
+              itemsSpacing: 8,
+              itemDirection: "left-to-right",
+              itemWidth: 80,
+              itemHeight: 20,
+              itemOpacity: 0.75,
+              symbolSize: 12, // tamanho do símbolo na legenda (9 aqui)
+              symbolShape: "circle",
+              symbolBorderColor: "rgba(0, 0, 0, .5)",
+              effects: [
+                {
+                  on: "hover",
+                  style: {
+                    itemBackground: "rgba(0, 0, 0, .03)",
+                    itemOpacity: 1,
+                  },
+                },
+              ],
+            },
+          ]}
           // curve="linear"
         />
       </Box>
