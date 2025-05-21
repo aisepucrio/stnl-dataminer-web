@@ -295,8 +295,6 @@ const Preview = () => {
       flexDirection: "row",
       maxWidth: "90vw",         
       overflowX: "auto",       
-      boxSizing: "border-box",
-       
     }}>
 
       <DataGrid
@@ -319,12 +317,12 @@ const Preview = () => {
       pagination 
       checkboxSelection     
       sx={{
-        minWidth: "40vw",
+        width: "50vw",
         marginTop: 2,
         marginLeft: 2,
         marginBottom: 5,
         overflowX: "auto",
-        tableLayout: "fixed",
+        tableLayout: "fixed", // evitar que os dados saissem debaixo da coluna correspondente 
         '& .MuiDataGrid-cell': {
           minWidth: "7vw",        },
         '& .MuiDataGrid-columnHeader': {          
