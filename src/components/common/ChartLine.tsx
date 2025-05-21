@@ -53,10 +53,16 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [lineData, setLineData] = useState<any>([]);
 
-  const options = ["commits", "issues", "pull requests"];
+  // const options = ["commits", "issues", "pull requests"];
+  const options = [
+    { key: "commits", label: "Commits", color: "#e9e29c" },
+    { key: "issues", label: "Issues", color: "#dfc8b4" },
+    { key: "pull_requests", label: "Pull Quests", color: "#db9387" },
+  ];
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selected, setSelected] = useState<string[]>(options);
+  // const [selected, setSelected] = useState<string[]>(options);
+  const [selected, setSelected] = useState<string[]>(options.map((o) => o.key));
 
   const open = Boolean(anchorEl);
 
@@ -68,11 +74,16 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
     setAnchorEl(null);
   };
 
-  const handleToggle = (option: string) => {
+  // const handleToggle = (option: string) => {
+  //   setSelected((prev) =>
+  //     prev.includes(option)
+  //       ? prev.filter((o) => o !== option)
+  //       : [...prev, option]
+  //   );
+  // };
+  const handleToggle = (key: string) => {
     setSelected((prev) =>
-      prev.includes(option)
-        ? prev.filter((o) => o !== option)
-        : [...prev, option]
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
   };
 
@@ -194,10 +205,10 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
         </Button>
         <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
           {options.map((option) => (
-            <MenuItem key={option} onClick={() => handleToggle(option)}>
+            <MenuItem key={option.key} onClick={() => handleToggle(option.key)}>
               <FormControlLabel
-                control={<Checkbox checked={selected.includes(option)} />}
-                label={option}
+                control={<Checkbox checked={selected.includes(option.key)} />}
+                label={option.label}
               />
             </MenuItem>
           ))}
@@ -219,13 +230,11 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
           xScale={{ type: "point" }}
           yScale={{ type: "linear", min: "auto", max: "auto", stacked: false }}
           axisBottom={{
-            tickRotation: -45, // coloca os textos em diagonal
-            // legend: "Data",
+            tickRotation: -45,
             legendOffset: 36,
             legendPosition: "middle",
           }}
           axisLeft={{
-            // orient: "left",
             legend: "count",
             legendOffset: -40,
             legendPosition: "middle",
@@ -238,6 +247,17 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
           useMesh={true}
           curve="monotoneX"
           enablePoints={true}
+          // colors={lineData.map((serie) =>
+          //   selected.includes(serie.id) ? "#1C4886" : "rgba(0,0,0,0)"
+          // )}
+          colors={(serie) => {
+            const id = String(serie.id);
+            const option = options.find((o) => o.key === id);
+            return selected.includes(id)
+              ? option?.color ?? "#ccc"
+              : "rgba(0,0,0,0)";
+          }}
+
           // curve="linear"
         />
       </Box>
