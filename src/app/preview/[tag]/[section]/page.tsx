@@ -11,8 +11,10 @@ import {
   Paper,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import Filter from "@/components/common/Filter";
+import { RootState } from "@/app/store";
 
 type github_commits={
   id: string,
@@ -154,22 +156,38 @@ const Preview = () => {
   const [data, setData] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
-  const source = params.source;
+  const tag = params.tag;
   const section = params.section;
+
+  const source = useSelector((state: RootState) => state.source.value);
+  const item = useSelector((state: RootState) => state.item.value);
+
+  const [startDate, setStartDate] = useState<string>(""); // ou data inicial padrão
+  const [endDate, setEndDate] = useState<string>(""); // ou data final padrão
+
+  const [startHash, setStartHash] = useState<string>("");
+  const [endHash, setEndHash] = useState<string>("");
+
+  const [startSprint, setStartSprint] = useState<string>("");
+  const [endSprint, setEndSprint] = useState<string>("");
+
+  const [loading, setLoading] = useState(true);
+
+  const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const realSection = section === "comments" ? "issues" : section;
 
-        const res = await fetch(`${apiUrl}/api/${source}/${realSection}`, {
+        const res = await fetch(`${apiUrl}/api/${tag}/${realSection}`, {
           method: "GET",
         });
 
         if (!res.ok) throw new Error("Erro ao buscar dados");
         const json = await res.json();
 
-        const formattedData = source === "jira" && realSection === "issues" ? json.results : json;
+        const formattedData = tag === "jira" && realSection === "issues" ? json.results : json;
         console.log(formattedData);
 
         setData(formattedData);
@@ -180,7 +198,7 @@ const Preview = () => {
     };
 
     fetchData();
-  }, [apiUrl, source, section]);
+  }, [apiUrl, tag, section]);
 
   if (error) return <Typography color="error">Erro: {error}</Typography>;
   if (!data) return <Typography>Carregando...</Typography>;
@@ -199,10 +217,18 @@ const Preview = () => {
   const columns = Object.keys(filteredData[0]);
 
   return (
-    <Box p={2} sx={{
+    <Box sx={{
       display: "flex",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      maxWidth: "90vw",         
+      overflowX: "hidden",       
+      boxSizing: "border-box", 
     }}>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{
+        width: "60vw",
+        marginLeft: 2,
+      }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -231,13 +257,26 @@ const Preview = () => {
         </Table>
       </TableContainer>
 
-      <Box sx={{
-        marginLeft: 10,
-        backgroundColor: "#E7F2FF",
-        width: 80,
-        height: "100%",
-      }}> 
-
+      <Box
+      sx={{
+        marginLeft: 2,
+        height: "60vh"
+      }}>
+        <Filter
+        source={source}
+        item={item}
+        startDate={startDate}
+        endDate={endDate}
+        setStartDate={setStartDate}
+        setEndDate={setEndDate}
+        startHash={startHash}
+        setStartHash={setStartHash}
+        endHash={endHash}
+        setEndHash={setEndHash}
+        startSprint={startSprint}
+        setStartSprint={setStartSprint}
+        endSprint={endSprint}
+        setEndSprint={setEndSprint}/>
       </Box>
 
     </Box>
