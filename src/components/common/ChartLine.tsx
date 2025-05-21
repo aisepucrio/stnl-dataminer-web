@@ -1,9 +1,12 @@
 import {
   Box,
+  Button,
   Checkbox,
   FormControl,
+  FormControlLabel,
   InputLabel,
   ListItemText,
+  Menu,
   MenuItem,
   OutlinedInput,
   Select,
@@ -13,6 +16,9 @@ import { useState, useEffect } from "react";
 import { ResponsiveLine } from "@nivo/line";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
+
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import Image from "next/image";
 
 const color = "#1C4886";
 
@@ -46,6 +52,29 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const source = useSelector((state: RootState) => state.source.value);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [lineData, setLineData] = useState<any>([]);
+
+  const options = ["commits", "issues", "pull requests"];
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleToggle = (option: string) => {
+    setSelected((prev) =>
+      prev.includes(option)
+        ? prev.filter((o) => o !== option)
+        : [...prev, option]
+    );
+  };
 
   const formatLineData = (data: any) => {
     const labels = data.time_series.labels;
@@ -126,21 +155,55 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
 
   return (
     <>
-      <Box sx={{ ...row, justifyContent: "space-between" }}>
+      <Box sx={{ ...row, justifyContent: "space-between", py: "24px" }}>
         <Typography
           sx={{
             color,
-            fontSize: "32px",
-            pt: "7px",
+            fontSize: "18px",
             px: "16px",
-            fontWeight: 500,
+            fontWeight: 600,
             bgcolor: "",
           }}
         >
           Charts Geral
         </Typography>
-        <Typography>Select</Typography>
       </Box>
+      <Box>
+        {/* select aqui */}
+
+        <Button
+          onClick={handleClick}
+          // variant="outlined"
+          startIcon={<ChevronRightIcon />}
+          sx={{
+            textTransform: "none",
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+            // bgcolor: "green",
+            marginLeft: "10px"
+          }}
+        >
+          <Image
+            src="/icons/BookOpen.svg"
+            alt="chart filter"
+            width={20}
+            height={20}
+          />
+          <Typography>Chart Filter</Typography>
+        </Button>
+        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          {options.map((option) => (
+            <MenuItem key={option} onClick={() => handleToggle(option)}>
+              <FormControlLabel
+                control={<Checkbox checked={selected.includes(option)} />}
+                label={option}
+              />
+            </MenuItem>
+          ))}
+        </Menu>
+      </Box>
+
       <Box
         sx={{
           height: 400,
