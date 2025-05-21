@@ -58,13 +58,6 @@ export default function Dashboard() {
 
   const [loading, setLoading] = useState(true);
 
-  // const [items, setItems] = useState<any[]>([]);
-
-  const [selectedItem, setSelectedItem] = useState(""); // usado no select
-
-  const [repository, setRepository] = useState("");
-  const [project, setProject] = useState("");
-
   const [qtyRepository, setQtyRepository] = useState<number | null>(0);
   const [qtyProject, setQtyProject] = useState<number | null>(0);
   const [qtyIssue, setQtyIssue] = useState<number | null>(0);
@@ -87,39 +80,32 @@ export default function Dashboard() {
       if (!response.ok) {
         throw new Error(`Erro ao buscar dados de ${source}`);
       }
+      console.log()
+      console.log("data is >> ")
+      console.log(data)
+      console.log()
 
       const {
-        issues_count = 0,
-        pull_requests_count = 0,
-        commits_count = 0,
-        repositories_count = 0,
-        projects_count,
+        issues_count = qtyIssue,
+        pull_requests_count = qtyPullrequest,
+        commits_count = qtyCommit,
+        repositories_count = qtyRepository,
+        projects_count = qtyProject,
       } = data;
 
       if (source === "github") {
-        const repositories = data.repositories.map((repo: any) => repo);
-        // console.log(repositories);
-
         setQtyIssue(issues_count);
         setQtyPullrequest(pull_requests_count);
         setQtyCommit(commits_count);
         setQtyRepository(repositories_count);
-        // setItems(repositories);
-
-        setQtyComment(0);
-        setQtySprints(0);
 
         return;
       }
 
       if (source === "jira") {
-        const projects = data.projects.map((project: string) => project);
-
         setQtyIssue(issues_count);
-        // setQtyComment();
         setQtyProject(projects_count);
 
-        // setItems(projects);
         return;
       }
     } catch (error) {
@@ -176,15 +162,15 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    setSelectedItem("");
-    setRepository("");
-    setProject("");
     fetchSource(source);
   }, [source]);
 
   useEffect(() => {
     if (item) {
       fetchItem(item);
+    } else {
+      // window.alert("removeu item, vai dar fetch de novo")
+      fetchSource(source)
     }
   }, [item]);
 
@@ -205,7 +191,6 @@ export default function Dashboard() {
         alignItems: "center",
         gap: "20px",
         py: 3
-        // paddingTop: "20px",
       }}
     >
       {/* <Button
