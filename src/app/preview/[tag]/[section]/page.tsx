@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import Filter from "@/components/common/Filter";
 import { RootState } from "@/app/store";
+import { DataGrid } from "@mui/x-data-grid";
 
 type github_commits={
   id: string,
@@ -43,30 +44,26 @@ type github_commits={
     }
   ],
   repository: string,
-  sha: string,
   message: string,
-  date: string,
+  sha: string,
   insertions: string,
   deletions: string,
   files_changed: string,
   in_main_branch: string,
   merge: string,
+  time_mined: string,
+  date: string,
   dmm_unit_size: string,
   dmm_unit_complexity: string,
   dmm_unit_interfacing: string,
-  time_mined: string
   }
 
 
 type github_issues={
   id: string,
-  created_at_formatted: string,
-  updated_at_formatted: string,
-  closed_at_formatted: string,
-  merged_at_formatted: string,
+  number: string,
   repository: string,
   record_id: string,
-  number: string,
   title: string,
   state: string,
   creator: string,
@@ -74,9 +71,6 @@ type github_issues={
   labels: string,
   milestone: string,
   locked: string,
-  created_at: string,
-  updated_at: string,
-  closed_at: string,
   body: string,
   comments: string,
   timeline_events: string,
@@ -87,6 +81,13 @@ type github_issues={
   reactions: string,
   data_type: string,
   time_mined: string, 
+  created_at_formatted: string,
+  updated_at_formatted: string,
+  closed_at_formatted: string,
+  merged_at_formatted: string,
+  created_at: string,
+  updated_at: string,
+  closed_at: string,
 }
 
 type github_pullrequests = {
@@ -159,11 +160,70 @@ const Preview = () => {
   const tag = params.tag;
   const section = params.section;
 
+  // choosing the order 
+  const columns_github_commits = [
+    { accessorKey: "id", header: "ID" },
+    { accessorKey: "author.name", header: "Author Name" },
+    { accessorKey: "author.email", header: "Author Email" },
+    { accessorKey: "committer.name", header: "Committer Name" },
+    { accessorKey: "committer.email", header: "Committer Email" },
+    { accessorKey: "modified_files", header: "Modified Files" }, 
+    { accessorKey: "repository", header: "Repository" },
+    { accessorKey: "message", header: "Message" },
+    { accessorKey: "insertions", header: "Insertions" },
+    { accessorKey: "deletions", header: "Deletions" },
+    { accessorKey: "sha", header: "SHA" },
+    { accessorKey: "files_changed", header: "Files Changed" },
+    { accessorKey: "in_main_branch", header: "In Main Branch" },
+    { accessorKey: "merge", header: "Merge" },
+    { accessorKey: "time_mined", header: "Time Mined" },
+    { accessorKey: "date", header: "Date" },
+    { accessorKey: "dmm_unit_size", header: "DMM Unit Size" },
+    { accessorKey: "dmm_unit_complexity", header: "DMM Unit Complexity" },
+    { accessorKey: "dmm_unit_interfacing", header: "DMM Unit Interfacing" },
+  ]
+
+
+
+  const columns_github_issues = [
+  { accessorKey: "id", header: "ID" },
+  { accessorKey: "number", header: "Number" },
+  { accessorKey: "repository", header: "Repository" },
+  { accessorKey: "record_id", header: "Record ID" },
+  { accessorKey: "title", header: "Title" },
+  { accessorKey: "state", header: "State" },
+  { accessorKey: "creator", header: "Creator" },
+  { accessorKey: "body", header: "Body" },
+  { accessorKey: "assignees", header: "Assignees" },
+  { accessorKey: "labels", header: "Labels" },
+  { accessorKey: "milestone", header: "Milestone" },
+  { accessorKey: "locked", header: "Locked" },
+  { accessorKey: "comments", header: "Comments" },
+  { accessorKey: "timeline_events", header: "Timeline Events" },
+  { accessorKey: "merged_at", header: "Merged At" },
+  { accessorKey: "commits", header: "Commits" },
+  { accessorKey: "is_pull_request", header: "Is Pull Request" },
+  { accessorKey: "author_association", header: "Author Association" },
+  { accessorKey: "reactions", header: "Reactions" },
+  { accessorKey: "data_type", header: "Data Type" },
+  { accessorKey: "time_mined", header: "Time Mined" },
+  { accessorKey: "created_at_formatted", header: "Created At (Formatted)" },
+  { accessorKey: "updated_at_formatted", header: "Updated At (Formatted)" },
+  { accessorKey: "closed_at_formatted", header: "Closed At (Formatted)" },
+  { accessorKey: "merged_at_formatted", header: "Merged At (Formatted)" },
+  { accessorKey: "created_at", header: "Created At" },
+  { accessorKey: "updated_at", header: "Updated At" },
+  { accessorKey: "closed_at", header: "Closed At" },
+  ]
+
+
+
+
   const source = useSelector((state: RootState) => state.source.value);
   const item = useSelector((state: RootState) => state.item.value);
 
-  const [startDate, setStartDate] = useState<string>(""); // ou data inicial padrão
-  const [endDate, setEndDate] = useState<string>(""); // ou data final padrão
+  const [startDate, setStartDate] = useState<string>(""); 
+  const [endDate, setEndDate] = useState<string>(""); 
 
   const [startHash, setStartHash] = useState<string>("");
   const [endHash, setEndHash] = useState<string>("");
@@ -214,53 +274,71 @@ const Preview = () => {
         }))
       : data;
 
-  const columns = Object.keys(filteredData[0]);
+  //const columns = Object.keys(filteredData[0]);
+
+  let columns;
+
+  if (tag === "github" && section === "commits") {
+    columns = columns_github_commits;
+  } else if (tag === "github" && section === "issues") {
+    columns = columns_github_issues;
+  } else {
+    columns = Object.keys(filteredData[0]).map((key) => ({
+      accessorKey: key,
+      header: key,
+    }));
+  }
 
   return (
     <Box sx={{
       display: "flex",
       flexDirection: "row",
-      flexWrap: "wrap",
       maxWidth: "90vw",         
-      overflowX: "hidden",       
-      boxSizing: "border-box", 
+      overflowX: "auto",       
+      boxSizing: "border-box",
+       
     }}>
-      <TableContainer component={Paper} sx={{
-        width: "60vw",
+
+      <DataGrid
+      rows={filteredData.map((row, index) => ({ id: index, ...row }))}
+      columns={columns.map((col) => ({
+        field: col.accessorKey,
+        headerName: col.header,
+        renderCell: (params: any) => {
+          const keys = col.accessorKey.split(".");
+          let value = params.row;
+          for (const key of keys) {
+            value = value?.[key];
+          }
+          return typeof value === "object" && value !== null
+            ? JSON.stringify(value, null, 2)
+            : String(value ?? "");
+        },
+      }))}
+      pageSizeOptions={[10, 25, 50, 100]}
+      pagination 
+      checkboxSelection     
+      sx={{
+        minWidth: "40vw",
+        marginTop: 2,
         marginLeft: 2,
-      }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {columns.map((col) => (
-                <TableCell key={col} sx={{ fontWeight: "bold" }}>
-                  {col}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredData.map((item, i) => (
-              <TableRow key={i}>
-                {columns.map((col) => (
-                <TableCell key={col} sx={{ 
-                  fontSize: 14,
-                }}>
-                   {typeof item[col] === "object" && item[col] !== null 
-                   ? JSON.stringify(item[col], null, 2)
-                   : String(item[col])}
-                </TableCell>))}
-
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
+        marginBottom: 5,
+        overflowX: "auto",
+        tableLayout: "fixed",
+        '& .MuiDataGrid-cell': {
+          minWidth: "7vw",        },
+        '& .MuiDataGrid-columnHeader': {          
+          minWidth: "7vw",
+        },
+      }}
+      />
+      
       <Box
       sx={{
         marginLeft: 2,
-        height: "60vh"
+        height: "80vh", 
+        marginTop: 2,
+        marginRight: 2
       }}>
         <Filter
         source={source}
