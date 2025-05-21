@@ -31,7 +31,7 @@ const Collect = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
-  const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
+  const [checkedOptions, setCheckedOptions] = useState<string[]>(["metadata"]);
 
   const handleCheckboxChange = (option: string) => {
     setCheckedOptions((prev) =>
@@ -69,6 +69,7 @@ const Collect = () => {
     comment: "comments",
     "pull request": "pull_requests",
     issue: "issues",
+    metadata: "metadata"
   };
 
   const formatDate = (dateStr: string): string => {
@@ -109,8 +110,6 @@ const Collect = () => {
     } else if (source === "jira") {
       payload.projects = tags;
     }
-
-    console.log(payload);
 
     const endpoint =
       source === "github"
