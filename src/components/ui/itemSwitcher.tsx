@@ -70,8 +70,6 @@ const ItemSwitcher = () => {
       }
 
       if (source === "jira") {
-        console.log("data é : ::::::::::::::")
-        console.log(data)
         const projects = data.projects.map((project: string) => project);
 
         setItems(projects);

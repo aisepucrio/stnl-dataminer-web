@@ -54,11 +54,14 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const [lineData, setLineData] = useState<any>([]);
 
   // const options = ["commits", "issues", "pull requests"];
-  const options = [
-    { key: "commits", label: "Commits", color: "#e9e29c" },
-    { key: "issues", label: "Issues", color: "#dfc8b4" },
-    { key: "pull_requests", label: "Pull Quests", color: "#db9387" },
-  ];
+  const [options, setOptions] = useState<
+    { key: string; label: string; color: string }[]
+  >([]);
+  // const options = [
+  //   { key: "commits", label: "Commits", color: "#e9e29c" },
+  //   { key: "issues", label: "Issues", color: "#dfc8b4" },
+  //   { key: "pull_requests", label: "Pull Quests", color: "#db9387" },
+  // ];
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   // const [selected, setSelected] = useState<string[]>(options);
@@ -88,33 +91,58 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   };
 
   const formatLineData = (data: any) => {
-    const labels = data.time_series.labels;
-    const issues = data.time_series.issues;
-    const pullRequests = data.time_series.pull_requests;
-    const commits = data.time_series.commits;
+    // const time_series = data.time_series;
+    // console.log("time series is")
+    // console.log(time_series)
 
-    const formatSeries = (id, values) => ({
-      id,
-      data: labels.map((label, index) => ({
-        x: label,
-        y: values[index],
-      })),
+    // const labels = data.time_series.labels;
+    // const issues = data.time_series.issues;
+    // const pullRequests = data.time_series.pull_requests;
+    // const commits = data.time_series.commits;
+
+    // const formatSeries = (id, values) => ({
+    //   id,
+    //   data: labels.map((label, index) => ({
+    //     x: label,
+    //     y: values[index],
+    //   })),
+    // });
+
+    // const issuesData = formatSeries("issues", issues);
+    // const pullRequestsData = formatSeries("pull_requests", pullRequests);
+    // const commitsData = formatSeries("commits", commits);
+
+    // return [issuesData, pullRequestsData, commitsData];
+    
+    //  a parte de cima era a logica anterior do github
+// ================================================================
+    const { time_series } = data;
+    const { labels, ...otherSeries } = time_series;
+
+    const result = Object.keys(otherSeries).map((key) => {
+      return {
+        id: key,
+        data: otherSeries[key].map((value: number, index: number) => ({
+          x: labels[index],
+          y: value,
+        })),
+      };
     });
 
-    const issuesData = formatSeries("issues", issues);
-    const pullRequestsData = formatSeries("pull_requests", pullRequests);
-    const commitsData = formatSeries("commits", commits);
-
-    return [issuesData, pullRequestsData, commitsData];
+    return result;
   };
 
   const fetchData = async () => {
     let endpoint = "";
-    if (source === "github") {
-      endpoint = `${apiUrl}/api/github/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}`;
-    } else if (source === "jira") {
-      endpoint = `${apiUrl}`; // substitua pelo endpoint correto quando souber
-    }
+    // if (source === "github") {
+    endpoint = `${apiUrl}/api/${source}/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}`;
+    // } else if (source === "jira") {
+    // endpoint = `${apiUrl}`; // substitua pelo endpoint correto quando souber
+    // }
+    // console.log()
+    // console.log("endpoint é")
+    // console.log(endpoint)
+    // console.log()
 
     setLoading(true);
 
@@ -129,7 +157,10 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       }
 
       const data = await response.json();
+      // console.log(data);
       const formatted = formatLineData(data);
+
+      // console.log(formatted);
 
       setLineData(formatted);
 
@@ -143,6 +174,25 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
 
   useEffect(() => {
     if (!startDate || !endDate) return;
+
+    if (source === "github") {
+      const githubOptions = [
+        { key: "commits", label: "Commits", color: "#e9e29c" },
+        { key: "issues", label: "Issues", color: "#dfc8b4" },
+        { key: "pull_requests", label: "Pull Quests", color: "#db9387" },
+      ];
+      setOptions(githubOptions);
+      setSelected(githubOptions.map((o) => o.key));
+    } else if (source === "jira") {
+      const jiraOptions = [
+        { key: "commits", label: "Commits", color: "#e9e29c" },
+        { key: "issues", label: "Issues", color: "#dfc8b4" },
+        { key: "comments", label: "Comments", color: "#db9387" },
+        { key: "sprints", label: "Sprints", color: "#a7d3a6" }, // cor escolhida
+      ];
+      setOptions(jiraOptions);
+      setSelected(jiraOptions.map((o) => o.key));
+    }
 
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -158,7 +208,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
     }
 
     fetchData();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, source]);
 
   if (loading) {
     return <div> ... loading ...</div>;
