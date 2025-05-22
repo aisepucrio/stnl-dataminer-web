@@ -326,91 +326,99 @@ const Preview = () => {
         flexDirection: "column",
         justifyContent: "flex-start",
         marginLeft: 2,
-        height: "70vh", 
+        height: "100vh",
         marginTop: 2,
         marginRight: 2,
         backgroundColor: "#E7F2FF",
-        width: "18vw", 
+        width: "18vw",
         borderRadius: 4,
-        padding: 2
-      }}>
-        <Typography variant="h5" sx={{ 
-          mb: 3, 
-          fontWeight: "bold", 
-          alignSelf: "flex-start" }}>
-        Filters
-        </Typography>
-        
-        <Box
+        padding: 3,
+        }}
+      >
+      <Typography
+        variant="h5"
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          justifyContent: "center",
-          backgroundColor: "#F7F9FB",
-          borderRadius: 2,
-          width: "15vw",
-          marginTop: 4,
-          marginBottom: 7, 
-          padding: 1
-          }}>
-          <Typography variant="h6" sx={{ mb: 1 }}>Start </Typography>
-          <input
+          mb: 3,
+          color: "#1C4886",
+          fontSize: "32px",
+        }}
+      >Filters</Typography>
+
+      {/* Start */}
+      <Box sx={{ mb: 5 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            mb: 1,
+            color: "#1C4886",
+            fontSize: "22px",
+          }}
+        >Start</Typography>
+        <input
           type="date"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
-          style={{ 
-            height: "6vh", 
-            borderRadius: 2, 
-            border: "none",
-            backgroundColor: "#F7F9FB",
-            fontSize: 18
-          }} 
-         />
-        </Box>
+          style={{
+            width: "100%",
+            height: "40px",
+            fontSize: "20px",
+            padding: "0 10px",
+            border: "1px solid #A0AAB4",
+            borderRadius: 0,
+            backgroundColor: "#E7F2FF",
+            color: "black"
+          }}
+        />
+      </Box>
 
-        <Box 
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          justifyContent: "center",
-          backgroundColor: "#F7F9FB",
-          borderRadius: 2,
-          width: "15vw",
-          marginBottom: 5, 
-          padding: 1
-        }}>
-          <Typography variant="h6" sx={{ mb: 1 }}>Finish </Typography>
-          <input
+      {/* Finish */}
+      <Box sx={{ mb: 6 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            mb: 1,
+            color: "#1C4886",
+            fontSize: "22px",
+          }}
+        >
+          Finish
+        </Typography>
+        <input
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
-          style={{ 
-            height: "6vh", 
-            borderRadius: 2, 
-            border: "none",
-            backgroundColor: "#F7F9FB",
-            fontSize: 18,
-          }} 
-          />
-        </Box>
-        <Button
-          variant="contained" 
-          sx={{
-            backgroundColor: '#1C4886', 
-            color: '#FFFFFF', 
-            borderRadius: '8px',
-            padding: '10px 24px', 
-            marginTop: 3, 
-            '&:hover': {
-              backgroundColor: '#3F51B5', 
-            },
-            }}>
-          Apply Filters
-        </Button>
+          style={{
+            width: "100%",
+            height: "40px",
+            fontSize: "20px",
+            padding: "0 10px",
+            border: "1px solid #A0AAB4",
+            borderRadius: 0,
+            backgroundColor: "#E7F2FF",
+            color: "#000000"
+          }}
+        />
       </Box>
 
+      <Button
+        variant="contained"
+        sx={{
+          bgcolor: "#1C4886",
+          borderRadius: "16px",
+          width: "100%",
+          height: "70px",
+          fontWeight: 700,
+          color: "white",
+          fontSize: "22px",
+          textTransform: "none",
+          ":hover": {
+            backgroundColor: "#173B6C",
+          },
+        }}
+      >
+        Apply filters
+      </Button>
+    </Box>
 
     </Box>
   );
