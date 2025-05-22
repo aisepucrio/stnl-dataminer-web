@@ -1,19 +1,12 @@
 "use client";
 import {
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  Button,
   Typography,
-  Paper,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
-import Filter from "@/components/common/Filter";
 import { RootState } from "@/app/store";
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -156,6 +149,7 @@ const Preview = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [data, setData] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
+
   const params = useParams();
   const tag = params.tag;
   const section = params.section;
@@ -216,25 +210,22 @@ const Preview = () => {
   { accessorKey: "closed_at", header: "Closed At" },
   ]
 
+  const [startDateInput, setStartDateInput] = useState<string>("");
+  const [endDateInput, setEndDateInput] = useState<string>("");
 
-
-
+  const [startDate, setStartDate] = useState<string>(""); 
+  const [endDate, setEndDate] = useState<string>("");
+ 
   const source = useSelector((state: RootState) => state.source.value);
   const item = useSelector((state: RootState) => state.item.value);
 
-  const [startDate, setStartDate] = useState<string>(""); 
-  const [endDate, setEndDate] = useState<string>(""); 
 
-  const [startHash, setStartHash] = useState<string>("");
-  const [endHash, setEndHash] = useState<string>("");
-
-  const [startSprint, setStartSprint] = useState<string>("");
-  const [endSprint, setEndSprint] = useState<string>("");
-
-  const [loading, setLoading] = useState(true);
-
-  const [items, setItems] = useState<any[]>([]);
-
+  const handleApplyFilters = () => {
+    setStartDate(startDateInput);
+    setEndDate(endDateInput);
+  };
+  
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -264,23 +255,25 @@ const Preview = () => {
   if (!data) return <Typography>Carregando...</Typography>;
   if (data.length === 0) return <Typography>Nenhum dado encontrado.</Typography>;
 
-  // exibição diferente para o comments ( que tem os dados vindos dos issues )
-  const filteredData =
-    section === "comments"
-      ? data.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          comments: item.comments,
-        }))
-      : data;
-
-  //const columns = Object.keys(filteredData[0]);
+  const filteredData = (section === "comments"
+    ? data.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        comments: item.comments,
+      }))
+    : data
+  ).filter((item: any) => {
+    const itemDate = new Date(item.date || item.created_at || item.created).getTime();
+    const start = startDate ? new Date(startDate).getTime() : -Infinity;
+    const end = endDate ? new Date(endDate).getTime() : Infinity;
+    return itemDate >= start && itemDate <= end;
+  });
 
   let columns;
 
-  if (tag === "github" && section === "commits") {
+  if (source === "github" && section === "commits") {
     columns = columns_github_commits;
-  } else if (tag === "github" && section === "issues") {
+  } else if (source === "github" && section === "issues") {
     columns = columns_github_issues;
   } else {
     columns = Object.keys(filteredData[0]).map((key) => ({
@@ -296,64 +289,140 @@ const Preview = () => {
       maxWidth: "90vw",         
       overflowX: "auto",       
     }}>
-
       <DataGrid
-      rows={filteredData.map((row, index) => ({ id: index, ...row }))}
-      columns={columns.map((col) => ({
-        field: col.accessorKey,
-        headerName: col.header,
-        renderCell: (params: any) => {
-          const keys = col.accessorKey.split(".");
-          let value = params.row;
-          for (const key of keys) {
-            value = value?.[key];
-          }
-          return typeof value === "object" && value !== null
-            ? JSON.stringify(value, null, 2)
-            : String(value ?? "");
-        },
-      }))}
-      pageSizeOptions={[10, 25, 50, 100]}
-      pagination 
-      checkboxSelection     
-      sx={{
-        width: "50vw",
-        marginTop: 2,
-        marginLeft: 2,
-        marginBottom: 5,
-        overflowX: "auto",
-        tableLayout: "fixed", // evitar que os dados saissem debaixo da coluna correspondente 
-        '& .MuiDataGrid-cell': {
-          minWidth: "7vw",        },
-        '& .MuiDataGrid-columnHeader': {          
-          minWidth: "7vw",
-        },
-      }}
+        rows={filteredData.map((row, index) => ({ id: index, ...row }))}
+        columns={columns.map((col) => ({
+          field: col.accessorKey,
+          headerName: col.header,
+          renderCell: (params: any) => {
+            const keys = col.accessorKey.split(".");
+            let value = params.row;
+            for (const key of keys) {
+              value = value?.[key];
+            }
+            return typeof value === "object" && value !== null
+              ? JSON.stringify(value, null, 2)
+              : String(value ?? "");
+          },
+        }))}
+        pageSizeOptions={[10, 25, 50, 100]}
+        pagination 
+        checkboxSelection     
+        sx={{
+          width: "50vw",
+          marginTop: 2,
+          marginLeft: 2,
+          marginBottom: 5,
+          overflowX: "auto",
+          tableLayout: "fixed",
+          '& .MuiDataGrid-cell': {
+            minWidth: "7vw",
+          },
+          '& .MuiDataGrid-columnHeader': {          
+            minWidth: "7vw",
+          },
+        }}
       />
-      
       <Box
       sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start",
         marginLeft: 2,
-        height: "80vh", 
+        height: "100vh",
         marginTop: 2,
-        marginRight: 2
-      }}>
-        <Filter
-        source={source}
-        item={item}
-        startDate={startDate}
-        endDate={endDate}
-        setStartDate={setStartDate}
-        setEndDate={setEndDate}
-        startHash={startHash}
-        setStartHash={setStartHash}
-        endHash={endHash}
-        setEndHash={setEndHash}
-        startSprint={startSprint}
-        setStartSprint={setStartSprint}
-        endSprint={endSprint}
-        setEndSprint={setEndSprint}/>
+        marginRight: 2,
+        backgroundColor: "#E7F2FF",
+        width: "18vw",
+        borderRadius: 4,
+        padding: 3,
+        }}
+      >
+      <Typography
+        variant="h5"
+        sx={{
+          mb: 3,
+          color: "#1C4886",
+          fontSize: "32px",
+        }}
+      >Filters</Typography>
+
+      {/* Start */}
+      <Box sx={{ mb: 5 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            mb: 1,
+            color: "#1C4886",
+            fontSize: "22px",
+          }}
+        >Start</Typography>
+        <input
+          type="date"
+          value={startDateInput}
+          onChange={(e) => setStartDateInput(e.target.value)}
+          style={{
+            width: "100%",
+            height: "40px",
+            fontSize: "20px",
+            padding: "0 10px",
+            border: "1px solid #A0AAB4",
+            borderRadius: 0,
+            backgroundColor: "#E7F2FF",
+            color: "black"
+          }}
+        />
       </Box>
+
+      {/* Finish */}
+      <Box sx={{ mb: 6 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            mb: 1,
+            color: "#1C4886",
+            fontSize: "22px",
+          }}
+        >
+          Finish
+        </Typography>
+        <input
+          type="date"
+          value={endDateInput}
+          onChange={(e) => setEndDateInput(e.target.value)}
+          style={{
+            width: "100%",
+            height: "40px",
+            fontSize: "20px",
+            padding: "0 10px",
+            border: "1px solid #A0AAB4",
+            borderRadius: 0,
+            backgroundColor: "#E7F2FF",
+            color: "#000000"
+          }}
+        />
+      </Box>
+
+      <Button
+        variant="contained"
+        onClick={handleApplyFilters}
+        sx={{
+          bgcolor: "#1C4886",
+          borderRadius: "16px",
+          width: "100%",
+          height: "70px",
+          fontWeight: 700,
+          color: "white",
+          fontSize: "22px",
+          textTransform: "none",
+          ":hover": {
+            backgroundColor: "#173B6C",
+          },
+        }}
+      >
+        Apply filters
+      </Button>
+    </Box>
 
     </Box>
   );
