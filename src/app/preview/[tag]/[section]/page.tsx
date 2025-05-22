@@ -1,14 +1,8 @@
 "use client";
 import {
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  Button,
   Typography,
-  Paper,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -156,6 +150,7 @@ const Preview = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [data, setData] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
+
   const params = useParams();
   const tag = params.tag;
   const section = params.section;
@@ -216,25 +211,14 @@ const Preview = () => {
   { accessorKey: "closed_at", header: "Closed At" },
   ]
 
-
-
-
+  const [startDate, setStartDate] = useState<string>(""); 
+  const [endDate, setEndDate] = useState<string>("");
+  
   const source = useSelector((state: RootState) => state.source.value);
   const item = useSelector((state: RootState) => state.item.value);
 
-  const [startDate, setStartDate] = useState<string>(""); 
-  const [endDate, setEndDate] = useState<string>(""); 
 
-  const [startHash, setStartHash] = useState<string>("");
-  const [endHash, setEndHash] = useState<string>("");
-
-  const [startSprint, setStartSprint] = useState<string>("");
-  const [endSprint, setEndSprint] = useState<string>("");
-
-  const [loading, setLoading] = useState(true);
-
-  const [items, setItems] = useState<any[]>([]);
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -265,14 +249,19 @@ const Preview = () => {
   if (data.length === 0) return <Typography>Nenhum dado encontrado.</Typography>;
 
   // exibição diferente para o comments ( que tem os dados vindos dos issues )
-  const filteredData =
-    section === "comments"
-      ? data.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          comments: item.comments,
-        }))
-      : data;
+  const filteredData = (section === "comments"
+  ? data.map((item: any) => ({
+      id: item.id,
+      title: item.title,
+      comments: item.comments,
+    }))
+  : data
+  ).filter((item: any) => {
+  const itemDate = new Date(item.date || item.created_at || item.created).getTime();
+  const start = startDate ? new Date(startDate).getTime() : -Infinity;
+  const end = endDate ? new Date(endDate).getTime() : Infinity;
+  return itemDate >= start && itemDate <= end;
+  });
 
   //const columns = Object.keys(filteredData[0]);
 
@@ -333,27 +322,95 @@ const Preview = () => {
       
       <Box
       sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start",
         marginLeft: 2,
-        height: "80vh", 
+        height: "70vh", 
         marginTop: 2,
-        marginRight: 2
+        marginRight: 2,
+        backgroundColor: "#E7F2FF",
+        width: "18vw", 
+        borderRadius: 4,
+        padding: 2
       }}>
-        <Filter
-        source={source}
-        item={item}
-        startDate={startDate}
-        endDate={endDate}
-        setStartDate={setStartDate}
-        setEndDate={setEndDate}
-        startHash={startHash}
-        setStartHash={setStartHash}
-        endHash={endHash}
-        setEndHash={setEndHash}
-        startSprint={startSprint}
-        setStartSprint={setStartSprint}
-        endSprint={endSprint}
-        setEndSprint={setEndSprint}/>
+        <Typography variant="h5" sx={{ 
+          mb: 3, 
+          fontWeight: "bold", 
+          alignSelf: "flex-start" }}>
+        Filters
+        </Typography>
+        
+        <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          justifyContent: "center",
+          backgroundColor: "#F7F9FB",
+          borderRadius: 2,
+          width: "15vw",
+          marginTop: 4,
+          marginBottom: 7, 
+          padding: 1
+          }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>Start </Typography>
+          <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          style={{ 
+            height: "6vh", 
+            borderRadius: 2, 
+            border: "none",
+            backgroundColor: "#F7F9FB",
+            fontSize: 18
+          }} 
+         />
+        </Box>
+
+        <Box 
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          justifyContent: "center",
+          backgroundColor: "#F7F9FB",
+          borderRadius: 2,
+          width: "15vw",
+          marginBottom: 5, 
+          padding: 1
+        }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>Finish </Typography>
+          <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          style={{ 
+            height: "6vh", 
+            borderRadius: 2, 
+            border: "none",
+            backgroundColor: "#F7F9FB",
+            fontSize: 18,
+          }} 
+          />
+        </Box>
+        <Button
+          variant="contained" 
+          sx={{
+            backgroundColor: '#1C4886', 
+            color: '#FFFFFF', 
+            borderRadius: '8px',
+            padding: '10px 24px', 
+            marginTop: 3, 
+            '&:hover': {
+              backgroundColor: '#3F51B5', 
+            },
+            }}>
+          Apply Filters
+        </Button>
       </Box>
+
 
     </Box>
   );
