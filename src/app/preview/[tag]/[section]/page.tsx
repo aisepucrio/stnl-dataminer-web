@@ -7,7 +7,6 @@ import {
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
-import Filter from "@/components/common/Filter";
 import { RootState } from "@/app/store";
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -211,13 +210,21 @@ const Preview = () => {
   { accessorKey: "closed_at", header: "Closed At" },
   ]
 
+  const [startDateInput, setStartDateInput] = useState<string>("");
+  const [endDateInput, setEndDateInput] = useState<string>("");
+
   const [startDate, setStartDate] = useState<string>(""); 
   const [endDate, setEndDate] = useState<string>("");
-  
+ 
   const source = useSelector((state: RootState) => state.source.value);
   const item = useSelector((state: RootState) => state.item.value);
 
 
+  const handleApplyFilters = () => {
+    setStartDate(startDateInput);
+    setEndDate(endDateInput);
+  };
+  
   
   useEffect(() => {
     const fetchData = async () => {
@@ -248,28 +255,25 @@ const Preview = () => {
   if (!data) return <Typography>Carregando...</Typography>;
   if (data.length === 0) return <Typography>Nenhum dado encontrado.</Typography>;
 
-  // exibição diferente para o comments ( que tem os dados vindos dos issues )
   const filteredData = (section === "comments"
-  ? data.map((item: any) => ({
-      id: item.id,
-      title: item.title,
-      comments: item.comments,
-    }))
-  : data
+    ? data.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        comments: item.comments,
+      }))
+    : data
   ).filter((item: any) => {
-  const itemDate = new Date(item.date || item.created_at || item.created).getTime();
-  const start = startDate ? new Date(startDate).getTime() : -Infinity;
-  const end = endDate ? new Date(endDate).getTime() : Infinity;
-  return itemDate >= start && itemDate <= end;
+    const itemDate = new Date(item.date || item.created_at || item.created).getTime();
+    const start = startDate ? new Date(startDate).getTime() : -Infinity;
+    const end = endDate ? new Date(endDate).getTime() : Infinity;
+    return itemDate >= start && itemDate <= end;
   });
-
-  //const columns = Object.keys(filteredData[0]);
 
   let columns;
 
-  if (tag === "github" && section === "commits") {
+  if (source === "github" && section === "commits") {
     columns = columns_github_commits;
-  } else if (tag === "github" && section === "issues") {
+  } else if (source === "github" && section === "issues") {
     columns = columns_github_issues;
   } else {
     columns = Object.keys(filteredData[0]).map((key) => ({
@@ -285,41 +289,40 @@ const Preview = () => {
       maxWidth: "90vw",         
       overflowX: "auto",       
     }}>
-
       <DataGrid
-      rows={filteredData.map((row, index) => ({ id: index, ...row }))}
-      columns={columns.map((col) => ({
-        field: col.accessorKey,
-        headerName: col.header,
-        renderCell: (params: any) => {
-          const keys = col.accessorKey.split(".");
-          let value = params.row;
-          for (const key of keys) {
-            value = value?.[key];
-          }
-          return typeof value === "object" && value !== null
-            ? JSON.stringify(value, null, 2)
-            : String(value ?? "");
-        },
-      }))}
-      pageSizeOptions={[10, 25, 50, 100]}
-      pagination 
-      checkboxSelection     
-      sx={{
-        width: "50vw",
-        marginTop: 2,
-        marginLeft: 2,
-        marginBottom: 5,
-        overflowX: "auto",
-        tableLayout: "fixed", // evitar que os dados saissem debaixo da coluna correspondente 
-        '& .MuiDataGrid-cell': {
-          minWidth: "7vw",        },
-        '& .MuiDataGrid-columnHeader': {          
-          minWidth: "7vw",
-        },
-      }}
+        rows={filteredData.map((row, index) => ({ id: index, ...row }))}
+        columns={columns.map((col) => ({
+          field: col.accessorKey,
+          headerName: col.header,
+          renderCell: (params: any) => {
+            const keys = col.accessorKey.split(".");
+            let value = params.row;
+            for (const key of keys) {
+              value = value?.[key];
+            }
+            return typeof value === "object" && value !== null
+              ? JSON.stringify(value, null, 2)
+              : String(value ?? "");
+          },
+        }))}
+        pageSizeOptions={[10, 25, 50, 100]}
+        pagination 
+        checkboxSelection     
+        sx={{
+          width: "50vw",
+          marginTop: 2,
+          marginLeft: 2,
+          marginBottom: 5,
+          overflowX: "auto",
+          tableLayout: "fixed",
+          '& .MuiDataGrid-cell': {
+            minWidth: "7vw",
+          },
+          '& .MuiDataGrid-columnHeader': {          
+            minWidth: "7vw",
+          },
+        }}
       />
-      
       <Box
       sx={{
         display: "flex",
@@ -356,8 +359,8 @@ const Preview = () => {
         >Start</Typography>
         <input
           type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
+          value={startDateInput}
+          onChange={(e) => setStartDateInput(e.target.value)}
           style={{
             width: "100%",
             height: "40px",
@@ -385,8 +388,8 @@ const Preview = () => {
         </Typography>
         <input
           type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
+          value={endDateInput}
+          onChange={(e) => setEndDateInput(e.target.value)}
           style={{
             width: "100%",
             height: "40px",
@@ -402,6 +405,7 @@ const Preview = () => {
 
       <Button
         variant="contained"
+        onClick={handleApplyFilters}
         sx={{
           bgcolor: "#1C4886",
           borderRadius: "16px",
