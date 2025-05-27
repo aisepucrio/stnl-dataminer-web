@@ -217,8 +217,6 @@ const Preview = () => {
   const [endDate, setEndDate] = useState<string>("");
  
   const source = useSelector((state: RootState) => state.source.value);
-  const item = useSelector((state: RootState) => state.item.value);
-
 
   const handleApplyFilters = () => {
     setStartDate(startDateInput);
@@ -239,10 +237,8 @@ const Preview = () => {
         const json = await res.json();
 
         const formattedData = tag === "jira" && realSection === "issues" ? json.results : json;
-        console.log(formattedData);
 
         setData(formattedData);
-        console.log("data formatada");
       } catch (err: any) {
         setError(err.message || "Erro desconhecido");
       }
@@ -253,21 +249,29 @@ const Preview = () => {
 
   if (error) return <Typography color="error">Erro: {error}</Typography>;
   if (!data) return <Typography>Carregando...</Typography>;
-  if (data.length === 0) return <Typography>Nenhum dado encontrado.</Typography>;
 
-  const filteredData = (section === "comments"
-    ? data.map((item: any) => ({
-        id: item.id,
-        title: item.title,
-        comments: item.comments,
-      }))
-    : data
-  ).filter((item: any) => {
-    const itemDate = new Date(item.date || item.created_at || item.created).getTime();
+  const filteredDataByDate = (data || []).filter((item: any) => {
+    const itemDateValue = item.date || item.created_at || item.created;
+    const itemDate = new Date(itemDateValue).getTime();
     const start = startDate ? new Date(startDate).getTime() : -Infinity;
     const end = endDate ? new Date(endDate).getTime() : Infinity;
     return itemDate >= start && itemDate <= end;
   });
+
+  const processedData = section === "comments" && source === "github" ? 
+  filteredDataByDate.map((item: any) => ({
+    id: item.id,
+    title: item.title,
+    comments: item.comments,
+  }))
+: filteredDataByDate;
+
+if (processedData.length === 0) {
+  if (data.length === 0) {
+      return <Typography>Nenhum dado encontrado.</Typography>;
+  }
+  return <Typography>Nenhum dado encontrado com os filtros aplicados.</Typography>;
+}
 
   let columns;
 
@@ -276,7 +280,7 @@ const Preview = () => {
   } else if (source === "github" && section === "issues") {
     columns = columns_github_issues;
   } else {
-    columns = Object.keys(filteredData[0]).map((key) => ({
+    columns = Object.keys(filteredDataByDate[0]).map((key) => ({
       accessorKey: key,
       header: key,
     }));
@@ -290,7 +294,7 @@ const Preview = () => {
       overflowX: "auto",       
     }}>
       <DataGrid
-        rows={filteredData.map((row, index) => ({ id: index, ...row }))}
+        rows={filteredDataByDate.map((row, index) => ({ id: index, ...row }))}
         columns={columns.map((col) => ({
           field: col.accessorKey,
           headerName: col.header,
