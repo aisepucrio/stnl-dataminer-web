@@ -236,9 +236,20 @@ const Preview = () => {
         if (!res.ok) throw new Error("Erro ao buscar dados");
         const json = await res.json();
 
-        const formattedData = tag === "jira" && realSection === "issues" ? json.results : json;
+        let formattedData = []; // Comece com um array vazio por padrão
+      if (json && Array.isArray(json.results)) {
+        // Se 'json.results' existir e for um array (caso da sua API paginada)
+        formattedData = json.results;
+      } else if (Array.isArray(json)) {
+        // Senão, se o próprio 'json' for um array (para APIs que retornam o array diretamente)
+        formattedData = json;
+      }
 
-        setData(formattedData);
+        console.log("API Response (json):", json);
+        console.log("Data before formatting (formattedData):", formattedData);
+        console.log("Is formattedData an array?", Array.isArray(formattedData));
+
+        setData(Array.isArray(formattedData) ? formattedData : []);
       } catch (err: any) {
         setError(err.message || "Erro desconhecido");
       }
