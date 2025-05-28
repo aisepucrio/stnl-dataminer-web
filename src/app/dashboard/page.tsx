@@ -3,7 +3,6 @@ import ChartLine from "@/components/common/ChartLine";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 
-// MUI
 import { Box, Button, SelectChangeEvent } from "@mui/material";
 import { useEffect, useState } from "react";
 import InfoCard from "@/components/common/InfoCard";
@@ -34,24 +33,22 @@ const sources = {
   // },
 };
 
-const chartData = [
-  {
-    id: "Série A",
-    data: [
-      { x: "Jan", y: 10 },
-      { x: "Fev", y: 20 },
-      { x: "Mar", y: 15 },
-    ],
-  },
-];
 
 export default function Dashboard() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const source = useSelector((state: RootState) => state.source.value);
   const item = useSelector((state: RootState) => state.item.value);
 
-  const [startDate, setStartDate] = useState<string>(""); // ou data inicial padrão
-  const [endDate, setEndDate] = useState<string>(""); // ou data final padrão
+  // date -----------------------------
+  const today = new Date();
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(today.getFullYear() - 1);
+  
+  const formatDate = (date: Date) => date.toISOString().split("T")[0];
+  
+  const [startDate, setStartDate] = useState<string>(formatDate(oneYearAgo));
+  const [endDate, setEndDate] = useState<string>(formatDate(today));
+  // date -----------------------------
 
   const [startHash, setStartHash] = useState<string>("");
   const [endHash, setEndHash] = useState<string>("");
@@ -60,13 +57,6 @@ export default function Dashboard() {
   const [endSprint, setEndSprint] = useState<string>("");
 
   const [loading, setLoading] = useState(true);
-
-  const [items, setItems] = useState<any[]>([]);
-
-  const [selectedItem, setSelectedItem] = useState(""); // usado no select
-
-  const [repository, setRepository] = useState("");
-  const [project, setProject] = useState("");
 
   const [qtyRepository, setQtyRepository] = useState<number | null>(0);
   const [qtyProject, setQtyProject] = useState<number | null>(0);
@@ -90,39 +80,32 @@ export default function Dashboard() {
       if (!response.ok) {
         throw new Error(`Erro ao buscar dados de ${source}`);
       }
+      console.log()
+      console.log("data is >> ")
+      console.log(data)
+      console.log()
 
       const {
-        issues_count = 0,
-        pull_requests_count = 0,
-        commits_count = 0,
-        repositories_count = 0,
-        projects_count,
+        issues_count = qtyIssue,
+        pull_requests_count = qtyPullrequest,
+        commits_count = qtyCommit,
+        repositories_count = qtyRepository,
+        projects_count = qtyProject,
       } = data;
 
       if (source === "github") {
-        const repositories = data.repositories.map((repo: any) => repo);
-        // console.log(repositories);
-
         setQtyIssue(issues_count);
         setQtyPullrequest(pull_requests_count);
         setQtyCommit(commits_count);
         setQtyRepository(repositories_count);
-        setItems(repositories);
-
-        setQtyComment(0);
-        setQtySprints(0);
 
         return;
       }
 
       if (source === "jira") {
-        const projects = data.projects.map((project: string) => project);
-
         setQtyIssue(issues_count);
-        // setQtyComment();
         setQtyProject(projects_count);
 
-        setItems(projects);
         return;
       }
     } catch (error) {
@@ -149,15 +132,15 @@ export default function Dashboard() {
       const data = await response.json();
 
       const {
-        repositories_count = 0,
-        projects_count = 0,
-        issues_count = 0,
-        pull_requests_count = 0,
-        commits_count = 0,
-        comments_count = 0,
-        forks_count = 0,
-        stars_count = 0,
-        sprints_count = 0,
+        repositories_count = qtyRepository,
+        projects_count = qtyProject ,
+        issues_count = qtyIssue,
+        pull_requests_count  = qtyPullrequest,
+        commits_count = qtyCommit,
+        comments_count = qtyComment,
+        forks_count = qtyFork ,
+        stars_count = qtyStar ,
+        sprints_count = qtySprint ,
       } = data;
 
       setQtyRepository(repositories_count);
@@ -179,15 +162,15 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    setSelectedItem("");
-    setRepository("");
-    setProject("");
     fetchSource(source);
   }, [source]);
 
   useEffect(() => {
     if (item) {
       fetchItem(item);
+    } else {
+      // window.alert("removeu item, vai dar fetch de novo")
+      fetchSource(source)
     }
   }, [item]);
 
@@ -200,12 +183,14 @@ export default function Dashboard() {
       sx={{
         ...row,
         width: "100%",
-        height: "100%",
+        height: "752px",
+        // height: "100%",
         bgcolor: "",
         boxSizing: "border-box",
         justifyContent: "center",
         alignItems: "center",
-        paddingTop: "20px",
+        gap: "20px",
+        py: 3
       }}
     >
       {/* <Button
@@ -215,16 +200,7 @@ export default function Dashboard() {
       >
         print item
       </Button> */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          height: "93vh",
-          gap: 2,
-          width: "90%",
-          bgcolor: "",
-        }}
-      >
+
         <Box
           sx={{
             width: "72%",
@@ -351,8 +327,8 @@ export default function Dashboard() {
               <>"error"</>
             )}
           </Box>
-          <Box flexGrow={1} sx={{ bgcolor: "#f7f9fb", borderRadius: "16px" }}>
-            <ChartLine data={chartData} />
+          <Box flexGrow={1} sx={{ bgcolor: "#f7f9fb", borderRadius: "16px", height: "100%" }}>
+            <ChartLine  startDate={startDate} endDate={endDate} />
           </Box>
         </Box>
 
@@ -362,6 +338,7 @@ export default function Dashboard() {
             justifyContent: "center", // Centraliza horizontalmente
             alignItems: "center", // Mantém o alinhamento no topo (não altera a vertical)
             boxSizing: "border-box",
+            height: "100%"
           }}
         >
           <Filter
@@ -381,7 +358,7 @@ export default function Dashboard() {
             setEndSprint={setEndSprint}
           />
         </Box>
-      </Box>
+
     </Box>
   );
 }

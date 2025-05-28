@@ -78,7 +78,7 @@ const MainMenu = () => {
           "& .MuiDrawer-paper": {
             width: 240,
             boxSizing: "border-box",
-            backgroundColor: "#ffffff",
+            backgroundColor: "#C8DEFF7A",
             display: "flex",
             justifyContent: "space-between",
             flexDirection: "column",
@@ -92,10 +92,18 @@ const MainMenu = () => {
         }}>
           <SourceSwitcher />
         </Box>
-        
+        <Box 
+        sx={{
+          opacity: 0.6,
+          marginTop: 8,
+          marginLeft: 3, 
+          fontSize: 18,
+        }}>
+          Dashboards
+        </Box>
 
         <Box sx={{ overflow: "auto", flexGrow: 1 }}>
-          <List sx={{ marginTop: 10 }}>
+          <List>
             {pages.map(({ name, path, icon, children }) => {
               const isActive = pathname === path;
 
@@ -120,7 +128,7 @@ const MainMenu = () => {
                         mr: 2,
                         display: "flex",
                         "&:hover": {
-                          backgroundColor: "action.hover",
+                          backgroundColor: "transparent",
                         },
                       }}
                     >
@@ -154,10 +162,10 @@ const MainMenu = () => {
                                 width: "100%",
                                 borderRadius: 2,
                                 marginY: 0.5,
-                                pl: 2,
+                                pl: 2, 
                                 "&:hover": {
-                                  backgroundColor: "action.hover",
-                                },
+                                  backgroundColor: "transparent",
+                                },                         
                               }}
                             >
                               <ListItemText
@@ -180,6 +188,7 @@ const MainMenu = () => {
         </Box>
 
         <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Link href="/">
           <Image
             src="/images/logo-raise.svg"
             alt="Logo"
@@ -188,28 +197,12 @@ const MainMenu = () => {
             style={{
               objectFit: "contain",
               marginTop: 15,
+              marginBottom: 50,
+              cursor: "pointer"
             }}
           />
-        </Box>
-
-        <Box
-          component="a"
-          href={apiUrl}
-          sx={{
-            border: "3px solid #1C4886",
-            fontSize: 18,
-            fontWeight: 600,
-            color: "#1C4886",
-            borderRadius: 2,
-            margin: 1.5,
-            textAlign: "center",
-            paddingY: "7px",
-            marginBottom: 5,
-            textDecoration: "none",
-          }}
-        >
-          View API Docs
-        </Box>
+          </Link>
+        </Box> 
       </Drawer>
     </Box>
   );

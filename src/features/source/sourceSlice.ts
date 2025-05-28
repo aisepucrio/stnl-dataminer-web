@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-type SourceType = 'github' | 'jira' | 'stackoverflow'
+type SourceType = 'github' | 'jira' 
+// | 'stackoverflow'
 
 interface SourceState {
   value: SourceType

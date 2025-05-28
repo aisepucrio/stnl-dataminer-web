@@ -41,23 +41,6 @@ const Header = () => {
           ...row,
         }}
       >
-        <Box
-          sx={{
-            ...row,
-            gap: "8px",
-            width: "64px",
-            alignItems: "center",
-            bgcolor: "",
-          }}
-        >
-          <Image
-            src="/icons/sidebar.svg"
-            alt="Sidebar"
-            width={20}
-            height={20}
-          />
-          <Image src="/icons/star.svg" alt="Star" width={20} height={20} />
-        </Box>
         <Box sx={{ ...row, width: "184px", px: "8px" }}>
           <Typography
             sx={{ color: "#a0a2a4", fontSize: "16px" }}

@@ -10,13 +10,18 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Alert,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
+import { useRouter } from 'next/navigation'; // ✅ CERTO no App Router
+
+
 
 const Collect = () => {
   const source = useSelector((state: RootState) => state.source.value);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const [open, setOpen] = useState(false);
   const [tags, setTags] = useState<any[]>([]);
@@ -26,7 +31,7 @@ const Collect = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
-  const [checkedOptions, setCheckedOptions] = useState<string[]>([]);
+  const [checkedOptions, setCheckedOptions] = useState<string[]>(["metadata"]);
 
   const handleCheckboxChange = (option: string) => {
     setCheckedOptions((prev) =>
@@ -64,6 +69,7 @@ const Collect = () => {
     comment: "comments",
     "pull request": "pull_requests",
     issue: "issues",
+    metadata: "metadata"
   };
 
   const formatDate = (dateStr: string): string => {
@@ -105,8 +111,6 @@ const Collect = () => {
       payload.projects = tags;
     }
 
-    console.log(payload);
-
     const endpoint =
       source === "github"
         ? `${apiUrl}/api/github/collect-all/`
@@ -125,6 +129,7 @@ const Collect = () => {
       })
       .then((data) => {
         console.log("Sucesso:", data);
+        router.push("/jobs");
       })
       .catch((err) => {
         console.error("Erro ao coletar dados:", err);
@@ -286,7 +291,12 @@ const Collect = () => {
 
       {/* Essa é a box B */}
       {/* Box B - Datas */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "30px" }}>
+        {!startDate && !endDate && (
+          <Alert variant="outlined" severity="warning" sx={{ width: "40vw" }}>
+            Leaving the date fields empty will mine data from the entire period.
+          </Alert>
+        )}
         <TextField
           label="Start"
           type="date"
