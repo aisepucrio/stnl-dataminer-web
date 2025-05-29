@@ -20,10 +20,6 @@ import type { RootState } from "@/app/store";
 
 // import icons 
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
-import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
-import ImportContactsOutlinedIcon from '@mui/icons-material/ImportContactsOutlined';
-import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
-import QueryStatsOutlinedIcon from '@mui/icons-material/QueryStatsOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 
 const MainMenu = () => {
@@ -56,15 +52,15 @@ const MainMenu = () => {
   };
 
   const pages = [
-    { name: "Overview", path: "/", icon: <QueryStatsOutlinedIcon sx={{ fontSize: 22 }} /> },
+    { name: "Overview", path: "/", icon: "icons/iconOverview.svg" },
     {
       name: "Preview",
       path: "/preview",
-      icon: <WorkOutlineOutlinedIcon sx={{ fontSize: 22 }} />,
+      icon: "icons/iconPreview.svg",
       children: getPreviewChildren(),
     },
-    { name: "Collect", path: "/collect", icon: <FolderOutlinedIcon sx={{ fontSize: 22 }} /> },
-    { name: "Jobs", path: "/jobs", icon: <ImportContactsOutlinedIcon sx={{ fontSize: 22 }} /> },
+    { name: "Collect", path: "/collect", icon: "icons/iconCollect.svg" },
+    { name: "Jobs", path: "/jobs", icon: "icons/iconJobs.svg" },
   ];
 
   return (
@@ -106,7 +102,6 @@ const MainMenu = () => {
           <List>
             {pages.map(({ name, path, icon, children }) => {
               const isActive = pathname === path;
-
               const isPreview = name === "Preview";
 
               return (
@@ -121,28 +116,44 @@ const MainMenu = () => {
                       component={!isPreview ? "a" : "div"}
                       href={!isPreview ? path : undefined}
                       sx={{
-                        width: "80%",
+                        width: isPreview? "70%" : "90%",
                         borderRadius: 2,
                         margin: 0.5,
-                        ml: isPreview ? 0 : 3,
-                        mr: 2,
+                        ml: 3,
+                        mr: isPreview? 5 : 2,
                         display: "flex",
+                        backgroundColor: isActive? "#0000000D" : "transparent",
+                        paddingRight: isPreview? 25 : 20,
+                        paddingLeft: isPreview? 0 : 2.5,
                         "&:hover": {
-                          backgroundColor: "transparent",
+                          backgroundColor: "#0000000D",
                         },
                       }}
                     >
                       {isPreview && (
-                        <Icon>
+                        <Icon sx={{fontSize: 20, marginBottom: .5, opacity: 0.6}}>
                           {previewOpen ? <ExpandMoreRoundedIcon /> : <ChevronRightOutlinedIcon />}
                         </Icon>
                       )}
-                      <ListItemIcon sx={{ fontSize: 24 }}>{icon}</ListItemIcon>
+                      <ListItemIcon sx={{ minWidth: 0, mr: 1, justifyContent: 'center' }}>
+                        {typeof icon === 'string' ? (
+                          <Image
+                            src={`/${icon}`} // caminho da imagem
+                            alt={`${name} icon`}
+                            width={20} 
+                            height={20}
+                            style={{
+                              objectFit: "contain",
+                              
+                            }}
+                          />
+                          ) : ( icon )}
+                      </ListItemIcon> 
                       <ListItemText
                         primary={name}
                         primaryTypographyProps={{
                           fontWeight: 400,
-                          fontSize: 16,
+                          fontSize: 15,
                           color: "#000000",
                         }}
                       />
@@ -162,9 +173,11 @@ const MainMenu = () => {
                                 width: "100%",
                                 borderRadius: 2,
                                 marginY: 0.5,
+                                marginRight: 2,
                                 pl: 2, 
+                                backgroundColor: isActive? "#0000000D" : "transparent",
                                 "&:hover": {
-                                  backgroundColor: "transparent",
+                                  backgroundColor: "#0000000D",
                                 },                         
                               }}
                             >
