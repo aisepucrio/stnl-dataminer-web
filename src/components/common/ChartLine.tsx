@@ -1,39 +1,270 @@
 import {
   Box,
+  Button,
   Checkbox,
   FormControl,
+  FormControlLabel,
   InputLabel,
   ListItemText,
+  Menu,
   MenuItem,
   OutlinedInput,
   Select,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ResponsiveLine } from "@nivo/line";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/app/store";
+
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import Image from "next/image";
 
 const color = "#1C4886";
 
-const ChartLine = ({ data }: any) => {
-  const [personName, setPersonName] = useState<string[]>([]);
+interface ChartLineProps {
+  startDate: string;
+  endDate: string;
+}
+
+const chartData = [
+  {
+    id: "Série A",
+    data: [
+      { x: "Jan", y: 10 },
+      { x: "Fev", y: 20 },
+      { x: "Mar", y: 15 },
+    ],
+  },
+  {
+    id: "Série B",
+    data: [
+      { x: "Jan", y: 20 },
+      { x: "Fev", y: 18 },
+      { x: "Mar", y: 15 },
+    ],
+  },
+];
+
+const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
+  const [loading, setLoading] = useState(false);
+  const [interval, setInterval] = useState<string>("month");
+  const source = useSelector((state: RootState) => state.source.value);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const [lineData, setLineData] = useState<any>([]);
+
+  // const options = ["commits", "issues", "pull requests"];
+  const [options, setOptions] = useState<
+    { key: string; label: string; color: string }[]
+  >([]);
+  // const options = [
+  //   { key: "commits", label: "Commits", color: "#e9e29c" },
+  //   { key: "issues", label: "Issues", color: "#dfc8b4" },
+  //   { key: "pull_requests", label: "Pull Quests", color: "#db9387" },
+  // ];
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  // const [selected, setSelected] = useState<string[]>(options);
+  const [selected, setSelected] = useState<string[]>(options.map((o) => o.key));
+
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  // const handleToggle = (option: string) => {
+  //   setSelected((prev) =>
+  //     prev.includes(option)
+  //       ? prev.filter((o) => o !== option)
+  //       : [...prev, option]
+  //   );
+  // };
+  const handleToggle = (key: string) => {
+    setSelected((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
+
+  const formatLineData = (data: any) => {
+    // const time_series = data.time_series;
+    // console.log("time series is")
+    // console.log(time_series)
+
+    // const labels = data.time_series.labels;
+    // const issues = data.time_series.issues;
+    // const pullRequests = data.time_series.pull_requests;
+    // const commits = data.time_series.commits;
+
+    // const formatSeries = (id, values) => ({
+    //   id,
+    //   data: labels.map((label, index) => ({
+    //     x: label,
+    //     y: values[index],
+    //   })),
+    // });
+
+    // const issuesData = formatSeries("issues", issues);
+    // const pullRequestsData = formatSeries("pull_requests", pullRequests);
+    // const commitsData = formatSeries("commits", commits);
+
+    // return [issuesData, pullRequestsData, commitsData];
+    
+    //  a parte de cima era a logica anterior do github
+// ================================================================
+    const { time_series } = data;
+    const { labels, ...otherSeries } = time_series;
+
+    const result = Object.keys(otherSeries).map((key) => {
+      return {
+        id: key,
+        data: otherSeries[key].map((value: number, index: number) => ({
+          x: labels[index],
+          y: value,
+        })),
+      };
+    });
+
+    return result;
+  };
+
+  const fetchData = async () => {
+    let endpoint = "";
+    // if (source === "github") {
+    endpoint = `${apiUrl}/api/${source}/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}`;
+    // } else if (source === "jira") {
+    // endpoint = `${apiUrl}`; // substitua pelo endpoint correto quando souber
+    // }
+    // console.log()
+    // console.log("endpoint é")
+    // console.log(endpoint)
+    // console.log()
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro na requisição: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // console.log(data);
+      const formatted = formatLineData(data);
+
+      // console.log(formatted);
+
+      setLineData(formatted);
+
+      // Aqui você pode usar os dados, por exemplo: setData(data);
+    } catch (err) {
+      console.error("Erro ao buscar dados do gráfico:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!startDate || !endDate) return;
+
+    if (source === "github") {
+      const githubOptions = [
+        { key: "commits", label: "Commits", color: "#e9e29c" },
+        { key: "issues", label: "Issues", color: "#dfc8b4" },
+        { key: "pull_requests", label: "Pull Quests", color: "#db9387" },
+      ];
+      setOptions(githubOptions);
+      setSelected(githubOptions.map((o) => o.key));
+    } else if (source === "jira") {
+      const jiraOptions = [
+        { key: "commits", label: "Commits", color: "#e9e29c" },
+        { key: "issues", label: "Issues", color: "#dfc8b4" },
+        { key: "comments", label: "Comments", color: "#db9387" },
+        { key: "sprints", label: "Sprints", color: "#a7d3a6" }, // cor escolhida
+      ];
+      setOptions(jiraOptions);
+      setSelected(jiraOptions.map((o) => o.key));
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffInMs = end.getTime() - start.getTime();
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+    if (diffInDays < 15) {
+      setInterval("day");
+    } else if (diffInDays < 90) {
+      setInterval("week");
+    } else {
+      setInterval("month");
+    }
+
+    fetchData();
+  }, [startDate, endDate, source]);
+
+  if (loading) {
+    return <div> ... loading ...</div>;
+  }
 
   return (
     <>
-      <Box sx={{ ...row, justifyContent: "space-between" }}>
+      <Box sx={{ ...row, justifyContent: "space-between", py: "24px" }}>
         <Typography
           sx={{
             color,
-            fontSize: "32px",
-            pt: "7px",
+            fontSize: "18px",
             px: "16px",
-            fontWeight: 500,
+            fontWeight: 600,
             bgcolor: "",
           }}
         >
           Charts Geral
         </Typography>
-        <Typography>Select</Typography>
       </Box>
+      <Box>
+        {/* select aqui CHART select*/}
+
+        <Button
+          onClick={handleClick}
+          // variant="outlined"
+          startIcon={<ChevronRightIcon />}
+          sx={{
+            textTransform: "none",
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+            // bgcolor: "green",
+            marginLeft: "10px",
+          }}
+        >
+          <Image
+            src="/icons/BookOpen.svg"
+            alt="chart filter"
+            width={20}
+            height={20}
+          />
+          <Typography>Chart Filter</Typography>
+        </Button>
+        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          {options.map((option) => (
+            <MenuItem key={option.key} onClick={() => handleToggle(option.key)}>
+              <FormControlLabel
+                control={<Checkbox checked={selected.includes(option.key)} />}
+                label={option.label}
+              />
+            </MenuItem>
+          ))}
+        </Menu>
+      </Box>
+
       <Box
         sx={{
           height: 400,
@@ -44,28 +275,65 @@ const ChartLine = ({ data }: any) => {
         }}
       >
         <ResponsiveLine
-          data={data}
+          data={lineData}
           margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
           xScale={{ type: "point" }}
           yScale={{ type: "linear", min: "auto", max: "auto", stacked: false }}
           axisBottom={{
-            // orient: "bottom",
-            legend: "X",
+            tickRotation: -45,
             legendOffset: 36,
             legendPosition: "middle",
           }}
           axisLeft={{
-            // orient: "left",
-            legend: "Y",
+            legend: "count",
             legendOffset: -40,
             legendPosition: "middle",
           }}
           pointSize={10}
           pointColor={{ theme: "background" }}
-          pointBorderWidth={2}
+          pointBorderWidth={3}
           pointBorderColor={{ from: "serieColor" }}
           enableSlices="x"
           useMesh={true}
+          curve="monotoneX"
+          enablePoints={true}
+          // colors={lineData.map((serie) =>
+          //   selected.includes(serie.id) ? "#1C4886" : "rgba(0,0,0,0)"
+          // )}
+          colors={(serie) => {
+            const id = String(serie.id);
+            const option = options.find((o) => o.key === id);
+            return selected.includes(id)
+              ? option?.color ?? "#ccc"
+              : "rgba(0,0,0,0)";
+          }}
+          legends={[
+            {
+              anchor: "bottom-right", // posição da legenda
+              direction: "column", // coluna vertical
+              justify: false,
+              translateX: 90,
+              translateY: -60,
+              itemsSpacing: 8,
+              itemDirection: "left-to-right",
+              itemWidth: 80,
+              itemHeight: 20,
+              itemOpacity: 0.75,
+              symbolSize: 12, // tamanho do símbolo na legenda (9 aqui)
+              symbolShape: "circle",
+              symbolBorderColor: "rgba(0, 0, 0, .5)",
+              effects: [
+                {
+                  on: "hover",
+                  style: {
+                    itemBackground: "rgba(0, 0, 0, .03)",
+                    itemOpacity: 1,
+                  },
+                },
+              ],
+            },
+          ]}
+          // curve="linear"
         />
       </Box>
     </>

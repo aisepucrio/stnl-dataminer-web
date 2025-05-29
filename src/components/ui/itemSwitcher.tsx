@@ -47,8 +47,8 @@ const ItemSwitcher = () => {
   };
 
   const onClear = () => {
-      dispatch(setItem(""));
-  }
+    dispatch(setItem(""));
+  };
 
   const fetchSource = async (source: string) => {
     const url = apiUrl + sources[source].fetchUrl;
@@ -58,6 +58,7 @@ const ItemSwitcher = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        setItems([]);
         throw new Error(`Erro ao buscar dados de ${source}`);
       }
       setLoading(false);
@@ -70,49 +71,12 @@ const ItemSwitcher = () => {
 
       if (source === "jira") {
         const projects = data.projects.map((project: string) => project);
+
         setItems(projects);
         return;
       }
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
-    }
-  };
-
-  const fetchItem = async (value: any) => {
-    let path = "";
-
-    if (source == "github") {
-      path = "/api/github/dashboard?repository_id=" + value;
-    } else if (source == "jira") {
-      path = "/api/jira/dashboard?project_name=" + value;
-    } else {
-      return;
-    }
-
-    try {
-      const response = await fetch(apiUrl + path);
-      if (!response.ok) {
-        throw new Error(`Erro ao buscar dados: ${response.status}`);
-      }
-      const data = await response.json();
-      // console.log("Dados recebidos:", data);
-
-      const {
-        repositories_count = 0,
-        projects_count = 0,
-        issues_count = 0,
-        pull_requests_count = 0,
-        commits_count = 0,
-        comments_count = 0,
-        forks_count = 0,
-        stars_count = 0,
-        sprints_count = 0,
-      } = data;
-
-      return;
-    } catch (error) {
-      console.error("Erro ao buscar items:", error);
-      return null;
     }
   };
 
@@ -126,7 +90,6 @@ const ItemSwitcher = () => {
       dispatch(setItem(""));
     }
     prevSourceRef.current = source;
-    console.log("ola nundo");
     setSelectedItem("");
     fetchSource(source);
   }, [source]);
@@ -148,12 +111,13 @@ const ItemSwitcher = () => {
         displayEmpty
         autoWidth
         endAdornment={
-          (
-            item &&
+          item && (
             <IconButton size="small" onClick={onClear}>
-              <ClearIcon sx={{color: "white", fontSize: "17px", marginRight: "15px"}}/>
+              <ClearIcon
+                sx={{ color: "white", fontSize: "17px", marginRight: "15px" }}
+              />
             </IconButton>
-            )
+          )
         }
         sx={{
           height: "100%",
@@ -185,11 +149,11 @@ const ItemSwitcher = () => {
         {source === "jira" &&
           items.map((item) => (
             <MenuItem
-              key={item}
-              value={item}
+              key={item.id}
+              value={item.id}
               sx={{ width: "100%", bgcolor: "" }}
             >
-              {item}
+              {item.name}
             </MenuItem>
           ))}
       </Select>
