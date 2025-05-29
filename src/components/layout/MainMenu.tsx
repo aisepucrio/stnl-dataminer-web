@@ -95,11 +95,11 @@ const MainMenu = () => {
         <Box 
         sx={{
           opacity: 0.6,
-          marginTop: 8,
+          marginTop: 4,
           marginLeft: 3, 
-          fontSize: 18,
+          fontSize: 16,
         }}>
-          Dashboards
+          Navigation
         </Box>
 
         <Box sx={{ overflow: "auto", flexGrow: 1 }}>
@@ -123,7 +123,7 @@ const MainMenu = () => {
                       sx={{
                         width: "80%",
                         borderRadius: 2,
-                        margin: 1,
+                        margin: 0.5,
                         ml: isPreview ? 0 : 3,
                         mr: 2,
                         display: "flex",
@@ -141,8 +141,8 @@ const MainMenu = () => {
                       <ListItemText
                         primary={name}
                         primaryTypographyProps={{
-                          fontWeight: 500,
-                          fontSize: 20,
+                          fontWeight: 400,
+                          fontSize: 16,
                           color: "#000000",
                         }}
                       />
@@ -171,7 +171,7 @@ const MainMenu = () => {
                               <ListItemText
                                 primary={child.title}
                                 primaryTypographyProps={{
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   color: "#333",
                                 }}
                               />
