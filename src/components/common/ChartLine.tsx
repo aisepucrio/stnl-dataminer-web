@@ -2,14 +2,9 @@ import {
   Box,
   Button,
   Checkbox,
-  FormControl,
   FormControlLabel,
-  InputLabel,
-  ListItemText,
   Menu,
   MenuItem,
-  OutlinedInput,
-  Select,
   Typography,
 } from "@mui/material";
 import { useState, useEffect } from "react";
@@ -53,20 +48,12 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [lineData, setLineData] = useState<any>([]);
 
-  // const options = ["commits", "issues", "pull requests"];
   const [options, setOptions] = useState<
     { key: string; label: string; color: string }[]
   >([]);
-  // const options = [
-  //   { key: "commits", label: "Commits", color: "#e9e29c" },
-  //   { key: "issues", label: "Issues", color: "#dfc8b4" },
-  //   { key: "pull_requests", label: "Pull Quests", color: "#db9387" },
-  // ];
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  // const [selected, setSelected] = useState<string[]>(options);
   const [selected, setSelected] = useState<string[]>(options.map((o) => o.key));
-
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -77,13 +64,6 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
     setAnchorEl(null);
   };
 
-  // const handleToggle = (option: string) => {
-  //   setSelected((prev) =>
-  //     prev.includes(option)
-  //       ? prev.filter((o) => o !== option)
-  //       : [...prev, option]
-  //   );
-  // };
   const handleToggle = (key: string) => {
     setSelected((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
@@ -91,30 +71,6 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   };
 
   const formatLineData = (data: any) => {
-    // const time_series = data.time_series;
-    // console.log("time series is")
-    // console.log(time_series)
-
-    // const labels = data.time_series.labels;
-    // const issues = data.time_series.issues;
-    // const pullRequests = data.time_series.pull_requests;
-    // const commits = data.time_series.commits;
-
-    // const formatSeries = (id, values) => ({
-    //   id,
-    //   data: labels.map((label, index) => ({
-    //     x: label,
-    //     y: values[index],
-    //   })),
-    // });
-
-    // const issuesData = formatSeries("issues", issues);
-    // const pullRequestsData = formatSeries("pull_requests", pullRequests);
-    // const commitsData = formatSeries("commits", commits);
-
-    // return [issuesData, pullRequestsData, commitsData];
-    
-    //  a parte de cima era a logica anterior do github
 // ================================================================
     const { time_series } = data;
     const { labels, ...otherSeries } = time_series;
@@ -134,15 +90,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
 
   const fetchData = async () => {
     let endpoint = "";
-    // if (source === "github") {
     endpoint = `${apiUrl}/api/${source}/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}`;
-    // } else if (source === "jira") {
-    // endpoint = `${apiUrl}`; // substitua pelo endpoint correto quando souber
-    // }
-    // console.log()
-    // console.log("endpoint é")
-    // console.log(endpoint)
-    // console.log()
 
     setLoading(true);
 
@@ -157,14 +105,10 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       }
 
       const data = await response.json();
-      // console.log(data);
       const formatted = formatLineData(data);
-
-      // console.log(formatted);
 
       setLineData(formatted);
 
-      // Aqui você pode usar os dados, por exemplo: setData(data);
     } catch (err) {
       console.error("Erro ao buscar dados do gráfico:", err);
     } finally {
@@ -231,10 +175,8 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       </Box>
       <Box>
         {/* select aqui CHART select*/}
-
         <Button
           onClick={handleClick}
-          // variant="outlined"
           startIcon={<ChevronRightIcon />}
           sx={{
             textTransform: "none",
@@ -297,9 +239,6 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
           useMesh={true}
           curve="monotoneX"
           enablePoints={true}
-          // colors={lineData.map((serie) =>
-          //   selected.includes(serie.id) ? "#1C4886" : "rgba(0,0,0,0)"
-          // )}
           colors={(serie) => {
             const id = String(serie.id);
             const option = options.find((o) => o.key === id);
@@ -333,7 +272,6 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
               ],
             },
           ]}
-          // curve="linear"
         />
       </Box>
     </>
