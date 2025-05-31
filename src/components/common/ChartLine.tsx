@@ -47,6 +47,8 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const source = useSelector((state: RootState) => state.source.value);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [lineData, setLineData] = useState<any>([]);
+  const lineColors = ["#D81B60", "#1E88E5", "#FFC107", "#004D40"];
+
 
   const [options, setOptions] = useState<
     { key: string; label: string; color: string }[]
@@ -224,13 +226,14 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
           useMesh={true}
           curve="monotoneX"
           enablePoints={true}
-          colors={(serie) => {
-            const id = String(serie.id);
-            const option = options.find((o) => o.key === id);
-            return selected.includes(id)
-              ? option?.color ?? "#ccc"
-              : "rgba(0,0,0,0)";
-          }}
+          // colors={(serie) => {
+          //   const id = String(serie.id);
+          //   const option = options.find((o) => o.key === id);
+          //   return selected.includes(id)
+          //     ? option?.color ?? "#ccc"
+          //     : "rgba(0,0,0,0)";
+          // }}
+          colors={lineColors}
           legends={[
             {
               anchor: "bottom", // posição da legenda
