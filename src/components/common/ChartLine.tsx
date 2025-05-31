@@ -54,21 +54,6 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selected, setSelected] = useState<string[]>(options.map((o) => o.key));
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleToggle = (key: string) => {
-    setSelected((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    );
-  };
 
   const formatLineData = (data: any) => {
 // ================================================================
@@ -175,7 +160,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       </Box>
       <Box>
         {/* select aqui CHART select*/}
-        <Button
+        {/* <Button
           onClick={handleClick}
           startIcon={<ChevronRightIcon />}
           sx={{
@@ -204,12 +189,12 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
               />
             </MenuItem>
           ))}
-        </Menu>
+        </Menu> */}
       </Box>
 
       <Box
         sx={{
-          height: 400,
+          height: 450,
           bgcolor: "",
           alignItems: "center",
           justifyContent: "center",
@@ -218,7 +203,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       >
         <ResponsiveLine
           data={lineData}
-          margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+          margin={{ top: 50, right: 110, bottom: 90, left: 60 }}
           xScale={{ type: "point" }}
           yScale={{ type: "linear", min: "auto", max: "auto", stacked: false }}
           axisBottom={{
@@ -248,14 +233,15 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
           }}
           legends={[
             {
-              anchor: "bottom-right", // posição da legenda
-              direction: "column", // coluna vertical
+              anchor: "bottom", // posição da legenda
+              direction: "row", // coluna vertical
+              toggleSerie: true,
               justify: false,
               translateX: 90,
-              translateY: -60,
+              translateY: 80,
               itemsSpacing: 8,
               itemDirection: "left-to-right",
-              itemWidth: 80,
+              itemWidth: 200,
               itemHeight: 20,
               itemOpacity: 0.75,
               symbolSize: 12, // tamanho do símbolo na legenda (9 aqui)
