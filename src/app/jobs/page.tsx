@@ -21,11 +21,11 @@ import SwapVertIcon from "@mui/icons-material/SwapVert";
 import IconButton from "@mui/material/IconButton";
 
 const statusConfig: Record<string, { color: string; label: string }> = {
-  STARTED: { color: "#8A8CD9", label: "Started" },
-  PENDING: { color: "#FFC555", label: "Pending" },
-  SUCCESS: { color: "#A1E3CB", label: "Success" },
+  STARTED: { color: "#8A8CD9", label: "In Progress" },
+  PENDING: { color: "#FFC555", label: "In Queue" },
+  SUCCESS: { color: "#A1E3CB", label: "Finished" },
   FAILURE: { color: "#FF5555", label: "Failure" },
-  REVOKED: { color: "#A3A3A3", label: "Revoked" },
+  REVOKED: { color: "#A3A3A3", label: "Cancelled" },
   PROGRESS: { color: "#D3E3A1", label: "In Progress" },
 };
 
