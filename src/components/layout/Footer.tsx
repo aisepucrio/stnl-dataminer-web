@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Box, Button } from "@mui/material";
 
 const Footer = () => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   return (
     <Box
       component="footer"
@@ -18,7 +19,7 @@ const Footer = () => {
     >
       <Button
         component={Link}
-        href="https://example.com"
+        href={apiUrl}
         variant="outlined"
         sx={{
           border: "0.15rem solid #1C4886",
