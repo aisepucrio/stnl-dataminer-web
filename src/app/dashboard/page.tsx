@@ -7,6 +7,7 @@ import { Box, Button, SelectChangeEvent } from "@mui/material";
 import { useEffect, useState } from "react";
 import InfoCard from "@/components/common/InfoCard";
 import Filter from "@/components/common/Filter";
+import Footer from "@/components/layout/Footer";
 
 // ---------------------------------------------------
 
