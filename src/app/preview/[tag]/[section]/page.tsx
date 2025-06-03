@@ -302,7 +302,7 @@ if (processedData.length === 0) {
       display: "flex",
       flexDirection: "row",
       maxWidth: "90vw",         
-      overflowX: "auto",       
+      
     }}>
       <DataGrid
         rows={filteredDataByDate.map((row, index) => ({ id: index, ...row }))}
@@ -366,7 +366,6 @@ if (processedData.length === 0) {
       
       <Box sx={{ mb: 5, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
         <Typography
-          variant="h6"
           sx={{
             mb: 1,
             color: "#1C1C1C",
@@ -380,9 +379,9 @@ if (processedData.length === 0) {
           onChange={(e) => setStartDateInput(e.target.value)}
           style={{
             width: "100%",
-            height: "40px",
+            height: "20px",
             fontSize: "20px",
-            padding: "0 10px",
+            padding: "0 5px",
             borderRadius: 0,
             border: "none",
             backgroundColor: "#F7F9FB",
@@ -393,7 +392,6 @@ if (processedData.length === 0) {
 
       <Box sx={{ mb: 6, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
         <Typography
-          variant="h6"
           sx={{
             mb: 1,
             color: "#1C1C1C",

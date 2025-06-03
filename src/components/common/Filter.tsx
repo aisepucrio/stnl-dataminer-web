@@ -39,22 +39,21 @@ const filter = {
   pt: "15px",
 };
 
-const color = "#1C4886";
+const color = "#1C1C1C";
 
 const title = { color, fontSize: "32px" };
 
-const label = { color, fontSize: "24px" };
+const label = { color, fontSize: "22px"};
 
 const input = {
   height: "45px",
   width: "90%",
-  BorderColor: color,
-  border: "none", // remove completamente a borda
-  borderRadius: 0,
-  "& .MuiOutlinedInput-root": {
-    borderRadius: 0, // zera o border-radius do contorno
-    height: "40px",
-  },
+  fontSize: "20px",
+  backgroundColor: "#F7F9FB",
+  fontWeight: "bold",
+  border: "none",
+  marginLeft: 2
+
 };
 
 const button = {
@@ -102,65 +101,159 @@ const Filter = ({
       <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         <Typography sx={title}>Filters</Typography>
 
-        <Typography sx={label}>Start</Typography>
+        <Box
+          sx={{
+            backgroundColor: "#F7F9FB",
+            borderRadius: 5,
+            padding: 2,
+            
+          }}
+        >
+          <Typography sx={label}>Start</Typography>
+          <input
+            type="date"
+            style={{
+              ...input,
+              marginLeft: "6.5%",
+              
+            }}
+            value={localStartDate}
+            onChange={(e) => setLocalStartDate(e.target.value)}
+          />
 
-        <TextField
+          {/* ... seus outros TextField para hash/tag e sprint ... */}
+          {source === "github" && item && (
+            <TextField
+              sx={{
+                ...input,
+                width: "100%",
+                '& .MuiInputBase-root': {
+                    height: "45px",
+                    
+                    '&::before': { borderBottom: 'none !important' },
+                    '&::after': { borderBottom: 'none !important' },
+                    '&:hover:not(.Mui-disabled):before': { borderBottom: 'none !important' },
+                },
+                '& .MuiInputBase-input': {
+                    border: 'none',
+                    '&::placeholder': {
+                        color: 'gray', 
+                        opacity: 1, 
+                    },
+                }
+              }}
+              type="text"
+              variant="standard"
+              onChange={(e) => setStartHash(e.target.value)}
+              placeholder="Hash or tag"
+            />
+          )}
+
+          {source === "jira" && item && (
+            <TextField
+              sx={{
+                ...input,
+                width: "100%",
+                '& .MuiInputBase-root': {
+                    height: "45px",
+                    
+                    '&::before': { borderBottom: 'none !important' },
+                    '&::after': { borderBottom: 'none !important' },
+                    '&:hover:not(.Mui-disabled):before': { borderBottom: 'none !important' },
+                },
+                '& .MuiInputBase-input': {
+                    border: 'none',
+                    '&::placeholder': {
+                        color: 'gray',
+                        opacity: 1,
+                    },
+                }
+              }}
+              type="text"
+              variant="standard"
+              onChange={(e) => setEndHash(e.target.value)}
+              placeholder="# Sprint"
+            />
+          )}
+        </Box>
+
+        <Box
+          sx={{
+            marginTop: 2,
+            backgroundColor: "#F7F9FB",
+            borderRadius: 5,
+            padding: 2,
+            border: "none",
+          }}
+        >
+          <Typography sx={label}>Finish</Typography>
+          <input
           type="date"
-          sx={input}
-          value={localStartDate}
-          onChange={(e) => setLocalStartDate(e.target.value)}
-        />
-
-        {/* A customização é aqui */}
-        {/* {source} */}
-        {source === "github" && item && (
-          // <Typography>tem item de github</Typography>
-          <TextField
-            sx={input}
-            type="text"
-            onChange={(e) => setStartHash(e.target.value)}
-            placeholder="Hash or tag"
+            style={{
+              ...input,
+              marginLeft: "6.5%"
+              
+            }}
+            
+            value={localEndDate}
+            onChange={(e) => setLocalEndDate(e.target.value)}
           />
-        )}
 
-        {source === "jira" && item && (
-          <TextField
-            sx={input}
-            type="text"
-            onChange={(e) => setEndHash(e.target.value)}
-            placeholder="# Sprint"
-          />
-        )}
+          {/* ... seus outros TextField para hash/tag e sprint ... */}
+          {source === "github" && item && (
+            <TextField
+              sx={{
+                ...input,
+                width: "100%",
+                '& .MuiInputBase-root': {
+                    height: "45px",
+                    
+                    '&::before': { borderBottom: 'none !important' },
+                    '&::after': { borderBottom: 'none !important' },
+                    '&:hover:not(.Mui-disabled):before': { borderBottom: 'none !important' },
+                },
+                '& .MuiInputBase-input': {
+                    border: 'none',
+                    '&::placeholder': {
+                        color: 'gray',
+                        opacity: 1,
+                    },
+                }
+              }}
+              type="text"
+              variant="standard"
+              onChange={(e) => setEndHash(e.target.value)}
+              placeholder="Hash or tag"
+            />
+          )}
 
-        {/* ------------------------------------ */}
-        <Typography sx={label}>Finish</Typography>
-
-        <TextField
-          sx={input}
-          type="date"
-          value={localEndDate}
-          onChange={(e) => setLocalEndDate(e.target.value)}
-          // InputLabelProps={{ shrink: true }}
-        />
-
-        {source === "github" && item && (
-          // <Typography>tem item de github</Typography>
-          <TextField
-            sx={input}
-            type="text"
-            onChange={(e) => setEndHash(e.target.value)}
-            placeholder="Hash or tag"
-          />
-        )}
-
-        {source === "jira" && item && (
-          <TextField
-            sx={input}
-            type="text"
-            onChange={(e) => setEndHash(e.target.value)}
-            placeholder="# Sprint"
-          />
-        )}
+          {source === "jira" && item && (
+            <TextField
+              sx={{
+                ...input,
+                width: "100%",
+                '& .MuiInputBase-root': {
+                    height: "45px",
+                    
+                    '&::before': { borderBottom: 'none !important' },
+                    '&::after': { borderBottom: 'none !important' },
+                    '&:hover:not(.Mui-disabled):before': { borderBottom: 'none !important' },
+                },
+                '& .MuiInputBase-input': {
+                    border: 'none',
+                    '&::placeholder': {
+                        color: 'gray',
+                        opacity: 1,
+                    },
+                }
+              }}
+              type="text"
+              variant="standard"
+              onChange={(e) => setEndHash(e.target.value)}
+              placeholder="# Sprint"
+            />
+          )}
+        </Box>
       </Box>
       <br />
       <br />
