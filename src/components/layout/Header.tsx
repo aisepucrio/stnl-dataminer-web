@@ -1,8 +1,10 @@
 "use client";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ItemSwitcher from "../ui/itemSwitcher";
+import ArticleIcon from '@mui/icons-material/Article';
 
 const row = {
   display: "flex",
@@ -20,6 +22,7 @@ const formatPathName = (path: string) => {
 const Header = () => {
   const pathname = usePathname();
   const pageTitle = formatPathName(pathname);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   return (
     <Box
@@ -67,6 +70,29 @@ const Header = () => {
           justifyContent: "flex-end",
         }}
       >
+
+      <Button
+        component={Link}
+        href={apiUrl}
+        target="_blank" 
+        rel="noopener noreferrer"
+        sx={{
+          alignItems: "center",
+          color: "#1C4886",
+          mr: 2,
+          "&:hover": {
+            backgroundColor: "rgba(28, 72, 134, 0.04)",
+          },
+        }}
+      >
+        <ArticleIcon
+        sx={{
+          width: "27px",
+          height: "27px"
+        }}/>
+      </Button>
+
+
         <Image
           src="/icons/themeMode.svg"
           alt="Sidebar"
