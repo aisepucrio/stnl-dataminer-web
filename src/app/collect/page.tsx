@@ -14,9 +14,7 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
-import { useRouter } from 'next/navigation'; // ✅ CERTO no App Router
-
-
+import { useRouter } from 'next/navigation';
 
 const Collect = () => {
   const source = useSelector((state: RootState) => state.source.value);
@@ -33,16 +31,41 @@ const Collect = () => {
 
   const [checkedOptions, setCheckedOptions] = useState<string[]>(["metadata"]);
 
+  const actualOptions =
+    source === "github" ? ["issue", "comment", "pull request", "commit"] : [];
+
+  const displayOptions = [...actualOptions, "select all"];
+
+  const isAllSelected = actualOptions.every(option => checkedOptions.includes(option));
+
   const handleCheckboxChange = (option: string) => {
-    setCheckedOptions((prev) =>
-      prev.includes(option)
-        ? prev.filter((item) => item !== option)
-        : [...prev, option]
-    );
+    if (option === "select all") {
+      if (isAllSelected) {
+        setCheckedOptions(["metadata"]); // Mantém apenas metadata se ele for um padrão fixo
+      } else {
+        setCheckedOptions([...actualOptions, "metadata", "select all"]); // Inclua metadata aqui
+      }
+    } else {
+      setCheckedOptions((prev) =>
+        prev.includes(option)
+          ? prev.filter((item) => item !== option) // Desmarca
+          : [...prev, option] // Marca
+      );
+    }
   };
 
-  const options =
-    source === "github" ? ["issue", "comment", "pull request", "commit"] : [];
+  
+  useEffect(() => {
+    if (isAllSelected && !checkedOptions.includes("select all")) {
+      setCheckedOptions((prev) => [...prev, "select all"]);
+    }
+    else if (!isAllSelected && checkedOptions.includes("select all")) {
+      setCheckedOptions((prev) => prev.filter(opt => opt !== "select all"));
+    }
+  }, [isAllSelected, checkedOptions, setCheckedOptions, actualOptions]); 
+
+  
+
 
   const handleAdd = () => {
     if (source === "github") {
@@ -82,7 +105,7 @@ const Collect = () => {
   useEffect(() => {
     if (source) {
       setLoading(false);
-      setTags([]); // zera as tags sempre que source muda
+      setTags([]); 
     }
   }, [source]);
 
@@ -106,7 +129,10 @@ const Collect = () => {
     if (source === "github") {
       payload.repositories = tags;
       payload.depth = "basic";
-      payload.collect_types = checkedOptions.map((opt) => collectTypeMap[opt]);
+      // filtra "select all" antes 
+      payload.collect_types = checkedOptions
+        .filter(opt => opt !== "select all") // remove opcao "select all" 
+        .map((opt) => collectTypeMap[opt]);
     } else if (source === "jira") {
       payload.projects = tags;
     }
@@ -148,12 +174,10 @@ const Collect = () => {
           justifyContent: "center",
         }}
       >
-        {/* Essa é a box A */}
         <Typography sx={{ fontSize: "24px", fontWeight: 600 }}>
           {source === "github" ? "Repository URLs" : "Projects URLS"}
         </Typography>
 
-        {/* Container com tags e caixa de entrada */}
         <Box
           sx={{
             borderRadius: 1,
@@ -166,7 +190,6 @@ const Collect = () => {
             alignItems: "center",
           }}
         >
-          {/* Tags */}
           {tags.map((tag, idx) => (
             <Chip
               key={idx}
@@ -206,11 +229,8 @@ const Collect = () => {
             />
           ))}
 
-          {/* Caixa que abre o modal */}
-
-          {/* Campo visual que abre o modal ao clicar */}
           <TextField
-            label="Adicionar"
+            label="Add"
             value=""
             onClick={() => setOpen(true)}
             placeholder="+ Add"
@@ -253,7 +273,7 @@ const Collect = () => {
               </Box>
               <Box display="flex" justifyContent="flex-end" gap={1}>
                 <Button variant="outlined" onClick={() => setOpen(false)}>
-                  Cancelar
+                  Cancel
                 </Button>
                 <Button variant="contained" onClick={handleAdd}>
                   Add
@@ -289,7 +309,6 @@ const Collect = () => {
         </Box>
       </Modal>
 
-      {/* Essa é a box B */}
       {/* Box B - Datas */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: "30px" }}>
         {!startDate && !endDate && (
@@ -329,7 +348,6 @@ const Collect = () => {
         />
       </Box>
 
-      {/* Essa é a box C */}
       {/* Box C - Checkboxes */}
       {/* {source === "github" && ( */}
       <Box sx={{ width: "50%", py: "40px" }}>
@@ -340,7 +358,7 @@ const Collect = () => {
             gap: 1,
           }}
         >
-          {options.map((option) => (
+          {displayOptions.map((option) => ( 
             <FormControlLabel
               key={option}
               control={

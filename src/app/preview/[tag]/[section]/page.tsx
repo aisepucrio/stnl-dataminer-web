@@ -302,7 +302,7 @@ if (processedData.length === 0) {
       display: "flex",
       flexDirection: "row",
       maxWidth: "90vw",         
-      overflowX: "auto",       
+      
     }}>
       <DataGrid
         rows={filteredDataByDate.map((row, index) => ({ id: index, ...row }))}
@@ -357,19 +357,20 @@ if (processedData.length === 0) {
         variant="h5"
         sx={{
           mb: 3,
-          color: "#1C4886",
-          fontSize: "32px",
+          color: "#1C1C1C",
+          fontSize: "20px",
+          fontWeight: 600
         }}
       >Filters</Typography>
 
-      {/* Start */}
-      <Box sx={{ mb: 5 }}>
+      
+      <Box sx={{ mb: 5, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
         <Typography
-          variant="h6"
           sx={{
             mb: 1,
-            color: "#1C4886",
+            color: "#1C1C1C",
             fontSize: "22px",
+            paddingLeft: 1.2,
           }}
         >Start</Typography>
         <input
@@ -378,25 +379,24 @@ if (processedData.length === 0) {
           onChange={(e) => setStartDateInput(e.target.value)}
           style={{
             width: "100%",
-            height: "40px",
+            height: "20px",
             fontSize: "20px",
-            padding: "0 10px",
-            border: "1px solid #A0AAB4",
+            padding: "0 5px",
             borderRadius: 0,
-            backgroundColor: "#E7F2FF",
-            color: "black"
+            border: "none",
+            backgroundColor: "#F7F9FB",
+            fontWeight: "bold",
           }}
         />
       </Box>
 
-      {/* Finish */}
-      <Box sx={{ mb: 6 }}>
+      <Box sx={{ mb: 6, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
         <Typography
-          variant="h6"
           sx={{
             mb: 1,
-            color: "#1C4886",
+            color: "#1C1C1C",
             fontSize: "22px",
+            paddingLeft: 1.2,
           }}
         >
           Finish
@@ -410,10 +410,11 @@ if (processedData.length === 0) {
             height: "40px",
             fontSize: "20px",
             padding: "0 10px",
-            border: "1px solid #A0AAB4",
             borderRadius: 0,
-            backgroundColor: "#E7F2FF",
-            color: "#000000"
+            border: "none",
+            backgroundColor: "#F7F9FB",
+            color: "#000000", 
+            fontWeight: "bold",
           }}
         />
       </Box>
