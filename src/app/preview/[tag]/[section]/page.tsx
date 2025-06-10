@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import { RootState } from "@/app/store";
 import { DataGrid } from "@mui/x-data-grid";
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
 type github_commits={
   id: string,
@@ -149,6 +150,7 @@ const Preview = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [data, setData] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loadingData, setLoadingData] = useState(true); 
 
   const params = useParams();
   const tag = params.tag;
@@ -226,6 +228,8 @@ const Preview = () => {
   
   useEffect(() => {
     const fetchData = async () => {
+      setLoadingData(true);
+      setError(null);
       try {
         const realSection = section === "comments" ? "issues" : section;
 
@@ -236,30 +240,24 @@ const Preview = () => {
         if (!res.ok) throw new Error("Erro ao buscar dados");
         const json = await res.json();
 
-        let formattedData = []; // Comece com um array vazio por padrão
+        let formattedData = [];
       if (json && Array.isArray(json.results)) {
-        // Se 'json.results' existir e for um array (caso da sua API paginada)
         formattedData = json.results;
       } else if (Array.isArray(json)) {
-        // Senão, se o próprio 'json' for um array (para APIs que retornam o array diretamente)
         formattedData = json;
       }
 
-        console.log("API Response (json):", json);
-        console.log("Data before formatting (formattedData):", formattedData);
-        console.log("Is formattedData an array?", Array.isArray(formattedData));
-
         setData(Array.isArray(formattedData) ? formattedData : []);
+        
       } catch (err: any) {
         setError(err.message || "Erro desconhecido");
+      } finally{
+        setLoadingData(false);
       }
     };
 
-    fetchData();
+      fetchData();
   }, [apiUrl, tag, section]);
-
-  if (error) return <Typography color="error">Erro: {error}</Typography>;
-  if (!data) return <Typography>Carregando...</Typography>;
 
   const filteredDataByDate = (data || []).filter((item: any) => {
     const itemDateValue = item.date || item.created_at || item.created;
@@ -277,74 +275,116 @@ const Preview = () => {
   }))
 : filteredDataByDate;
 
-if (processedData.length === 0) {
-  if (data.length === 0) {
-      return <Typography>Nenhum dado encontrado.</Typography>;
-  }
-  return <Typography>Nenhum dado encontrado com os filtros aplicados.</Typography>;
-}
-
   let columns;
 
   if (source === "github" && section === "commits") {
     columns = columns_github_commits;
   } else if (source === "github" && section === "issues") {
     columns = columns_github_issues;
-  } else {
+  } else if(processedData.length > 0){
     columns = Object.keys(filteredDataByDate[0]).map((key) => ({
       accessorKey: key,
       header: key,
     }));
   }
+  else{
+    columns = [];
+  }
+
+  const noData = !processedData || processedData.length === 0;
 
   return (
     <Box sx={{
       display: "flex",
       flexDirection: "row",
-      maxWidth: "90vw",         
-      overflowX: "auto",       
+      maxWidth: "90vw",
+      overflowX: "auto",  
+      height: "90vh",     
     }}>
-      <DataGrid
-        rows={filteredDataByDate.map((row, index) => ({ id: index, ...row }))}
-        columns={columns.map((col) => ({
-          field: col.accessorKey,
-          headerName: col.header,
-          renderCell: (params: any) => {
-            const keys = col.accessorKey.split(".");
-            let value = params.row;
-            for (const key of keys) {
-              value = value?.[key];
-            }
-            return typeof value === "object" && value !== null
-              ? JSON.stringify(value, null, 2)
-              : String(value ?? "");
-          },
-        }))}
-        pageSizeOptions={[10, 25, 50, 100]}
-        pagination 
-        checkboxSelection     
-        sx={{
-          width: "50vw",
-          marginTop: 2,
-          marginLeft: 2,
-          marginBottom: 5,
-          overflowX: "auto",
-          tableLayout: "fixed",
-          '& .MuiDataGrid-cell': {
-            minWidth: "7vw",
-          },
-          '& .MuiDataGrid-columnHeader': {          
-            minWidth: "7vw",
-          },
-        }}
-      />
+
+
+
+  
+        {loadingData ? ( // Verifica se está carregando
+        <Typography sx={{ marginTop: 2, marginLeft: 2 }}>Carregando dados da tabela...</Typography>
+      ) : error ? ( // Verifica se há um erro
+        <Typography color="error" sx={{ marginTop: 2, marginLeft: 2 }}>
+          Erro ao carregar dados: {error}
+        </Typography>
+      ) : processedData.length === 0 ? ( // Verifica se não há dados processados
+        <Typography sx={{ marginTop: 3, marginLeft: 2}}>
+          {data && data.length === 0
+            ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, border: "1px solid #F3550B", borderRadius: 5, padding: 2, paddingRight: 70}}> 
+                <WarningAmberRoundedIcon/> 
+                {`Could not find ${section} :(`} 
+              </Box>
+            )
+            : `Não foram encontrados ${section} com os filtros de data aplicados.`}
+        </Typography>
+      ) : ( 
+        <DataGrid
+          rows={processedData.map((row, index) => ({ id: row.id || index, ...row }))}
+          columns={columns.map((col) => ({
+             field: col.accessorKey, 
+            headerName: col.header, 
+             renderCell: (params: any) => {
+               let valueToRender = params.value;              
+               if (col.accessorKey) {
+                   const keys = col.accessorKey.split(".");
+                   let rawValue = params.row;
+                   for (const key of keys) {
+                       rawValue = rawValue?.[key];
+                   }
+                   valueToRender = typeof rawValue === "object" && rawValue !== null
+                       ? JSON.stringify(rawValue)
+                       : String(rawValue ?? "");
+               }
+
+               return (
+                 <span title={valueToRender} style={{
+                   whiteSpace: 'nowrap',
+                   overflow: 'hidden',
+                   textOverflow: 'ellipsis',
+                   width: '100%',
+                   display: 'block'
+                 }}>
+                   {valueToRender}
+                 </span>
+               );
+             },
+          }))}
+          pageSizeOptions={[10, 25, 50, 100]}
+          pagination
+          checkboxSelection
+          
+          sx={{
+            width: "50vw",
+            marginTop: 2,
+            marginLeft: 2,
+            marginBottom: 5,
+            overflowX: "auto",
+            tableLayout: "fixed",
+            '& .MuiDataGrid-cell': {
+              minWidth: "7vw",
+            },
+            '& .MuiDataGrid-columnHeader': {
+              minWidth: "7vw",
+            },
+            
+          }}
+        />
+      )}
+
       <Box
       sx={{
+        position: noData ? "absolute" : "static", 
+        right: noData ? 0 : 'auto',            
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",
         marginLeft: 2,
-        height: "100vh",
+        height: "90vh",
         marginTop: 2,
         marginRight: 2,
         backgroundColor: "#E7F2FF",
