@@ -320,7 +320,12 @@ const Preview = () => {
                 {`Could not find ${section} :(`} 
               </Box>
             )
-            : `Não foram encontrados ${section} com os filtros de data aplicados.`}
+            :
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, border: "1px solid #F3550B", borderRadius: 5, padding: 2, paddingRight: 70}}> 
+                <WarningAmberRoundedIcon/> 
+                {`Could not find ${section} between start and finish dates.`} 
+              </Box>    
+            }
         </Typography>
       ) : ( 
         <DataGrid
