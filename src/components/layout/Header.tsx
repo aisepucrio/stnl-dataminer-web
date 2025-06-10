@@ -78,8 +78,8 @@ const Header = () => {
         rel="noopener noreferrer"
         sx={{
           alignItems: "center",
-          color: "#1C4886",
-          mr: 2,
+          color: "#000000",
+          mr: 1,
           "&:hover": {
             backgroundColor: "rgba(28, 72, 134, 0.04)",
           },
