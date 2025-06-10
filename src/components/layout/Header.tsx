@@ -1,8 +1,9 @@
 "use client";
-import { Box, Typography, Breadcrumbs, Link } from "@mui/material";
+import { Box, Typography, Button, Breadcrumbs, Link } from "@mui/material";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import ItemSwitcher from "../ui/itemSwitcher";
+import ArticleIcon from '@mui/icons-material/Article';
 
 const row = {
   display: "flex",
@@ -21,6 +22,7 @@ const Header = () => {
   const breadcrumbs = pathSegments.length === 0
     ? ["Overview"]
     : pathSegments.map(formatSegment);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   return (
     <Box
@@ -62,6 +64,29 @@ const Header = () => {
           justifyContent: "flex-end",
         }}
       >
+
+      <Button
+        component={Link}
+        href={apiUrl}
+        target="_blank" 
+        rel="noopener noreferrer"
+        sx={{
+          alignItems: "center",
+          color: "#000000",
+          mr: 1,
+          "&:hover": {
+            backgroundColor: "rgba(28, 72, 134, 0.04)",
+          },
+        }}
+      >
+        <ArticleIcon
+        sx={{
+          width: "27px",
+          height: "27px"
+        }}/>
+      </Button>
+
+
         <Image
           src="/icons/themeMode.svg"
           alt="Theme Mode"
