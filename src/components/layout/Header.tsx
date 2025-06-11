@@ -1,7 +1,6 @@
 "use client";
 import { Box, Typography, Button, Breadcrumbs, Link, Tooltip } from "@mui/material";
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ItemSwitcher from "../ui/itemSwitcher";
 import ArticleIcon from '@mui/icons-material/Article';
