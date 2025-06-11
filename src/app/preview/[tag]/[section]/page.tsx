@@ -3,12 +3,22 @@ import {
   Box,
   Button,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import { RootState } from "@/app/store";
 import { DataGrid } from "@mui/x-data-grid";
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
 type github_commits={
   id: string,
@@ -149,10 +159,18 @@ const Preview = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [data, setData] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loadingData, setLoadingData] = useState(true); 
+
+  const [earliestDataDate, setEarliestDataDate] = useState<string>('');
+  const [latestDataDate, setLatestDataDate] = useState<string>('');   
+
 
   const params = useParams();
   const tag = params.tag;
   const section = params.section;
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState<string>('');
 
   // choosing the order 
   const columns_github_commits = [
@@ -222,10 +240,33 @@ const Preview = () => {
     setStartDate(startDateInput);
     setEndDate(endDateInput);
   };
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedFormat('');
+  };
+
+  const handleFormatChange = (event: SelectChangeEvent) => {
+    setSelectedFormat(event.target.value as string);
+  };
+
+
+  const handleExport = () => {
+    if (selectedFormat) {
+      console.log(`Exportando no formato: ${selectedFormat}`);
+      handleCloseDialog();
+    }
+  };
   
   
   useEffect(() => {
     const fetchData = async () => {
+      setLoadingData(true);
+      setError(null);
       try {
         const realSection = section === "comments" ? "issues" : section;
 
@@ -235,31 +276,52 @@ const Preview = () => {
 
         if (!res.ok) throw new Error("Erro ao buscar dados");
         const json = await res.json();
+        console.log(`Resposta da API para a seção ''${realSection}:`,json);
 
-        let formattedData = []; // Comece com um array vazio por padrão
+        let formattedData = [];
       if (json && Array.isArray(json.results)) {
-        // Se 'json.results' existir e for um array (caso da sua API paginada)
         formattedData = json.results;
       } else if (Array.isArray(json)) {
-        // Senão, se o próprio 'json' for um array (para APIs que retornam o array diretamente)
         formattedData = json;
       }
 
-        console.log("API Response (json):", json);
-        console.log("Data before formatting (formattedData):", formattedData);
-        console.log("Is formattedData an array?", Array.isArray(formattedData));
-
         setData(Array.isArray(formattedData) ? formattedData : []);
+
+        let minTimestamp = Infinity;
+        let maxTimestamp = -Infinity;
+
+        formattedData.forEach((item: any) => {
+          
+          const itemDateValue = item.date || item.created_at || item.created;
+          if (itemDateValue) {
+            const dateObj = new Date(itemDateValue);
+            const timestamp = dateObj.getTime();
+            if (!isNaN(timestamp)) { // Garante que é uma data válida
+              minTimestamp = Math.min(minTimestamp, timestamp);
+              maxTimestamp = Math.max(maxTimestamp, timestamp);
+            }
+          }
+        });
+
+        if (minTimestamp !== Infinity && maxTimestamp !== -Infinity) {
+          const minDateObj = new Date(minTimestamp);
+          const maxDateObj = new Date(maxTimestamp);
+
+          
+          setEarliestDataDate(minDateObj.toISOString().split('T')[0]);
+          setLatestDataDate(maxDateObj.toISOString().split('T')[0]);
+        }
+
+        
       } catch (err: any) {
         setError(err.message || "Erro desconhecido");
+      } finally{
+        setLoadingData(false);
       }
     };
 
-    fetchData();
+      fetchData();
   }, [apiUrl, tag, section]);
-
-  if (error) return <Typography color="error">Erro: {error}</Typography>;
-  if (!data) return <Typography>Carregando...</Typography>;
 
   const filteredDataByDate = (data || []).filter((item: any) => {
     const itemDateValue = item.date || item.created_at || item.created;
@@ -277,74 +339,217 @@ const Preview = () => {
   }))
 : filteredDataByDate;
 
-if (processedData.length === 0) {
-  if (data.length === 0) {
-      return <Typography>Nenhum dado encontrado.</Typography>;
-  }
-  return <Typography>Nenhum dado encontrado com os filtros aplicados.</Typography>;
-}
-
   let columns;
 
   if (source === "github" && section === "commits") {
     columns = columns_github_commits;
   } else if (source === "github" && section === "issues") {
     columns = columns_github_issues;
-  } else {
+  } else if(processedData.length > 0){
     columns = Object.keys(filteredDataByDate[0]).map((key) => ({
       accessorKey: key,
       header: key,
     }));
   }
+  else{
+    columns = [];
+  }
+
+  const noData = !processedData || processedData.length === 0;
+
 
   return (
     <Box sx={{
       display: "flex",
       flexDirection: "row",
-      maxWidth: "90vw",         
-      
-    }}>
-      <DataGrid
-        rows={filteredDataByDate.map((row, index) => ({ id: index, ...row }))}
-        columns={columns.map((col) => ({
-          field: col.accessorKey,
-          headerName: col.header,
-          renderCell: (params: any) => {
-            const keys = col.accessorKey.split(".");
-            let value = params.row;
-            for (const key of keys) {
-              value = value?.[key];
+      maxWidth: "90vw",
+      overflowX: "auto",  
+      height: "90vh",     
+     }}>
+
+        {loadingData ? ( // Verifica se está carregando
+        <Typography sx={{ marginTop: 2, marginLeft: 2 }}>Carregando dados da tabela...</Typography>
+      ) : error ? ( // Verifica se há um erro
+        <Typography color="error" sx={{ marginTop: 2, marginLeft: 2 }}>
+          Erro ao carregar dados: {error}
+        </Typography>
+      ) : filteredDataByDate.length === 0 ? ( // Verifica se não há dados processados
+        <Typography sx={{ marginTop: 3, marginLeft: 2}}>
+          {data && data.length === 0
+            ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, border: "1px solid #F3550B", borderRadius: 5, padding: 2, paddingRight: 70}}> 
+                <WarningAmberRoundedIcon/> 
+                {`Could not find ${section} :(`} 
+              </Box>
+            )
+            :
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, border: "1px solid #F3550B", borderRadius: 5, padding: 2, paddingRight: 70}}> 
+                <WarningAmberRoundedIcon/> 
+                {`Could not find ${section} between start and finish dates.`} 
+            </Box>    
             }
-            return typeof value === "object" && value !== null
-              ? JSON.stringify(value, null, 2)
-              : String(value ?? "");
-          },
-        }))}
-        pageSizeOptions={[10, 25, 50, 100]}
-        pagination 
-        checkboxSelection     
-        sx={{
-          width: "50vw",
-          marginTop: 2,
-          marginLeft: 2,
-          marginBottom: 5,
-          overflowX: "auto",
-          tableLayout: "fixed",
-          '& .MuiDataGrid-cell': {
-            minWidth: "7vw",
-          },
-          '& .MuiDataGrid-columnHeader': {          
-            minWidth: "7vw",
-          },
-        }}
-      />
+        </Typography>
+      ) : ( 
+        <Box>
+          <DataGrid
+            rows={filteredDataByDate.map((row, index) => ({ id: row.id || index, ...row }))}
+            columns={columns.map((col) => ({
+              field: col.accessorKey, 
+              headerName: col.header, 
+              renderCell: (params: any) => {
+                let valueToRender = params.value;              
+                if (col.accessorKey) {
+                    const keys = col.accessorKey.split(".");
+                    let rawValue = params.row;
+                    for (const key of keys) {
+                        rawValue = rawValue?.[key];
+                    }
+                    valueToRender = typeof rawValue === "object" && rawValue !== null
+                        ? JSON.stringify(rawValue)
+                        : String(rawValue ?? "");
+                }
+
+                return (
+                  <span title={valueToRender} style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: '100%',
+                    display: 'block'
+                  }}>
+                    {valueToRender}
+                  </span>
+                );
+              },
+            }))}
+            pageSizeOptions={[10, 25, 50, 100]}
+            pagination
+            checkboxSelection
+            
+            sx={{
+              width: "62vw",
+              height: "80vh",
+              marginTop: 2,
+              marginLeft: 2,
+              marginBottom: 2,
+              overflowX: "auto",
+              tableLayout: "fixed",
+              '& .MuiDataGrid-cell': {
+                minWidth: "7vw",
+              },
+              '& .MuiDataGrid-columnHeader': {
+                minWidth: "7vw",
+              },
+              
+            }}
+
+          />
+          <Box
+
+          component="footer"
+          sx={{
+            width: "100%",
+            
+            display: "flex",
+            justifyContent: "flex-start",
+            backgroundColor: "transparent",
+            
+          }}
+          >
+          <Button
+            onClick={handleOpenDialog} 
+            variant="outlined"
+            sx={{
+              border: "0.15rem solid #1C4886",
+              color: "#1C4886",
+              borderRadius: "16px",
+              marginLeft: "49.95vw",
+              padding: "14px 16px",
+              
+              textTransform: "none",
+              fontSize: "1rem",
+              fontWeight: 600,
+              "&:hover": {
+                backgroundColor: "rgba(28, 72, 134, 0.04)",
+                borderColor: "#1C4886",
+              },
+            }}>
+
+            Export CSV / JSON
+          </Button>
+          <Dialog open={openDialog} 
+      onClose={handleCloseDialog}
+      PaperProps={{
+        sx: {
+          bgcolor: "#21211F", 
+          borderRadius: '16px', 
+        },
+      }}>        
+        <DialogContent> 
+          <FormControl fullWidth sx={{ minWidth: 400}}>
+            <Select
+              labelId="format-select-label"
+              id="format-select"
+              value={selectedFormat}
+              onChange={handleFormatChange}
+              sx={{
+                color: 'white', 
+                '& .MuiOutlinedInput-notchedOutline': { 
+                  borderColor: 'white', 
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white', 
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white', 
+                },
+                '& .MuiSvgIcon-root': { 
+                  color: '#63A4FF', 
+                },
+              }}
+            >
+              <MenuItem value="">
+                <em>Select a format type</em>
+              </MenuItem>
+              <MenuItem value="csv">CSV</MenuItem>
+              <MenuItem value="json">JSON</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} sx={{ color: '#63A4FF' }}>Cancel</Button>
+          <Button
+            onClick={handleExport}
+            variant="contained"
+            
+            sx={{
+                bgcolor: '#376BD2',
+                color: 'white',
+                marginRight: "10px",
+                '&:hover': { bgcolor: '#173B6C' }
+            }}
+          >
+            Export
+          </Button>
+        </DialogActions>
+      </Dialog>
+          
+          </Box>
+          
+        </Box>
+      )}
+
+      
+
       <Box
       sx={{
+        position: noData ? "absolute" : "static", 
+        right: noData ? 0 : 'auto',            
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",
         marginLeft: 2,
-        height: "100vh",
+        height: "80vh",
         marginTop: 2,
         marginRight: 2,
         backgroundColor: "#E7F2FF",
@@ -364,7 +569,7 @@ if (processedData.length === 0) {
       >Filters</Typography>
 
       
-      <Box sx={{ mb: 5, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
+      <Box sx={{ mb: 1, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
         <Typography
           sx={{
             mb: 1,
@@ -377,6 +582,8 @@ if (processedData.length === 0) {
           type="date"
           value={startDateInput}
           onChange={(e) => setStartDateInput(e.target.value)}
+          min={earliestDataDate || undefined} // Define a data mínima permitida
+          max={latestDataDate || undefined}   // Define a data máxima permitida
           style={{
             width: "100%",
             height: "20px",
@@ -389,8 +596,11 @@ if (processedData.length === 0) {
           }}
         />
       </Box>
+      <Typography sx={{color: "#595957", mb: 3, ml: 1, fontSize: "15px"}}>
+          Data starts from {earliestDataDate}
+        </Typography>
 
-      <Box sx={{ mb: 6, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
+      <Box sx={{ mb: 1, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
         <Typography
           sx={{
             mb: 1,
@@ -405,6 +615,8 @@ if (processedData.length === 0) {
           type="date"
           value={endDateInput}
           onChange={(e) => setEndDateInput(e.target.value)}
+          min={earliestDataDate || undefined} 
+          max={latestDataDate || undefined}   
           style={{
             width: "100%",
             height: "40px",
@@ -418,6 +630,9 @@ if (processedData.length === 0) {
           }}
         />
       </Box>
+      <Typography sx={{color: "#595957", mb: 5, ml: 1, fontSize: "15px"}}>
+          Data ends on {latestDataDate}
+        </Typography>
 
       <Button
         variant="contained"
@@ -439,8 +654,11 @@ if (processedData.length === 0) {
         Apply filters
       </Button>
     </Box>
+    
+    
+  </Box>
+  
 
-    </Box>
   );
 };
 
