@@ -1,5 +1,5 @@
 "use client";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, Tooltip } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -71,26 +71,28 @@ const Header = () => {
         }}
       >
 
-      <Button
-        component={Link}
-        href={apiUrl}
-        target="_blank" 
-        rel="noopener noreferrer"
-        sx={{
-          alignItems: "center",
-          color: "#000000",
-          mr: 1,
-          "&:hover": {
-            backgroundColor: "rgba(28, 72, 134, 0.04)",
-          },
-        }}
-      >
-        <ArticleIcon
-        sx={{
-          width: "27px",
-          height: "27px"
-        }}/>
-      </Button>
+      <Tooltip title="View API DOCS">
+        <Button
+          component={Link}
+          href={apiUrl}
+          target="_blank" 
+          rel="noopener noreferrer"
+          sx={{
+            alignItems: "center",
+            color: "#000000",
+            mr: 1,
+            "&:hover": {
+              backgroundColor: "rgba(28, 72, 134, 0.04)",
+            },
+          }}
+        >
+          <ArticleIcon
+          sx={{
+            width: "27px",
+            height: "27px"
+          }}/>
+        </Button>
+        </Tooltip>
 
 
         <Image
