@@ -172,7 +172,7 @@ const Collect = () => {
         }}
       >
         <Typography sx={{ fontSize: "24px", fontWeight: 600}}>
-          {source === "github" ? "Repository URLs" : "Projects URLS"}
+          {source === "github" ? "Repository Name" : "Projects Name"}
         </Typography>
 
         <Box
@@ -356,8 +356,7 @@ const Collect = () => {
           }}
         >
           {displayOptions.map((option : string) => (
-  
-            
+
             <FormControlLabel
               key={option}
               control={
@@ -367,7 +366,6 @@ const Collect = () => {
                 />
               }
               label={option} 
-              
             />
           ))}
         </FormGroup>
@@ -388,7 +386,7 @@ const Collect = () => {
             fontSize: "22px",
             textTransform: "none",
             borderRadius: "12px",
-            marginTop: .5,
+            marginTop: 2,
             fontWeight: 600,
           }}
         >
