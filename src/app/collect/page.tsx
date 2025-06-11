@@ -278,7 +278,7 @@ const Collect = () => {
               </Box>
               <Box display="flex" justifyContent="flex-end" gap={1}>
                 <Button variant="outlined" onClick={() => setOpen(false)}>
-                  Cancelar
+                  Cancel
                 </Button>
                 <Button variant="contained" onClick={handleAdd}>
                   Add
