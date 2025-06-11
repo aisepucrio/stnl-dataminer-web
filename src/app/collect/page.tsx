@@ -14,7 +14,9 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; 
+
+
 
 const Collect = () => {
   const source = useSelector((state: RootState) => state.source.value);
@@ -31,40 +33,29 @@ const Collect = () => {
 
   const [checkedOptions, setCheckedOptions] = useState<string[]>(["metadata"]);
 
-  const actualOptions =
+  
+
+  const options =
     source === "github" ? ["issue", "comment", "pull request", "commit"] : [];
 
-  const displayOptions = [...actualOptions, "select all"];
-
-  const isAllSelected = actualOptions.every(option => checkedOptions.includes(option));
+  const displayOptions = [...options, "select all"];
+  const isAllSelected = options.every(option => checkedOptions.includes(option));
 
   const handleCheckboxChange = (option: string) => {
     if (option === "select all") {
       if (isAllSelected) {
-        setCheckedOptions(["metadata"]); // Mantém apenas metadata se ele for um padrão fixo
+        setCheckedOptions(["metadata"]); 
       } else {
-        setCheckedOptions([...actualOptions, "metadata", "select all"]); // Inclua metadata aqui
+        setCheckedOptions([...options, "metadata", "select all"]); 
       }
     } else {
       setCheckedOptions((prev) =>
         prev.includes(option)
-          ? prev.filter((item) => item !== option) // Desmarca
-          : [...prev, option] // Marca
+          ? prev.filter((item) => item !== option) 
+          : [...prev, option] 
       );
     }
   };
-
-  
-  useEffect(() => {
-    if (isAllSelected && !checkedOptions.includes("select all")) {
-      setCheckedOptions((prev) => [...prev, "select all"]);
-    }
-    else if (!isAllSelected && checkedOptions.includes("select all")) {
-      setCheckedOptions((prev) => prev.filter(opt => opt !== "select all"));
-    }
-  }, [isAllSelected, checkedOptions, setCheckedOptions, actualOptions]); 
-
-  
 
 
   const handleAdd = () => {
@@ -103,11 +94,17 @@ const Collect = () => {
   };
 
   useEffect(() => {
+    if (isAllSelected && !checkedOptions.includes("select all")) {
+      setCheckedOptions((prev) => [...prev, "select all"]);
+    }
+    else if (!isAllSelected && checkedOptions.includes("select all")) {
+      setCheckedOptions((prev) => prev.filter(opt => opt !== "select all"));
+    }
     if (source) {
       setLoading(false);
       setTags([]); 
     }
-  }, [source]);
+  }, [source, isAllSelected, checkedOptions, setCheckedOptions, options]);
 
   if (loading) {
     return <div>Carregando...</div>;
@@ -129,10 +126,9 @@ const Collect = () => {
     if (source === "github") {
       payload.repositories = tags;
       payload.depth = "basic";
-      // filtra "select all" antes 
       payload.collect_types = checkedOptions
-        .filter(opt => opt !== "select all") // remove opcao "select all" 
-        .map((opt) => collectTypeMap[opt]);
+      .filter(opt => opt !== "select all") // remove opcao "select all" 
+      .map((opt) => collectTypeMap[opt]);    
     } else if (source === "jira") {
       payload.projects = tags;
     }
@@ -260,7 +256,7 @@ const Collect = () => {
               <Box mb={3}>
                 <TextField
                   fullWidth
-                  label="Repository URL"
+                  label="Format : owner/repo"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => {
@@ -298,7 +294,7 @@ const Collect = () => {
               </Box>
               <Box display="flex" justifyContent="flex-end" gap={1}>
                 <Button variant="outlined" onClick={() => setOpen(false)}>
-                  Cancelar
+                  Cancel
                 </Button>
                 <Button variant="contained" onClick={handleAdd}>
                   Add
@@ -349,16 +345,17 @@ const Collect = () => {
       </Box>
 
       {/* Box C - Checkboxes */}
-      {/* {source === "github" && ( */}
+      {source === "github" && ( 
       <Box sx={{ width: "50%", py: "40px" }}>
         <FormGroup
           sx={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            gridTemplateColumns: "1fr",
             gap: 1,
+            
           }}
         >
-          {displayOptions.map((option) => ( 
+          {displayOptions.map((option) => (            
             <FormControlLabel
               key={option}
               control={
@@ -368,11 +365,12 @@ const Collect = () => {
                 />
               }
               label={option}
+               
             />
           ))}
         </FormGroup>
       </Box>
-      {/* )} */}
+      )}
 
       {/* Botão Final */}
       <Box display="flex">
@@ -388,6 +386,7 @@ const Collect = () => {
             fontSize: "22px",
             textTransform: "none",
             borderRadius: "12px",
+            marginTop: 2,
             fontWeight: 600,
           }}
         >
