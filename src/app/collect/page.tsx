@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
-import { useRouter } from 'next/navigation'; // ✅ CERTO no App Router
+import { useRouter } from 'next/navigation'; 
 
 
 
@@ -33,16 +33,30 @@ const Collect = () => {
 
   const [checkedOptions, setCheckedOptions] = useState<string[]>(["metadata"]);
 
-  const handleCheckboxChange = (option: string) => {
-    setCheckedOptions((prev) =>
-      prev.includes(option)
-        ? prev.filter((item) => item !== option)
-        : [...prev, option]
-    );
-  };
+  
 
   const options =
     source === "github" ? ["issue", "comment", "pull request", "commit"] : [];
+
+  const displayOptions = [...options, "select all"];
+  const isAllSelected = options.every(option => checkedOptions.includes(option));
+
+  const handleCheckboxChange = (option: string) => {
+    if (option === "select all") {
+      if (isAllSelected) {
+        setCheckedOptions(["metadata"]); 
+      } else {
+        setCheckedOptions([...options, "metadata", "select all"]); 
+      }
+    } else {
+      setCheckedOptions((prev) =>
+        prev.includes(option)
+          ? prev.filter((item) => item !== option) 
+          : [...prev, option] 
+      );
+    }
+  };
+
 
   const handleAdd = () => {
     if (source === "github") {
@@ -80,11 +94,17 @@ const Collect = () => {
   };
 
   useEffect(() => {
+    if (isAllSelected && !checkedOptions.includes("select all")) {
+      setCheckedOptions((prev) => [...prev, "select all"]);
+    }
+    else if (!isAllSelected && checkedOptions.includes("select all")) {
+      setCheckedOptions((prev) => prev.filter(opt => opt !== "select all"));
+    }
     if (source) {
       setLoading(false);
       setTags([]); // zera as tags sempre que source muda
     }
-  }, [source]);
+  }, [source, isAllSelected, checkedOptions, setCheckedOptions, options]);
 
   if (loading) {
     return <div>Carregando...</div>;
@@ -106,7 +126,9 @@ const Collect = () => {
     if (source === "github") {
       payload.repositories = tags;
       payload.depth = "basic";
-      payload.collect_types = checkedOptions.map((opt) => collectTypeMap[opt]);
+      payload.collect_types = checkedOptions
+      .filter(opt => opt !== "select all") // remove opcao "select all" 
+      .map((opt) => collectTypeMap[opt]);    
     } else if (source === "jira") {
       payload.projects = tags;
     }
@@ -331,16 +353,17 @@ const Collect = () => {
 
       {/* Essa é a box C */}
       {/* Box C - Checkboxes */}
-      {/* {source === "github" && ( */}
+      {source === "github" && ( 
       <Box sx={{ width: "50%", py: "40px" }}>
         <FormGroup
           sx={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            gridTemplateColumns: "1fr",
             gap: 1,
+            
           }}
         >
-          {options.map((option) => (
+          {displayOptions.map((option) => (            
             <FormControlLabel
               key={option}
               control={
@@ -350,11 +373,12 @@ const Collect = () => {
                 />
               }
               label={option}
+               
             />
           ))}
         </FormGroup>
       </Box>
-      {/* )} */}
+      )}
 
       {/* Botão Final */}
       <Box display="flex">
@@ -370,6 +394,7 @@ const Collect = () => {
             fontSize: "22px",
             textTransform: "none",
             borderRadius: "12px",
+            marginTop: 2,
             fontWeight: 600,
           }}
         >
