@@ -631,7 +631,7 @@ const Preview = () => {
         />
       </Box>
       <Typography sx={{color: "#595957", mb: 5, ml: 1, fontSize: "15px"}}>
-          Data maximum: {latestDataDate}
+          Data ends on {latestDataDate}
         </Typography>
 
       <Button
