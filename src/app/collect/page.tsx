@@ -38,7 +38,7 @@ const Collect = () => {
   const options =
     source === "github" ? ["issue", "comment", "pull request", "commit"] : [];
 
-  const displayOptions = [...options, "select all"];
+  const displayOptions = ["select all", ...options];
   const isAllSelected = options.every(option => checkedOptions.includes(option));
 
   const handleCheckboxChange = (option: string) => {
@@ -168,9 +168,10 @@ const Collect = () => {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
+          mt: -3
         }}
       >
-        <Typography sx={{ fontSize: "24px", fontWeight: 600 }}>
+        <Typography sx={{ fontSize: "24px", fontWeight: 600}}>
           {source === "github" ? "Repository URLs" : "Projects URLS"}
         </Typography>
 
@@ -231,7 +232,7 @@ const Collect = () => {
             onClick={() => setOpen(true)}
             placeholder="+ Add"
             InputProps={{ readOnly: true }}
-            sx={{ width: 120, cursor: "pointer" }}
+            sx={{ width: 140, cursor: "pointer", ml: -1}}
           />
         </Box>
       </Box>
@@ -306,7 +307,7 @@ const Collect = () => {
       </Modal>
 
       {/* Box B - Datas */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "30px" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "30px", mt: -2}}>
         {!startDate && !endDate && (
           <Alert variant="outlined" severity="warning" sx={{ width: "40vw" }}>
             Leaving the date fields empty will mine data from the entire period.
@@ -320,7 +321,7 @@ const Collect = () => {
           InputLabelProps={{ shrink: true }}
           fullWidth
           sx={{
-            height: "100px",
+            height: "80px",
             width: "230px",
             borderRadius: "16px",
             background: "#E1EEFF",
@@ -335,7 +336,7 @@ const Collect = () => {
           InputLabelProps={{ shrink: true }}
           fullWidth
           sx={{
-            height: "100px",
+            height: "80px",
             width: "230px",
             borderRadius: "16px",
             background: "#E1EEFF",
@@ -346,16 +347,17 @@ const Collect = () => {
 
       {/* Box C - Checkboxes */}
       {source === "github" && ( 
-      <Box sx={{ width: "50%", py: "40px" }}>
+      <Box sx={{ width: "50%", py: "40px", mt: -2, mb: -2}}>
         <FormGroup
           sx={{
             display: "grid",
             gridTemplateColumns: "1fr",
             gap: 1,
-            
           }}
         >
-          {displayOptions.map((option) => (            
+          {displayOptions.map((option : string) => (
+  
+            
             <FormControlLabel
               key={option}
               control={
@@ -364,8 +366,8 @@ const Collect = () => {
                   onChange={() => handleCheckboxChange(option)}
                 />
               }
-              label={option}
-               
+              label={option} 
+              
             />
           ))}
         </FormGroup>
@@ -386,7 +388,7 @@ const Collect = () => {
             fontSize: "22px",
             textTransform: "none",
             borderRadius: "12px",
-            marginTop: 2,
+            marginTop: .5,
             fontWeight: 600,
           }}
         >
