@@ -3,6 +3,15 @@ import {
   Box,
   Button,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -152,9 +161,16 @@ const Preview = () => {
   const [error, setError] = useState<string | null>(null);
   const [loadingData, setLoadingData] = useState(true); 
 
+  const [earliestDataDate, setEarliestDataDate] = useState<string>('');
+  const [latestDataDate, setLatestDataDate] = useState<string>('');   
+
+
   const params = useParams();
   const tag = params.tag;
   const section = params.section;
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState<string>('');
 
   // choosing the order 
   const columns_github_commits = [
@@ -224,6 +240,27 @@ const Preview = () => {
     setStartDate(startDateInput);
     setEndDate(endDateInput);
   };
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedFormat('');
+  };
+
+  const handleFormatChange = (event: SelectChangeEvent) => {
+    setSelectedFormat(event.target.value as string);
+  };
+
+
+  const handleExport = () => {
+    if (selectedFormat) {
+      console.log(`Exportando no formato: ${selectedFormat}`);
+      handleCloseDialog();
+    }
+  };
   
   
   useEffect(() => {
@@ -248,6 +285,32 @@ const Preview = () => {
       }
 
         setData(Array.isArray(formattedData) ? formattedData : []);
+
+        let minTimestamp = Infinity;
+        let maxTimestamp = -Infinity;
+
+        formattedData.forEach((item: any) => {
+          // Usa os mesmos campos de data que você usa para filtrar
+          const itemDateValue = item.date || item.created_at || item.created;
+          if (itemDateValue) {
+            const dateObj = new Date(itemDateValue);
+            const timestamp = dateObj.getTime();
+            if (!isNaN(timestamp)) { // Garante que é uma data válida
+              minTimestamp = Math.min(minTimestamp, timestamp);
+              maxTimestamp = Math.max(maxTimestamp, timestamp);
+            }
+          }
+        });
+
+        if (minTimestamp !== Infinity && maxTimestamp !== -Infinity) {
+          const minDateObj = new Date(minTimestamp);
+          const maxDateObj = new Date(maxTimestamp);
+
+          // Formata as datas para YYYY-MM-DD (compatível com input type="date")
+          setEarliestDataDate(minDateObj.toISOString().split('T')[0]);
+          setLatestDataDate(maxDateObj.toISOString().split('T')[0]);
+        }
+
         
       } catch (err: any) {
         setError(err.message || "Erro desconhecido");
@@ -293,6 +356,7 @@ const Preview = () => {
 
   const noData = !processedData || processedData.length === 0;
 
+
   return (
     <Box sx={{
       display: "flex",
@@ -300,7 +364,7 @@ const Preview = () => {
       maxWidth: "90vw",
       overflowX: "auto",  
       height: "90vh",     
-    }}>
+     }}>
 
 
 
@@ -324,62 +388,160 @@ const Preview = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, border: "1px solid #F3550B", borderRadius: 5, padding: 2, paddingRight: 70}}> 
                 <WarningAmberRoundedIcon/> 
                 {`Could not find ${section} between start and finish dates.`} 
-              </Box>    
+            </Box>    
             }
         </Typography>
       ) : ( 
-        <DataGrid
-          rows={processedData.map((row, index) => ({ id: row.id || index, ...row }))}
-          columns={columns.map((col) => ({
-             field: col.accessorKey, 
-            headerName: col.header, 
-             renderCell: (params: any) => {
-               let valueToRender = params.value;              
-               if (col.accessorKey) {
-                   const keys = col.accessorKey.split(".");
-                   let rawValue = params.row;
-                   for (const key of keys) {
-                       rawValue = rawValue?.[key];
-                   }
-                   valueToRender = typeof rawValue === "object" && rawValue !== null
-                       ? JSON.stringify(rawValue)
-                       : String(rawValue ?? "");
-               }
+        <Box>
+          <DataGrid
+            rows={processedData.map((row, index) => ({ id: row.id || index, ...row }))}
+            columns={columns.map((col) => ({
+              field: col.accessorKey, 
+              headerName: col.header, 
+              renderCell: (params: any) => {
+                let valueToRender = params.value;              
+                if (col.accessorKey) {
+                    const keys = col.accessorKey.split(".");
+                    let rawValue = params.row;
+                    for (const key of keys) {
+                        rawValue = rawValue?.[key];
+                    }
+                    valueToRender = typeof rawValue === "object" && rawValue !== null
+                        ? JSON.stringify(rawValue)
+                        : String(rawValue ?? "");
+                }
 
-               return (
-                 <span title={valueToRender} style={{
-                   whiteSpace: 'nowrap',
-                   overflow: 'hidden',
-                   textOverflow: 'ellipsis',
-                   width: '100%',
-                   display: 'block'
-                 }}>
-                   {valueToRender}
-                 </span>
-               );
-             },
-          }))}
-          pageSizeOptions={[10, 25, 50, 100]}
-          pagination
-          checkboxSelection
-          
+                return (
+                  <span title={valueToRender} style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: '100%',
+                    display: 'block'
+                  }}>
+                    {valueToRender}
+                  </span>
+                );
+              },
+            }))}
+            pageSizeOptions={[10, 25, 50, 100]}
+            pagination
+            checkboxSelection
+            
+            sx={{
+              width: "62vw",
+              height: "80vh",
+              marginTop: 2,
+              marginLeft: 2,
+              marginBottom: 2,
+              overflowX: "auto",
+              tableLayout: "fixed",
+              '& .MuiDataGrid-cell': {
+                minWidth: "7vw",
+              },
+              '& .MuiDataGrid-columnHeader': {
+                minWidth: "7vw",
+              },
+              
+            }}
+
+          />
+          <Box
+
+          component="footer"
           sx={{
-            width: "50vw",
-            marginTop: 2,
-            marginLeft: 2,
-            marginBottom: 5,
-            overflowX: "auto",
-            tableLayout: "fixed",
-            '& .MuiDataGrid-cell': {
-              minWidth: "7vw",
-            },
-            '& .MuiDataGrid-columnHeader': {
-              minWidth: "7vw",
-            },
+            width: "100%",
+            
+            display: "flex",
+            justifyContent: "flex-start",
+            backgroundColor: "transparent",
             
           }}
-        />
+          >
+          <Button
+            onClick={handleOpenDialog} 
+            variant="outlined"
+            sx={{
+              border: "0.15rem solid #1C4886",
+              color: "#1C4886",
+              borderRadius: "16px",
+              marginLeft: "49.95vw",
+              padding: "14px 16px",
+              
+              textTransform: "none",
+              fontSize: "1rem",
+              fontWeight: 600,
+              "&:hover": {
+                backgroundColor: "rgba(28, 72, 134, 0.04)",
+                borderColor: "#1C4886",
+              },
+            }}>
+
+            Export CSV / JSON
+          </Button>
+          <Dialog open={openDialog} 
+      onClose={handleCloseDialog}
+      PaperProps={{
+        sx: {
+          bgcolor: "#21211F", 
+          borderRadius: '16px', 
+        },
+      }}>        
+        <DialogContent> 
+          <FormControl fullWidth sx={{ minWidth: 400}}>
+            <Select
+              labelId="format-select-label"
+              id="format-select"
+              value={selectedFormat}
+              onChange={handleFormatChange}
+              sx={{
+                color: 'white', 
+                '& .MuiOutlinedInput-notchedOutline': { 
+                  borderColor: 'white', 
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white', 
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white', 
+                },
+                '& .MuiSvgIcon-root': { 
+                  color: '#63A4FF', 
+                },
+              }}
+            >
+              <MenuItem value="">
+                <em>Select a format type</em>
+              </MenuItem>
+              <MenuItem value="csv">CSV</MenuItem>
+              <MenuItem value="json">JSON</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} sx={{ color: '#63A4FF' }}>Cancel</Button>
+          <Button
+            onClick={handleExport}
+            variant="contained"
+            
+            sx={{
+                bgcolor: '#376BD2',
+                color: 'white',
+                marginRight: "10px",
+                '&:hover': { bgcolor: '#173B6C' }
+            }}
+          >
+            Export
+          </Button>
+        </DialogActions>
+      </Dialog>
+          
+          </Box>
+          
+        </Box>
       )}
+
+      
 
       <Box
       sx={{
@@ -389,7 +551,7 @@ const Preview = () => {
         flexDirection: "column",
         justifyContent: "flex-start",
         marginLeft: 2,
-        height: "90vh",
+        height: "80vh",
         marginTop: 2,
         marginRight: 2,
         backgroundColor: "#E7F2FF",
@@ -409,7 +571,7 @@ const Preview = () => {
       >Filters</Typography>
 
       
-      <Box sx={{ mb: 5, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
+      <Box sx={{ mb: 1, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
         <Typography
           sx={{
             mb: 1,
@@ -422,6 +584,8 @@ const Preview = () => {
           type="date"
           value={startDateInput}
           onChange={(e) => setStartDateInput(e.target.value)}
+          min={earliestDataDate || undefined} // Define a data mínima permitida
+          max={latestDataDate || undefined}   // Define a data máxima permitida
           style={{
             width: "100%",
             height: "20px",
@@ -434,8 +598,11 @@ const Preview = () => {
           }}
         />
       </Box>
+      <Typography sx={{color: "#595957", mb: 3, ml: 1, fontSize: "15px"}}>
+          Data starts from {earliestDataDate}
+        </Typography>
 
-      <Box sx={{ mb: 6, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
+      <Box sx={{ mb: 1, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
         <Typography
           sx={{
             mb: 1,
@@ -450,6 +617,8 @@ const Preview = () => {
           type="date"
           value={endDateInput}
           onChange={(e) => setEndDateInput(e.target.value)}
+          min={earliestDataDate || undefined} 
+          max={latestDataDate || undefined}   
           style={{
             width: "100%",
             height: "40px",
@@ -463,6 +632,9 @@ const Preview = () => {
           }}
         />
       </Box>
+      <Typography sx={{color: "#595957", mb: 5, ml: 1, fontSize: "15px"}}>
+          Data maximum: {latestDataDate}
+        </Typography>
 
       <Button
         variant="contained"
@@ -484,8 +656,11 @@ const Preview = () => {
         Apply filters
       </Button>
     </Box>
+    
+    
+  </Box>
+  
 
-    </Box>
   );
 };
 
