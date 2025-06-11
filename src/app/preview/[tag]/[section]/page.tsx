@@ -276,6 +276,7 @@ const Preview = () => {
 
         if (!res.ok) throw new Error("Erro ao buscar dados");
         const json = await res.json();
+        console.log(`Resposta da API para a seção ''${realSection}:`,json);
 
         let formattedData = [];
       if (json && Array.isArray(json.results)) {
@@ -290,7 +291,7 @@ const Preview = () => {
         let maxTimestamp = -Infinity;
 
         formattedData.forEach((item: any) => {
-          // Usa os mesmos campos de data que você usa para filtrar
+          
           const itemDateValue = item.date || item.created_at || item.created;
           if (itemDateValue) {
             const dateObj = new Date(itemDateValue);
@@ -306,7 +307,7 @@ const Preview = () => {
           const minDateObj = new Date(minTimestamp);
           const maxDateObj = new Date(maxTimestamp);
 
-          // Formata as datas para YYYY-MM-DD (compatível com input type="date")
+          
           setEarliestDataDate(minDateObj.toISOString().split('T')[0]);
           setLatestDataDate(maxDateObj.toISOString().split('T')[0]);
         }
@@ -366,16 +367,13 @@ const Preview = () => {
       height: "90vh",     
      }}>
 
-
-
-  
         {loadingData ? ( // Verifica se está carregando
         <Typography sx={{ marginTop: 2, marginLeft: 2 }}>Carregando dados da tabela...</Typography>
       ) : error ? ( // Verifica se há um erro
         <Typography color="error" sx={{ marginTop: 2, marginLeft: 2 }}>
           Erro ao carregar dados: {error}
         </Typography>
-      ) : processedData.length === 0 ? ( // Verifica se não há dados processados
+      ) : filteredDataByDate.length === 0 ? ( // Verifica se não há dados processados
         <Typography sx={{ marginTop: 3, marginLeft: 2}}>
           {data && data.length === 0
             ? (
@@ -394,7 +392,7 @@ const Preview = () => {
       ) : ( 
         <Box>
           <DataGrid
-            rows={processedData.map((row, index) => ({ id: row.id || index, ...row }))}
+            rows={filteredDataByDate.map((row, index) => ({ id: row.id || index, ...row }))}
             columns={columns.map((col) => ({
               field: col.accessorKey, 
               headerName: col.header, 
