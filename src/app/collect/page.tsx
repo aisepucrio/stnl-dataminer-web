@@ -262,7 +262,7 @@ const Collect = () => {
               <Box mb={3}>
                 <TextField
                   fullWidth
-                  label="Repository URL"
+                  label="Format : owner/repo"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => {
