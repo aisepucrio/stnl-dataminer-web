@@ -53,13 +53,13 @@ const MainMenu = () => {
 
   const pages = [
     { name: "Overview", path: "/", icon: "icons/iconOverview.svg" },
+    { name: "Collect", path: "/collect", icon: "icons/iconCollect.svg" },
     {
       name: "Preview",
       path: "/preview",
       icon: "icons/iconPreview.svg",
       children: getPreviewChildren(),
     },
-    { name: "Collect", path: "/collect", icon: "icons/iconCollect.svg" },
     { name: "Jobs", path: "/jobs", icon: "icons/iconJobs.svg" },
   ];
 
