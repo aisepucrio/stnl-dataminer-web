@@ -128,6 +128,8 @@ const Jobs = () => {
                 <TableCell sx={headerCellStyle}>Project</TableCell>
                 <TableCell sx={headerCellStyle}>Description</TableCell>
                 <TableCell sx={headerCellStyle}>Date</TableCell>
+                <TableCell sx={headerCellStyle}>Data Start Date</TableCell>
+                <TableCell sx={headerCellStyle}>Data Finish Date</TableCell>
                 <TableCell sx={headerCellStyle}>Status</TableCell>
                 <TableCell sx={headerCellStyle}></TableCell>
               </TableRow>
@@ -162,6 +164,14 @@ const Jobs = () => {
                           }
                         )}
                       </Box>
+                    </TableCell>
+                    <TableCell>
+                      
+
+                    </TableCell>
+
+                    <TableCell>
+                      
                     </TableCell>
 
                     <TableCell>
