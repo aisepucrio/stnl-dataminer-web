@@ -428,8 +428,8 @@ const Preview = () => {
             
             sx={{
               width: "62vw",
-              height: "80vh",
-              marginTop: 2,
+              height: "83vh",
+              marginTop: 3,
               marginLeft: 2,
               marginBottom: 2,
               overflowX: "auto",
@@ -444,97 +444,7 @@ const Preview = () => {
             }}
 
           />
-          <Box
-
-          component="footer"
-          sx={{
-            width: "100%",
-            
-            display: "flex",
-            justifyContent: "flex-start",
-            backgroundColor: "transparent",
-            
-          }}
-          >
-          <Button
-            onClick={handleOpenDialog} 
-            variant="outlined"
-            sx={{
-              border: "0.15rem solid #1C4886",
-              color: "#1C4886",
-              borderRadius: "16px",
-              marginLeft: "49.95vw",
-              padding: "14px 16px",
-              
-              textTransform: "none",
-              fontSize: "1rem",
-              fontWeight: 600,
-              "&:hover": {
-                backgroundColor: "rgba(28, 72, 134, 0.04)",
-                borderColor: "#1C4886",
-              },
-            }}>
-
-            Export CSV / JSON
-          </Button>
-          <Dialog open={openDialog} 
-      onClose={handleCloseDialog}
-      PaperProps={{
-        sx: {
-          bgcolor: "#21211F", 
-          borderRadius: '16px', 
-        },
-      }}>        
-        <DialogContent> 
-          <FormControl fullWidth sx={{ minWidth: 400}}>
-            <Select
-              labelId="format-select-label"
-              id="format-select"
-              value={selectedFormat}
-              onChange={handleFormatChange}
-              sx={{
-                color: 'white', 
-                '& .MuiOutlinedInput-notchedOutline': { 
-                  borderColor: 'white', 
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'white', 
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'white', 
-                },
-                '& .MuiSvgIcon-root': { 
-                  color: '#63A4FF', 
-                },
-              }}
-            >
-              <MenuItem value="">
-                <em>Select a format type</em>
-              </MenuItem>
-              <MenuItem value="csv">CSV</MenuItem>
-              <MenuItem value="json">JSON</MenuItem>
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} sx={{ color: '#63A4FF' }}>Cancel</Button>
-          <Button
-            onClick={handleExport}
-            variant="contained"
-            
-            sx={{
-                bgcolor: '#376BD2',
-                color: 'white',
-                marginRight: "10px",
-                '&:hover': { bgcolor: '#173B6C' }
-            }}
-          >
-            Export
-          </Button>
-        </DialogActions>
-      </Dialog>
           
-          </Box>
           
         </Box>
       )}
@@ -549,8 +459,8 @@ const Preview = () => {
         flexDirection: "column",
         justifyContent: "flex-start",
         marginLeft: 2,
-        height: "80vh",
-        marginTop: 2,
+        height: "83vh",
+        marginTop: 3,
         marginRight: 2,
         backgroundColor: "#E7F2FF",
         width: "18vw",
