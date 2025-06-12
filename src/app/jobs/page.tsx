@@ -35,6 +35,8 @@ type Job = {
   repository: string;
   created_at: string;
   created_at_formatted: string;
+  start_date: string;
+  end_date: string;
   status: string;
   error: string;
 };
@@ -166,12 +168,31 @@ const Jobs = () => {
                       </Box>
                     </TableCell>
                     <TableCell>
-                      
-
+                    <Box display="flex" alignItems="center">
+                        <CalendarTodayIcon fontSize="small" sx={{ mr: 1 }} />
+                        {new Date(job.start_date).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}
+                      </Box>
                     </TableCell>
 
                     <TableCell>
-                      
+                    <Box display="flex" alignItems="center">
+                        <CalendarTodayIcon fontSize="small" sx={{ mr: 1 }} />
+                        {new Date(job.end_date).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}
+                      </Box>
                     </TableCell>
 
                     <TableCell>
