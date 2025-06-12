@@ -114,7 +114,7 @@ const Header = () => {
       onClose={handleCloseDialog}
       PaperProps={{
         sx: {
-          bgcolor: "#21211F", 
+          bgcolor: "#ffffff", 
           borderRadius: '16px', 
         },
       }}>        
@@ -126,15 +126,15 @@ const Header = () => {
               value={selectedFormat}
               onChange={handleFormatChange}
               sx={{
-                color: 'white', 
+                color: 'black', 
                 '& .MuiOutlinedInput-notchedOutline': { 
-                  borderColor: 'white', 
+                  borderColor: 'black', 
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'white', 
+                  borderColor: 'black', 
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'white', 
+                  borderColor: 'black', 
                 },
                 '& .MuiSvgIcon-root': { 
                   color: '#63A4FF', 
