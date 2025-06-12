@@ -83,7 +83,6 @@ const Header = () => {
       <Box
           sx={{
             width: "13vw",
-            
             display: "flex",
             justifyContent: "flex-start",
             backgroundColor: "transparent",
@@ -97,8 +96,8 @@ const Header = () => {
               border: "0.15rem solid #1C4886",
               color: "#1C4886",
               borderRadius: "16px",
-              marginLeft: "-10vw",
-              padding: "14px 16px",
+              marginLeft: "-8vw",
+              padding: "10px 12px",
               textTransform: "none",
               fontSize: "1rem",
               fontWeight: 600,
