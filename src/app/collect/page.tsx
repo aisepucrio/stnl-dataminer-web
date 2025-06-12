@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -35,10 +35,12 @@ const Collect = () => {
 
   
 
-  const options =
-    source === "github" ? ["issue", "comment", "pull request", "commit"] : [];
+  const options = useMemo(() =>
+  source === "github" ? ["issue", "comment", "pull request", "commit"] : [],
+  [source]
+);
 
-  const displayOptions = [...options, "select all"];
+  const displayOptions = ["select all", ...options];
   const isAllSelected = options.every(option => checkedOptions.includes(option));
 
   const handleCheckboxChange = (option: string) => {
@@ -94,17 +96,10 @@ const Collect = () => {
   };
 
   useEffect(() => {
-    if (isAllSelected && !checkedOptions.includes("select all")) {
-      setCheckedOptions((prev) => [...prev, "select all"]);
-    }
-    else if (!isAllSelected && checkedOptions.includes("select all")) {
-      setCheckedOptions((prev) => prev.filter(opt => opt !== "select all"));
-    }
-    if (source) {
       setLoading(false);
       setTags([]); // zera as tags sempre que source muda
-    }
-  }, [source, isAllSelected, checkedOptions, setCheckedOptions, options]);
+      setCheckedOptions(["metadata"]);
+  }, [source]);
 
   if (loading) {
     return <div>Carregando...</div>;
@@ -126,9 +121,7 @@ const Collect = () => {
     if (source === "github") {
       payload.repositories = tags;
       payload.depth = "basic";
-      payload.collect_types = checkedOptions
-      .filter(opt => opt !== "select all") // remove opcao "select all" 
-      .map((opt) => collectTypeMap[opt]);    
+      payload.collect_types = checkedOptions.map((opt) => collectTypeMap[opt]); 
     } else if (source === "jira") {
       payload.projects = tags;
     }
