@@ -25,31 +25,11 @@ const Header = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<string>('');
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const breadcrumbs = pathSegments.length === 0
     ? ["Overview"]
     : pathSegments.map(formatSegment);
-
-
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setSelectedFormat('');
-  };
-
-  const handleFormatChange = (event: SelectChangeEvent) => {
-    setSelectedFormat(event.target.value as string);
-  };
-
-  const handleExport = () => {
-    if (selectedFormat) {
-      console.log(`Exportando no formato: ${selectedFormat}`);
-      handleCloseDialog();
-    }
-  };
 
 
   const handleOpenDialog = () => {
