@@ -1,5 +1,5 @@
 "use client";
-import { Box, Typography, Breadcrumbs, Link, Button } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Button,Tooltip } from "@mui/material";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import ItemSwitcher from "../ui/itemSwitcher";
@@ -68,27 +68,28 @@ const Header = () => {
           justifyContent: "flex-end",
         }}
       >
-
-        <Button
-          component={Link}
-          href={apiUrl}
-          target="_blank" 
-          rel="noopener noreferrer"
-          sx={{
-            alignItems: "center",
-            color: "#000000",
-            mr: 1,
-            "&:hover": {
-              backgroundColor: "rgba(28, 72, 134, 0.04)",
-            },
-          }}
-        >
-          <ArticleIcon
-          sx={{
-            width: "27px",
-            height: "27px"
-          }}/>
-        </Button>
+        <Tooltip title="View API Docs">
+          <Button
+            component={Link}
+            href={apiUrl}
+            target="_blank" 
+            rel="noopener noreferrer"
+            sx={{
+              alignItems: "center",
+              color: "#000000",
+              mr: 1,
+              "&:hover": {
+                backgroundColor: "rgba(28, 72, 134, 0.04)",
+              },
+            }}
+          >
+            <ArticleIcon
+            sx={{
+              width: "27px",
+              height: "27px"
+            }}/>
+          </Button>
+        </Tooltip>
 
 
         <Image
