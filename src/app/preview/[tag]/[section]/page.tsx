@@ -247,28 +247,6 @@ const Preview = () => {
     setStartDate(startDateInput);
     setEndDate(endDateInput);
   };
-
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setSelectedFormat('');
-  };
-
-  const handleFormatChange = (event: SelectChangeEvent) => {
-    setSelectedFormat(event.target.value as string);
-  };
-
-
-  const handleExport = () => {
-    if (selectedFormat) {
-      console.log(`Exportando no formato: ${selectedFormat}`);
-      handleCloseDialog();
-    }
-  };
-  
   
   useEffect(() => {
     const fetchData = async () => {
