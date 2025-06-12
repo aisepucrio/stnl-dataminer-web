@@ -155,6 +155,13 @@ type jira_issues={
   
 }
 
+// changing date format 
+const formatDateToMMDDYYYY = (isoDate: string) => {
+  if (!isoDate) return ''; 
+  const [year, month, day] = isoDate.split('-');
+  return `${month}/${day}/${year}`;
+};
+
 const Preview = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [data, setData] = useState<any | null>(null);
@@ -507,7 +514,7 @@ const Preview = () => {
         />
       </Box>
       <Typography sx={{color: "#595957", mb: 3, ml: 1, fontSize: "15px"}}>
-          Data starts from {earliestDataDate}
+          Data starts from {formatDateToMMDDYYYY(earliestDataDate)}
         </Typography>
 
       <Box sx={{ mb: 1, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
@@ -541,7 +548,7 @@ const Preview = () => {
         />
       </Box>
       <Typography sx={{color: "#595957", mb: 5, ml: 1, fontSize: "15px"}}>
-          Data ends on {latestDataDate}
+          Data ends on {formatDateToMMDDYYYY(latestDataDate)}
         </Typography>
 
       <Button
