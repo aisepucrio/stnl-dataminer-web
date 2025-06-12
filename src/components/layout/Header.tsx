@@ -1,5 +1,5 @@
 "use client";
-import { Box, Typography, Button, Breadcrumbs, Link } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Button } from "@mui/material";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import ItemSwitcher from "../ui/itemSwitcher";
@@ -15,14 +15,15 @@ const row = {
 const formatSegment = (segment: string) =>
   segment.charAt(0).toUpperCase() + segment.slice(1);
 
+
 const Header = () => {
   const pathname = usePathname();
   const pathSegments = pathname.split("/").filter(Boolean);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const breadcrumbs = pathSegments.length === 0
     ? ["Overview"]
     : pathSegments.map(formatSegment);
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   return (
     <Box
@@ -52,44 +53,47 @@ const Header = () => {
         </Breadcrumbs>
       </Box>
 
-      <Box sx={{ width: "180px", ...row, height: "40px" }}>
+
+      <Box sx={{ width: "180px", bgcolor: "", ...row, height: "40px" }}>
+        {/* sdf */}
         <ItemSwitcher />
       </Box>
-
       <Box
         sx={{
           height: "28px",
           width: "180px",
+          bgcolor: "",
           ...row,
+
           justifyContent: "flex-end",
         }}
       >
 
-      <Button
-        component={Link}
-        href={apiUrl}
-        target="_blank" 
-        rel="noopener noreferrer"
-        sx={{
-          alignItems: "center",
-          color: "#000000",
-          mr: 1,
-          "&:hover": {
-            backgroundColor: "rgba(28, 72, 134, 0.04)",
-          },
-        }}
-      >
-        <ArticleIcon
-        sx={{
-          width: "27px",
-          height: "27px"
-        }}/>
-      </Button>
+        <Button
+          component={Link}
+          href={apiUrl}
+          target="_blank" 
+          rel="noopener noreferrer"
+          sx={{
+            alignItems: "center",
+            color: "#000000",
+            mr: 1,
+            "&:hover": {
+              backgroundColor: "rgba(28, 72, 134, 0.04)",
+            },
+          }}
+        >
+          <ArticleIcon
+          sx={{
+            width: "27px",
+            height: "27px"
+          }}/>
+        </Button>
 
 
         <Image
           src="/icons/themeMode.svg"
-          alt="Theme Mode"
+          alt="Sidebar"
           width={25}
           height={25}
         />
