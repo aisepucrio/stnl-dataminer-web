@@ -130,12 +130,12 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
     const diffInMs = end.getTime() - start.getTime();
     const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
 
-    if (diffInDays < 15) {
+    if (diffInDays < 30) {
       setInterval("day");
-    } else if (diffInDays < 90) {
-      setInterval("week");
-    } else {
+    } else if (diffInDays < 12) {
       setInterval("month");
+    } else {
+      setInterval("year");
     }
 
     fetchData();

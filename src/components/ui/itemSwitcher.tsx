@@ -79,6 +79,8 @@ const ItemSwitcher = () => {
     dispatch(setItem(""));
   };
 
+  console.log(JSON.stringify(items))
+
   const fetchSource = async (source: string) => {
     const url = apiUrl + sources[source].fetchUrl;
     try {
@@ -152,6 +154,7 @@ useEffect(() => {
           bgcolor: "#1C4886",
           color: "#fff",
           borderRadius: "12px",
+          width: "75%"
         }}
         renderValue={(selected) => {
           const selectedItemObj = items.find((i) => i.id === selected);

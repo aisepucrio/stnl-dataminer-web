@@ -50,7 +50,7 @@ const Header = () => {
         </Breadcrumbs>
       </Box>
 
-      <Box sx={{ width: "180px", ...row, height: "40px" }}>
+      <Box sx={{ width: "100%", ...row, height: "40px" }}>
         <ItemSwitcher />
       </Box>
 
