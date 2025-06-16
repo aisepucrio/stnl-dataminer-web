@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -14,7 +14,9 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; 
+
+
 
 const Collect = () => {
   const source = useSelector((state: RootState) => state.source.value);
@@ -31,40 +33,31 @@ const Collect = () => {
 
   const [checkedOptions, setCheckedOptions] = useState<string[]>(["metadata"]);
 
-  const actualOptions =
-    source === "github" ? ["issue", "comment", "pull request", "commit"] : [];
+  
 
-  const displayOptions = [...actualOptions, "select all"];
+  const options = useMemo(() =>
+  source === "github" ? ["issue", "comment", "pull request", "commit"] : [],
+  [source]
+);
 
-  const isAllSelected = actualOptions.every(option => checkedOptions.includes(option));
+  const displayOptions = ["select all", ...options];
+  const isAllSelected = options.every(option => checkedOptions.includes(option));
 
   const handleCheckboxChange = (option: string) => {
     if (option === "select all") {
       if (isAllSelected) {
-        setCheckedOptions(["metadata"]); // Mantém apenas metadata se ele for um padrão fixo
+        setCheckedOptions(["metadata"]); 
       } else {
-        setCheckedOptions([...actualOptions, "metadata", "select all"]); // Inclua metadata aqui
+        setCheckedOptions([...options, "metadata", "select all"]); 
       }
     } else {
       setCheckedOptions((prev) =>
         prev.includes(option)
-          ? prev.filter((item) => item !== option) // Desmarca
-          : [...prev, option] // Marca
+          ? prev.filter((item) => item !== option) 
+          : [...prev, option] 
       );
     }
   };
-
-  
-  useEffect(() => {
-    if (isAllSelected && !checkedOptions.includes("select all")) {
-      setCheckedOptions((prev) => [...prev, "select all"]);
-    }
-    else if (!isAllSelected && checkedOptions.includes("select all")) {
-      setCheckedOptions((prev) => prev.filter(opt => opt !== "select all"));
-    }
-  }, [isAllSelected, checkedOptions, setCheckedOptions, actualOptions]); 
-
-  
 
 
   const handleAdd = () => {
@@ -103,10 +96,9 @@ const Collect = () => {
   };
 
   useEffect(() => {
-    if (source) {
       setLoading(false);
-      setTags([]); 
-    }
+      setTags([]); // zera as tags sempre que source muda
+      setCheckedOptions(["metadata"]);
   }, [source]);
 
   if (loading) {
@@ -129,10 +121,7 @@ const Collect = () => {
     if (source === "github") {
       payload.repositories = tags;
       payload.depth = "basic";
-      // filtra "select all" antes 
-      payload.collect_types = checkedOptions
-        .filter(opt => opt !== "select all") // remove opcao "select all" 
-        .map((opt) => collectTypeMap[opt]);
+      payload.collect_types = checkedOptions.map((opt) => collectTypeMap[opt]); 
     } else if (source === "jira") {
       payload.projects = tags;
     }
@@ -172,10 +161,11 @@ const Collect = () => {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
+          mt: -3
         }}
       >
-        <Typography sx={{ fontSize: "24px", fontWeight: 600 }}>
-          {source === "github" ? "Repository URLs" : "Projects URLS"}
+        <Typography sx={{ fontSize: "24px", fontWeight: 600}}>
+          {source === "github" ? "Repository Name" : "Projects Name"}
         </Typography>
 
         <Box
@@ -235,7 +225,7 @@ const Collect = () => {
             onClick={() => setOpen(true)}
             placeholder="+ Add"
             InputProps={{ readOnly: true }}
-            sx={{ width: 120, cursor: "pointer" }}
+            sx={{ width: 140, cursor: "pointer", ml: -1}}
           />
         </Box>
       </Box>
@@ -260,7 +250,7 @@ const Collect = () => {
               <Box mb={3}>
                 <TextField
                   fullWidth
-                  label="Repository URL"
+                  label="Format : owner/repo"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => {
@@ -298,7 +288,7 @@ const Collect = () => {
               </Box>
               <Box display="flex" justifyContent="flex-end" gap={1}>
                 <Button variant="outlined" onClick={() => setOpen(false)}>
-                  Cancelar
+                  Cancel
                 </Button>
                 <Button variant="contained" onClick={handleAdd}>
                   Add
@@ -310,7 +300,7 @@ const Collect = () => {
       </Modal>
 
       {/* Box B - Datas */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "30px" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "30px", mt: -2}}>
         {!startDate && !endDate && (
           <Alert variant="outlined" severity="warning" sx={{ width: "40vw" }}>
             Leaving the date fields empty will mine data from the entire period.
@@ -324,7 +314,7 @@ const Collect = () => {
           InputLabelProps={{ shrink: true }}
           fullWidth
           sx={{
-            height: "100px",
+            height: "80px",
             width: "230px",
             borderRadius: "16px",
             background: "#E1EEFF",
@@ -339,7 +329,7 @@ const Collect = () => {
           InputLabelProps={{ shrink: true }}
           fullWidth
           sx={{
-            height: "100px",
+            height: "80px",
             width: "230px",
             borderRadius: "16px",
             background: "#E1EEFF",
@@ -349,16 +339,17 @@ const Collect = () => {
       </Box>
 
       {/* Box C - Checkboxes */}
-      {/* {source === "github" && ( */}
-      <Box sx={{ width: "50%", py: "40px" }}>
+      {source === "github" && ( 
+      <Box sx={{ width: "50%", py: "40px", mt: -2, mb: -2}}>
         <FormGroup
           sx={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            gridTemplateColumns: "1fr",
             gap: 1,
           }}
         >
-          {displayOptions.map((option) => ( 
+          {displayOptions.map((option : string) => (
+
             <FormControlLabel
               key={option}
               control={
@@ -367,12 +358,12 @@ const Collect = () => {
                   onChange={() => handleCheckboxChange(option)}
                 />
               }
-              label={option}
+              label={option} 
             />
           ))}
         </FormGroup>
       </Box>
-      {/* )} */}
+      )}
 
       {/* Botão Final */}
       <Box display="flex">
@@ -388,6 +379,7 @@ const Collect = () => {
             fontSize: "22px",
             textTransform: "none",
             borderRadius: "12px",
+            marginTop: 2,
             fontWeight: 600,
           }}
         >

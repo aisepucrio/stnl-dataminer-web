@@ -102,26 +102,20 @@ const Jobs = () => {
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
           }}
         >
-          <Typography
-            variant="h4"
-            sx={{ color: "#1C4886", fontWeight: 600, mb: 4 }}
-          >
-            Jobs
-          </Typography>
 
           <Box>
             <IconButton onClick={() => setRev(!rev)} sx={{ color: "#1C4886" }}>
               <SwapVertIcon
-                sx={{ color: "#1C4886", fontSize: 40, cursor: "pointer" }}
+                sx={{ color: "#1C4886", fontSize: 36, cursor: "pointer" }}
               />
             </IconButton>
 
             <IconButton onClick={fetchJobs} sx={{ color: "#1C4886" }}>
               <RefreshOutlinedIcon
-                sx={{ color: "#1C4886", fontSize: 38, cursor: "pointer" }}
+                sx={{ color: "#1C4886", fontSize: 34, cursor: "pointer" }}
               />
             </IconButton>
           </Box>
