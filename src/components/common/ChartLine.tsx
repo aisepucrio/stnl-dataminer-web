@@ -51,7 +51,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const fetchData = async () => {
     let endpoint = "";
     endpoint = `${apiUrl}/api/${source}/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}`;
-
+    console.log(endpoint)
     setLoading(true);
 
     try {
@@ -78,6 +78,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
 
   useEffect(() => {
     if (!startDate || !endDate) return;
+    console.log("data ta mudando")
 
     if (source === "github") {
       const githubOptions = [
@@ -105,7 +106,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
 
     if (diffInDays < 30) {
       setInterval("day");
-    } else if (diffInDays < 12) {
+    } else if (diffInDays < 366) {
       setInterval("month");
     } else {
       setInterval("year");

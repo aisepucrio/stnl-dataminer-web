@@ -79,7 +79,7 @@ const ItemSwitcher = () => {
     dispatch(setItem(""));
   };
 
-  console.log(JSON.stringify(items))
+  // console.log(JSON.stringify(items))
 
   const fetchSource = async (source: string) => {
     const url = apiUrl + sources[source].fetchUrl;
