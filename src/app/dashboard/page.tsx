@@ -3,11 +3,10 @@ import ChartLine from "@/components/common/ChartLine";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
 
-import { Box, Button, SelectChangeEvent } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { Box } from "@mui/material";
+import { useEffect, useState } from "react";
 import InfoCard from "@/components/common/InfoCard";
 import Filter from "@/components/common/Filter";
-import Footer from "@/components/layout/Footer";
 
 // ---------------------------------------------------
 
@@ -36,7 +35,6 @@ const sources = {
 
 export default function Dashboard() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const didMount = useRef(false);
   const source = useSelector((state: RootState) => state.source.value);
   const item = useSelector((state: RootState) => state.item.value);
 
@@ -96,10 +94,6 @@ export default function Dashboard() {
       if (!response.ok) {
         throw new Error(`Erro ao buscar dados de ${source}`);
       }
-      console.log();
-      console.log("data is >> ");
-      console.log(data);
-      console.log();
 
       const {
         issues_count = qtyIssue,
@@ -187,19 +181,11 @@ export default function Dashboard() {
     }
   };
 
-  // useEffect(() => {
-  //   if (didMount.current) {
-  //     fetchSource(source);
-  //   } else {
-  //     didMount.current = true;
-  //   }
-  // }, [source]);
 
   useEffect(() => {
     if (item) {
       fetchItem(item);
     } else {
-      // window.alert("removeu item, vai dar fetch de novo")
       fetchSource(source);
     }
   }, [item, startDate, endDate]);
@@ -214,7 +200,6 @@ export default function Dashboard() {
         ...row,
         width: "100%",
         height: "752px",
-        // height: "100%",
         bgcolor: "",
         boxSizing: "border-box",
         justifyContent: "center",
@@ -223,13 +208,7 @@ export default function Dashboard() {
         py: 3,
       }}
     >
-      {/* <Button
-        onClick={(e) => {
-          window.alert(item);
-        }}
-      >
-        print item
-      </Button> */}
+
 
       <Box
         sx={{

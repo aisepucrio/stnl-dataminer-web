@@ -1,19 +1,11 @@
 import {
   Box,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  Menu,
-  MenuItem,
   Typography,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { ResponsiveLine } from "@nivo/line";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
-
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import Image from "next/image";
 
 const color = "#1C4886";
 
@@ -22,24 +14,6 @@ interface ChartLineProps {
   endDate: string;
 }
 
-const chartData = [
-  {
-    id: "Série A",
-    data: [
-      { x: "Jan", y: 10 },
-      { x: "Fev", y: 20 },
-      { x: "Mar", y: 15 },
-    ],
-  },
-  {
-    id: "Série B",
-    data: [
-      { x: "Jan", y: 20 },
-      { x: "Fev", y: 18 },
-      { x: "Mar", y: 15 },
-    ],
-  },
-];
 
 const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const [loading, setLoading] = useState(false);
@@ -54,7 +28,6 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
     { key: string; label: string; color: string }[]
   >([]);
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selected, setSelected] = useState<string[]>(options.map((o) => o.key));
 
   const formatLineData = (data: any) => {
@@ -160,39 +133,6 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
           Charts Geral
         </Typography>
       </Box>
-      <Box>
-        {/* select aqui CHART select*/}
-        {/* <Button
-          onClick={handleClick}
-          startIcon={<ChevronRightIcon />}
-          sx={{
-            textTransform: "none",
-            display: "flex",
-            gap: 1,
-            alignItems: "center",
-            // bgcolor: "green",
-            marginLeft: "10px",
-          }}
-        >
-          <Image
-            src="/icons/BookOpen.svg"
-            alt="chart filter"
-            width={20}
-            height={20}
-          />
-          <Typography>Chart Filter</Typography>
-        </Button>
-        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          {options.map((option) => (
-            <MenuItem key={option.key} onClick={() => handleToggle(option.key)}>
-              <FormControlLabel
-                control={<Checkbox checked={selected.includes(option.key)} />}
-                label={option.label}
-              />
-            </MenuItem>
-          ))}
-        </Menu> */}
-      </Box>
 
       <Box
         sx={{
@@ -271,9 +211,9 @@ const row = {
   display: "flex",
   flexDirection: "row",
 };
-const column = {
-  display: "flex",
-  flexDirection: "column",
-};
+// const column = {
+//   display: "flex",
+//   flexDirection: "column",
+// };
 
 export default ChartLine;
