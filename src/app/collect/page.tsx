@@ -121,7 +121,7 @@ const Collect = () => {
     if (source === "github") {
       payload.repositories = tags;
       payload.depth = "basic";
-      payload.collect_types = checkedOptions.map((opt) => collectTypeMap[opt]); 
+      payload.collect_types = checkedOptions.filter((opt) => opt !== "select all").map((opt) => collectTypeMap[opt]); 
     } else if (source === "jira") {
       payload.projects = tags;
     }
