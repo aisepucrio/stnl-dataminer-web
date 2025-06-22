@@ -1,8 +1,9 @@
 "use client";
-import { Box, Typography, Breadcrumbs, Link } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Tooltip, Button } from "@mui/material";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import ItemSwitcher from "../ui/itemSwitcher";
+import ArticleIcon from '@mui/icons-material/Article';
 
 const row = {
   display: "flex",
@@ -15,6 +16,7 @@ const formatSegment = (segment: string) =>
   segment.charAt(0).toUpperCase() + segment.slice(1);
 
 const Header = () => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const pathname = usePathname();
   const pathSegments = pathname.split("/").filter(Boolean);
 
@@ -62,11 +64,34 @@ const Header = () => {
           justifyContent: "flex-end",
         }}
       >
+        <Tooltip title="View API Docs"> 
+          <Button
+            component={Link}
+            href={apiUrl} 
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              alignItems: "center",
+              mr: 1,
+              "&:hover": {
+                backgroundColor: "rgba(28, 72, 134, 0.04)",
+              },
+            }}
+          >
+            <ArticleIcon
+            sx={{
+              width: "27px",
+              height: "27px", 
+              color: "black",
+            }}/>
+          </Button>
+        </Tooltip>
+        
         <Image
           src="/icons/themeMode.svg"
           alt="Theme Mode"
           width={25}
-          height={25}
+          height={28}
         />
       </Box>
     </Box>
