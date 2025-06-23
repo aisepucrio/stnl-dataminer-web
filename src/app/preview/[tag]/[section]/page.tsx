@@ -17,7 +17,7 @@ const Preview = () => {
   const source = useSelector((state: RootState) => state.source.value);
   const itemId = useSelector((state: RootState) => state.item.value);
   const params = useParams();
-  const [page, setPage] = useState(3);
+  const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(100);
   const [results, setResults] = useState<any[]>([]);
   const [startDate, setStartDate] = useState<string>("");
