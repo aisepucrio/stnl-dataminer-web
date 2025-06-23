@@ -45,7 +45,7 @@ const MainMenu = () => {
           { title: "User", to: "/preview/jira/users" },
           { title: "Issue", to: "/preview/jira/issues" },
           { title: "Comment", to: "/preview/jira/comments" },
-          { title: "Commit", to: "/preview/jira/sprints" },
+          { title: "Sprints", to: "/preview/jira/sprints" },
         ];
       default:
         return null;
