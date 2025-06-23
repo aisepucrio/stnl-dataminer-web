@@ -37,12 +37,13 @@ const MainMenu = () => {
           { title: "Pull Request", to: "/preview/github/pull-requests" },
           { title: "Comment", to: "/preview/github/comments" },
           { title: "Commit", to: "/preview/github/commits" },
+          { title: "User", to: "/preview/github/users" },
+
         ];
       case "jira":
         return [
-          { title: "Users", to: "/preview/jira/users" },
+          { title: "User", to: "/preview/jira/users" },
           { title: "Issue", to: "/preview/jira/issues" },
-          { title: "Pull Request", to: "/preview/jira/pull-requests" },
           { title: "Comment", to: "/preview/jira/comments" },
           { title: "Commit", to: "/preview/jira/commits" },
         ];
