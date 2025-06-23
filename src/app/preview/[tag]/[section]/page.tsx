@@ -7,10 +7,9 @@ import { useParams } from "next/navigation";
 import MUIDataTable from "mui-datatables";
 import columns from "./columns.js";
 import FilterPreview from "@/components/common/FilterPreview";
-import Filter from "@/components/common/Filter";
 
 const row = { display: "flex", flexDirection: "row" };
-const column = { display: "flex", flexDirection: "column" };
+// const column = { display: "flex", flexDirection: "column" };
 
 const Preview = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -53,6 +52,7 @@ const Preview = () => {
 
     const startDateParam = startDate ? `&created_after=${startDate}` : "";
     const endDateParam = endDate ? `&created_before=${endDate}` : "";
+
     // const endpoint = `http://localhost:8000/api/${tag}/${section}?page=`;
     const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${item}${startDateParam}${endDateParam}`;
 
