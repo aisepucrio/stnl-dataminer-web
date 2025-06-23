@@ -28,7 +28,7 @@ const columns = [
     label: "closed_at_formatted",
     options: {
       filter: true,
-      sort: false,
+      sort: true,
     },
   },
   {

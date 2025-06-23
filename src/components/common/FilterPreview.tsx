@@ -63,8 +63,9 @@ const FilterPreview = ({
   setStartDate,
   setEndDate,
 }: FilterProps) => {
-  const [localStartDate, setLocalStartDate] = useState(startDate && startDate);
-  const [localEndDate, setLocalEndDate] = useState(endDate && endDate);
+  const [localStartDate, setLocalStartDate] = useState(startDate || "");
+  const [localEndDate, setLocalEndDate] = useState(endDate || "");
+
   // const [startHash, setStartHash] = useState<string>("");
   // const [endHash, setEndHash] = useState<string>("");
 

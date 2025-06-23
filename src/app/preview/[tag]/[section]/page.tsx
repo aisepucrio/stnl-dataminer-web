@@ -18,18 +18,15 @@ const Preview = () => {
   const itemId = useSelector((state: RootState) => state.item.value);
   const params = useParams();
   const [page, setPage] = useState(3);
-
   const [pageSize, setPageSize] = useState(100);
   const [results, setResults] = useState<any[]>([]);
-  const [startDate, setStartDate] = useState<string>();
-  const [endDate, setEndDate] = useState<string>();
-  console.log();
-  console.log();
-  console.log("results");
-  console.log(results);
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
   const options = {
     filterType: "checkbox",
+    rowsPerPageOptions:[10,25,50,100],
+    // serverSide: true,
     selectableRows: "none",
     draggableColumns: {
       enabled: true,
@@ -40,8 +37,6 @@ const Preview = () => {
     onDownload: () => {
       return false;
     },
-    // customTableHeadRender: () => null,
-    // display: false,
     elevation: 1,
     filter: false,
   };
@@ -49,7 +44,6 @@ const Preview = () => {
   const fetchPreview = async () => {
     const tag = String(params.tag);
     const section = String(params.section);
-
     const item =
       itemId && source === "github"
         ? `&repository=${itemId}`
@@ -59,10 +53,8 @@ const Preview = () => {
 
     const startDateParam = startDate ? `&created_after=${startDate}` : "";
     const endDateParam = endDate ? `&created_before=${endDate}` : "";
-
     // const endpoint = `http://localhost:8000/api/${tag}/${section}?page=`;
     const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${item}${startDateParam}${endDateParam}`;
-    window.alert("Fetching from:" + endpoint);
 
     try {
       const res = await fetch(endpoint);
@@ -82,10 +74,9 @@ const Preview = () => {
 
   return (
     <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
-      <Box sx={{ width: "60vw", height: "87vh", bgcolor: "green" , overflow: "auto", position: "relative"}}>
+      <Box sx={{ width: "60vw", height: "87vh", bgcolor: "" , overflow: "auto", position: "relative"}}>
         {/* {source} <br />
         {itemId ? <>{itemId}</> : <>nao tem id selcionado</>} <br /> */}
-        {/* dds */}
         <MUIDataTable
           title={""}
           data={results}
