@@ -16,7 +16,7 @@ const formatSegment = (segment: string) =>
   segment.charAt(0).toUpperCase() + segment.slice(1);
 
 const Header = () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL || 'http://localhost:8000';
   const pathname = usePathname();
   const pathSegments = pathname.split("/").filter(Boolean);
 
@@ -67,7 +67,7 @@ const Header = () => {
         <Tooltip title="View API Docs"> 
           <Button
             component={Link}
-            href={apiUrl} 
+            href={docsUrl} 
             target="_blank"
             rel="noopener noreferrer"
             sx={{
