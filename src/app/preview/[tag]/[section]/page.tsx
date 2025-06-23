@@ -98,7 +98,7 @@ const Preview = () => {
         <Box
           sx={{
             width: "60vw",
-            height: "80vh",
+            height: "77vh",
             bgcolor: "",
             overflow: "auto",
             position: "relative",
