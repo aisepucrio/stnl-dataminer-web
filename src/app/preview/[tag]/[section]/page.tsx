@@ -9,7 +9,6 @@ import columns from "./columns.js";
 import FilterPreview from "@/components/common/FilterPreview";
 import Filter from "@/components/common/Filter";
 
-
 const row = { display: "flex", flexDirection: "row" };
 const column = { display: "flex", flexDirection: "column" };
 
@@ -43,6 +42,7 @@ const Preview = () => {
     },
     // customTableHeadRender: () => null,
     // display: false,
+    elevation: 1,
     filter: false,
   };
 
@@ -57,8 +57,11 @@ const Preview = () => {
         ? `&project=${itemId}`
         : "";
 
+    const startDateParam = startDate ? `&created_after=${startDate}` : "";
+    const endDateParam = endDate ? `&created_before=${endDate}` : "";
+
     // const endpoint = `http://localhost:8000/api/${tag}/${section}?page=`;
-    const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${item}`;
+    const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${item}${startDateParam}${endDateParam}`;
     window.alert("Fetching from:" + endpoint);
 
     try {
@@ -78,10 +81,11 @@ const Preview = () => {
   }, [source, itemId, startDate, endDate]);
 
   return (
-    <Box sx={{ ...row ,    gap: "20px", px: "20px", pt: 3 }}>
-      <Box sx={{ width: "60vw", height: "100vh", bgcolor: "", }}>
+    <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
+      <Box sx={{ width: "60vw", height: "87vh", bgcolor: "green" , overflow: "auto", position: "relative"}}>
         {/* {source} <br />
         {itemId ? <>{itemId}</> : <>nao tem id selcionado</>} <br /> */}
+        {/* dds */}
         <MUIDataTable
           title={""}
           data={results}
