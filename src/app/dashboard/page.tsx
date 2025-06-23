@@ -243,6 +243,12 @@ export default function Dashboard() {
                       color={"#e2edfe"}
                     />
                     <InfoCard
+                      label="Users"
+                      value={qtyComment}
+                      isLoading={loading}
+                      color={"#e2edfe"}
+                    />
+                    <InfoCard
                       label="Forks"
                       value={qtyFork}
                       isLoading={loading}
@@ -281,6 +287,12 @@ export default function Dashboard() {
                       isLoading={loading}
                       color={"#e6ecf5"}
                     />
+                    <InfoCard
+                      label="Users"
+                      value={qtyCommit}
+                      isLoading={loading}
+                      color={"#e2edfe"}
+                    />
                   </Box>
                 )}
               </>
@@ -306,6 +318,12 @@ export default function Dashboard() {
                       isLoading={loading}
                       color={"#e2edfe"}
                     />
+                    <InfoCard
+                      label="Users"
+                      value={qtySprint}
+                      isLoading={loading}
+                      color={"#e6ecf5"}
+                    />
                   </Box>
                 ) : (
                   <Box sx={{ gap: "20px", ...row }}>
@@ -320,6 +338,12 @@ export default function Dashboard() {
                       value={qtyProject}
                       isLoading={loading}
                       color={"#e6ecf5"}
+                    />
+                    <InfoCard
+                      label="Users"
+                      value={qtyProject}
+                      isLoading={loading}
+                      color={"#e2edfe"}
                     />
                   </Box>
                 )}
