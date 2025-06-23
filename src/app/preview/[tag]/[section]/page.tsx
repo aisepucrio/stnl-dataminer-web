@@ -24,8 +24,8 @@ const Preview = () => {
 
   const options = {
     filterType: "checkbox",
-    rowsPerPageOptions:[10,25,50,100],
-    // serverSide: true,
+    rowsPerPageOptions: [10, 25, 50, 100],
+    // pagination: false,
     selectableRows: "none",
     draggableColumns: {
       enabled: true,
@@ -70,11 +70,19 @@ const Preview = () => {
 
   useEffect(() => {
     fetchPreview();
-  }, [source, itemId, startDate, endDate]);
+  }, [source, itemId, startDate, endDate, page]);
 
   return (
     <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
-      <Box sx={{ width: "60vw", height: "87vh", bgcolor: "" , overflow: "auto", position: "relative"}}>
+      <Box
+        sx={{
+          width: "60vw",
+          height: "87vh",
+          bgcolor: "",
+          overflow: "auto",
+          position: "relative",
+        }}
+      >
         {/* {source} <br />
         {itemId ? <>{itemId}</> : <>nao tem id selcionado</>} <br /> */}
         <MUIDataTable
