@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import MUIDataTable from "mui-datatables";
 import columns from "./columns.js";
+import columnsJira from "./columnsJira.js";
 import FilterPreview from "@/components/common/FilterPreview";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -72,6 +73,7 @@ const Preview = () => {
 
     // const endpoint = `http://localhost:8000/api/${tag}/${section}?page=`;
     const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${item}${startDateParam}${endDateParam}`;
+    console.log(endpoint)
 
     try {
       const res = await fetch(endpoint);
@@ -107,7 +109,7 @@ const Preview = () => {
           <MUIDataTable
             title={""}
             data={results}
-            columns={columns}
+            columns={source=="github" ? columns : columnsJira}
             options={options}
           />
         </Box>
