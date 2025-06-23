@@ -1,5 +1,5 @@
 "use client";
-import { Box } from "@mui/material";
+import { Box, IconButton, MenuItem, Select, Typography } from "@mui/material";
 import type { RootState } from "@/app/store";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
@@ -7,6 +7,8 @@ import { useParams } from "next/navigation";
 import MUIDataTable from "mui-datatables";
 import columns from "./columns.js";
 import FilterPreview from "@/components/common/FilterPreview";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 const row = { display: "flex", flexDirection: "row" };
 // const column = { display: "flex", flexDirection: "column" };
@@ -21,11 +23,26 @@ const Preview = () => {
   const [results, setResults] = useState<any[]>([]);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const [total, setTotal] = useState<number>(); // Valor fixo só como exemplo
+  const totalPages = Math.ceil(total / pageSize);
+
+  const handlePrev = () => {
+    setPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNext = () => {
+    setPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handlePageSizeChange = (value: number) => {
+    setPageSize(value);
+    setPage(1); // Resetar página ao mudar o tamanho
+  };
 
   const options = {
     filterType: "checkbox",
     rowsPerPageOptions: [10, 25, 50, 100],
-    // pagination: false,
+    pagination: false,
     selectableRows: "none",
     draggableColumns: {
       enabled: true,
@@ -63,6 +80,7 @@ const Preview = () => {
       console.log("Dados recebidos:", data);
 
       setResults(data.results); // salva os resultados
+      setTotal(data.count);
     } catch (err) {
       console.error("Erro ao buscar preview:", err);
     }
@@ -74,23 +92,59 @@ const Preview = () => {
 
   return (
     <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
-      <Box
-        sx={{
-          width: "60vw",
-          height: "87vh",
-          bgcolor: "",
-          overflow: "auto",
-          position: "relative",
-        }}
-      >
-        {/* {source} <br />
+      <Box>
+        <Box
+          sx={{
+            width: "60vw",
+            height: "80vh",
+            bgcolor: "",
+            overflow: "auto",
+            position: "relative",
+          }}
+        >
+          {/* {source} <br />
         {itemId ? <>{itemId}</> : <>nao tem id selcionado</>} <br /> */}
-        <MUIDataTable
-          title={""}
-          data={results}
-          columns={columns}
-          options={options}
-        />
+          <MUIDataTable
+            title={""}
+            data={results}
+            columns={columns}
+            options={options}
+          />
+        </Box>
+        <br />
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={2}
+          sx={{ bgcolor: "", ...row, justifyContent: "flex-end" }}
+        >
+          <Typography>Rows per page:</Typography>
+          <Select
+            size="small"
+            value={pageSize}
+            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+          >
+            {[5, 10, 25, 50, 100].map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+
+          <Typography>
+            {page} of {totalPages || 1}
+          </Typography>
+
+          <IconButton onClick={handlePrev} disabled={page === 1}>
+            <ChevronLeftIcon />
+          </IconButton>
+          <IconButton
+            onClick={handleNext}
+            disabled={page === totalPages || totalPages === 0}
+          >
+            <ChevronRightIcon />
+          </IconButton>
+        </Box>
       </Box>
       <Box>
         <FilterPreview
