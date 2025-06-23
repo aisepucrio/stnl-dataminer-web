@@ -4,11 +4,6 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs, { Dayjs } from 'dayjs'; 
-
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
@@ -151,6 +146,13 @@ type jira_issues={
   
 }
 
+type user={
+  id: string, 
+  name: string;
+  email: string;  
+
+}
+
 // changing date format 
 const formatDateToYYYYMMDD = (isoDate: string) => {
   if (!isoDate) return ''; 
@@ -247,7 +249,9 @@ const Preview = () => {
       setLoadingData(true);
       setError(null);
       try {
-        const realSection = section === "comments" ? "issues" : section;
+        let realSection = section;
+        if (section === "comments") realSection = "issues";
+        if (section === "users") realSection = "commits";
 
         const res = await fetch(`${apiUrl}/api/${tag}/${realSection}`, {
           method: "GET",
@@ -310,13 +314,37 @@ const Preview = () => {
     return itemDate >= start && itemDate <= end;
   });
 
-  const processedData = section === "comments" && source === "github" ? 
-  filteredDataByDate.map((item: any) => ({
-    id: item.id,
-    title: item.title,
-    comments: item.comments,
-  }))
-: filteredDataByDate;
+  const processedData = (() => {
+    if (section === "comments" && source === "github") {
+      return filteredDataByDate.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        comments: item.comments,
+      }));
+    }
+  
+    if (section === "users" && source === "github") {
+      const allUsers = new Map<string, user>();
+
+      filteredDataByDate.forEach((commit: github_commits) => {
+        if (commit.author && commit.author.name) {
+          const userId = commit.author.email || commit.author.name; 
+          if (!allUsers.has(userId)) { 
+            allUsers.set(userId, {
+              id: userId,
+              name: commit.author.name,
+              email: commit.author.email,
+            });
+          }
+        }
+      });
+      return Array.from(allUsers.values());
+    }
+  
+    return filteredDataByDate;
+  })();
+
+
 
   let columns;
 
@@ -334,7 +362,7 @@ const Preview = () => {
     columns = [];
   }
 
-  const noData = !processedData || processedData.length === 0;
+  const noData = !filteredDataByDate || filteredDataByDate.length === 0;
 
 
   return (
