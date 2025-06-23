@@ -3,16 +3,12 @@ import {
   Box,
   Button,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  SelectChangeEvent,
 } from "@mui/material";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { Dayjs } from 'dayjs'; 
+
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
@@ -156,10 +152,10 @@ type jira_issues={
 }
 
 // changing date format 
-const formatDateToMMDDYYYY = (isoDate: string) => {
+const formatDateToYYYYMMDD = (isoDate: string) => {
   if (!isoDate) return ''; 
   const [year, month, day] = isoDate.split('-');
-  return `${month}/${day}/${year}`;
+  return `${year} / ${month} / ${day}`;
 };
 
 const Preview = () => {
@@ -176,9 +172,7 @@ const Preview = () => {
   const tag = params.tag;
   const section = params.section;
 
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedFormat, setSelectedFormat] = useState<string>('');
-
+  
   // choosing the order 
   const columns_github_commits = [
     { accessorKey: "id", header: "ID" },
@@ -492,7 +486,7 @@ const Preview = () => {
         />
       </Box>
       <Typography sx={{color: "#595957", mb: 3, ml: 1, fontSize: "15px"}}>
-          Data starts from {formatDateToMMDDYYYY(earliestDataDate)}
+          Data starts from {formatDateToYYYYMMDD(earliestDataDate)}
         </Typography>
 
       <Box sx={{ mb: 1, backgroundColor: "#F7F9FB", borderRadius: 5,padding: 2}}>
@@ -526,7 +520,7 @@ const Preview = () => {
         />
       </Box>
       <Typography sx={{color: "#595957", mb: 5, ml: 1, fontSize: "15px"}}>
-          Data ends on {formatDateToMMDDYYYY(latestDataDate)}
+          Data ends on {formatDateToYYYYMMDD(latestDataDate)}
         </Typography>
 
       <Button
