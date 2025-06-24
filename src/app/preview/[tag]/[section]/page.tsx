@@ -146,7 +146,7 @@ const Preview = () => {
   };
 
   useEffect(() => {
-    window.alert("vai dar fetch")
+    // window.alert("vai dar fetch")
     fetchPreview();
   }, [itemId, startDate, endDate, page]);
 
