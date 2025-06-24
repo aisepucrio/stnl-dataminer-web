@@ -5,11 +5,14 @@ import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import MUIDataTable from "mui-datatables";
-import columns from "./columns.js";
-import columnsJira from "./columnsJira.js";
+// import columns from "./columns.js";
+// import columnsJira from "./columnsJira.js";
 import FilterPreview from "@/components/common/FilterPreview";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+// import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+
 
 const row = { display: "flex", flexDirection: "row" };
 // const column = { display: "flex", flexDirection: "column" };
@@ -26,6 +29,29 @@ const Preview = () => {
   const [endDate, setEndDate] = useState<string>("");
   const [total, setTotal] = useState<number>(); // Valor fixo só como exemplo
   const totalPages = Math.ceil(total / pageSize);
+  const router = useRouter();
+  const isFirstRender = useRef(true);
+
+  const formatColumns = () => {
+    if (!results || results.length === 0) return [];
+
+    const firstColumn = results[0];
+
+    const listAux = Object.keys(firstColumn).map((key) => ({
+      name: key,
+      label: key,
+      options: {
+        filter: true,
+        sort: true,
+      },
+    }));
+
+    return listAux;
+  };
+
+  const columns = formatColumns();
+
+  console.log(columns);
 
   const handlePrev = () => {
     setPage((prev) => Math.max(prev - 1, 1));
@@ -73,7 +99,7 @@ const Preview = () => {
 
     // const endpoint = `http://localhost:8000/api/${tag}/${section}?page=`;
     const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${item}${startDateParam}${endDateParam}`;
-    console.log(endpoint)
+    console.log(endpoint);
 
     try {
       const res = await fetch(endpoint);
@@ -82,6 +108,37 @@ const Preview = () => {
       console.log("Dados recebidos:", data);
 
       setResults(data.results); // salva os resultados
+      // setResults(
+      //   data.results.map((item) => {
+      //     const newItem: any = {};
+      //     Object.keys(item).forEach((key) => {
+      //       const value = item[key];
+      //       newItem[key] =
+      //         typeof value === "object" && value !== null
+      //           ?"---Object---"
+      //           : value;
+      //     });
+      //     return newItem;
+      //   })
+      // );
+      setResults(
+        data.results.map((item) => {
+          const newItem: any = {};
+          Object.keys(item).forEach((key) => {
+            let value = item[key];
+
+            if (typeof value === "object" && value !== null) {
+              value = "---Object---";
+            } else if (String(value).length > 40) {
+              value = String(value).slice(0, 40) + "...";
+            }
+
+            newItem[key] = value;
+          });
+          return newItem;
+        })
+      );
+
       setTotal(data.count);
     } catch (err) {
       console.error("Erro ao buscar preview:", err);
@@ -89,8 +146,18 @@ const Preview = () => {
   };
 
   useEffect(() => {
+    window.alert("vai dar fetch")
     fetchPreview();
-  }, [source, itemId, startDate, endDate, page]);
+  }, [itemId, startDate, endDate, page]);
+
+   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    router.push("/");
+  }, [source]);
+
 
   return (
     <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
@@ -109,7 +176,8 @@ const Preview = () => {
           <MUIDataTable
             title={""}
             data={results}
-            columns={source=="github" ? columns : columnsJira}
+            // columns={source == "github" ? columns : columnsJira}
+            columns={columns}
             options={options}
           />
         </Box>
