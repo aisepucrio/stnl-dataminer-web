@@ -16,7 +16,7 @@ const formatSegment = (segment: string) =>
   segment.charAt(0).toUpperCase() + segment.slice(1);
 
 const Header = () => {
-  const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL || 'http://localhost:8000';
+  const docsUrl = process.env.NEXT_PUBLIC_API_URL ;
   const pathname = usePathname();
   const pathSegments = pathname.split("/").filter(Boolean);
 
