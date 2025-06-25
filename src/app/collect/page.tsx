@@ -11,6 +11,7 @@ import {
   FormControlLabel,
   Checkbox,
   Alert,
+  colors,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
@@ -349,16 +350,35 @@ const Collect = () => {
           }}
         >
           {displayOptions.map((option : string) => (
-
             <FormControlLabel
               key={option}
+              label={option}
+              sx={
+                option === "select all"
+                  ? {
+                      color: "#1C4886",
+                    }
+                  : {
+                    color: "black"
+                  }
+              }
+              
               control={
                 <Checkbox
                   checked={checkedOptions.includes(option)}
                   onChange={() => handleCheckboxChange(option)}
+                  sx={
+                    option === "select all"
+                      ? {
+                          color: "#1C4886",
+                          "&.Mui-checked": {
+                            color: "#1C4886",
+                          },
+                        }
+                      : {}
+                  }
                 />
               }
-              label={option} 
             />
           ))}
         </FormGroup>
