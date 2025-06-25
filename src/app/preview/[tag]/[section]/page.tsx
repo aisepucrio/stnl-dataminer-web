@@ -12,6 +12,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 // import { useRouter } from "next/router";
 import { useRouter } from "next/navigation";
+import ModalDownload from "@/components/common/ModalDownload";
 
 
 const row = { display: "flex", flexDirection: "row" };
@@ -21,6 +22,7 @@ const Preview = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const source = useSelector((state: RootState) => state.source.value);
   const itemId = useSelector((state: RootState) => state.item.value);
+  const itemName = useSelector((state: RootState) => state.item.itemName);
   const params = useParams();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(100);
@@ -31,6 +33,7 @@ const Preview = () => {
   const totalPages = Math.ceil(total / pageSize);
   const router = useRouter();
   const isFirstRender = useRef(true);
+  const [open, setOpen] = useState(false)
 
   const formatColumns = () => {
     if (!results || results.length === 0) return [];
@@ -51,7 +54,11 @@ const Preview = () => {
 
   const columns = formatColumns();
 
-  console.log(columns);
+  // console.log(columns);
+
+  const onClose = () => {
+    setOpen(false)
+  }
 
   const handlePrev = () => {
     setPage((prev) => Math.max(prev - 1, 1));
@@ -78,6 +85,7 @@ const Preview = () => {
     fixedHeader: false,
     print: false,
     onDownload: () => {
+      setOpen(true)
       return false;
     },
     elevation: 1,
@@ -89,7 +97,7 @@ const Preview = () => {
     const section = String(params.section);
     const item =
       itemId && source === "github"
-        ? `&repository=${itemId}`
+        ? `&repository=${itemName}`
         : itemId && source === "jira"
         ? `&project=${itemId}`
         : "";
@@ -99,13 +107,13 @@ const Preview = () => {
 
     // const endpoint = `http://localhost:8000/api/${tag}/${section}?page=`;
     const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${item}${startDateParam}${endDateParam}`;
-    console.log(endpoint);
+    // console.log(endpoint);
 
     try {
       const res = await fetch(endpoint);
       if (!res.ok) throw new Error("Erro no fetch");
       const data = await res.json();
-      console.log("Dados recebidos:", data);
+      // console.log("Dados recebidos:", data);
 
       setResults(data.results); // salva os resultados
       // setResults(
@@ -224,6 +232,7 @@ const Preview = () => {
           setEndDate={setEndDate}
         />
       </Box>
+      <ModalDownload open={open} onClose={onClose} source={source}/>
     </Box>
   );
 };
