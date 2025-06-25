@@ -24,6 +24,10 @@ const Header = () => {
     ? ["Overview"]
     : pathSegments.map(formatSegment);
 
+  
+  const shouldHideItemSwitcher = pathSegments.includes("collect") || pathSegments.includes("jobs");
+
+
   return (
     <Box
       sx={{
@@ -52,9 +56,12 @@ const Header = () => {
         </Breadcrumbs>
       </Box>
 
-      <Box sx={{ width: "100%", ...row, height: "40px" }}>
-        <ItemSwitcher />
-      </Box>
+      
+      {!shouldHideItemSwitcher && ( 
+        <Box sx={{ width: "100%", ...row, height: "40px" }}>
+          <ItemSwitcher />
+        </Box>
+      )}
 
       <Box
         sx={{
