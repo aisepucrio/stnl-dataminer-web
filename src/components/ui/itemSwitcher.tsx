@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { setItem } from "../../features/items/itemSlice";
+import { setItem, setItemName } from "../../features/items/itemSlice";
 import type { RootState, AppDispatch } from "../../app/store";
 import { useEffect, useState, useRef } from "react";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -59,7 +59,6 @@ const RotatingArrow = styled(ArrowForwardIosIcon, {
 const ItemSwitcher = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [open, setOpen] = useState(false);
-  
 
   const source = useSelector((state: RootState) => state.source.value);
   const item = useSelector((state: RootState) => state.item.value);
@@ -70,9 +69,22 @@ const ItemSwitcher = () => {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // const handleChange = (event: SelectChangeEvent) => {
+  //   const value = event.target.value;
+  //   dispatch(setItem(value));
+  // };
   const handleChange = (event: SelectChangeEvent) => {
-    const value = event.target.value;
-    dispatch(setItem(value));
+    const selectedId = event.target.value;
+    const selectedItemObj = items.find((i) => i.id === selectedId);
+
+    if (!selectedItemObj) return;
+
+    dispatch(setItem(selectedId));
+    dispatch(
+      setItemName(
+        source === "github" ? selectedItemObj.repository : selectedItemObj.name
+      )
+    );
   };
 
   const onClear = () => {
@@ -105,20 +117,20 @@ const ItemSwitcher = () => {
     }
   };
 
-useEffect(() => {
-  const prevSource = prevSourceRef.current;
+  useEffect(() => {
+    const prevSource = prevSourceRef.current;
 
-  if (prevSource !== undefined && prevSource !== source) {
-    if (source) {
-      setLoading(false);
+    if (prevSource !== undefined && prevSource !== source) {
+      if (source) {
+        setLoading(false);
+      }
+
+      dispatch(setItem(""));
+      fetchSource(source);
     }
 
-    dispatch(setItem(""));
-    fetchSource(source);
-  }
-
-  prevSourceRef.current = source;
-}, [source]);
+    prevSourceRef.current = source;
+  }, [source]);
 
   if (loading) {
     return <div></div>;
@@ -154,7 +166,7 @@ useEffect(() => {
           bgcolor: "#1C4886",
           color: "#fff",
           borderRadius: "12px",
-          width: "75%"
+          width: "75%",
         }}
         renderValue={(selected) => {
           const selectedItemObj = items.find((i) => i.id === selected);
