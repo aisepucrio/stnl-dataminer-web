@@ -5,15 +5,11 @@ import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import MUIDataTable from "mui-datatables";
-// import columns from "./columns.js";
-// import columnsJira from "./columnsJira.js";
 import FilterPreview from "@/components/common/FilterPreview";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-// import { useRouter } from "next/router";
 import { useRouter } from "next/navigation";
 import ModalDownload from "@/components/common/ModalDownload";
-
 
 const row = { display: "flex", flexDirection: "row" };
 // const column = { display: "flex", flexDirection: "column" };
@@ -29,7 +25,7 @@ const Preview = () => {
   const [results, setResults] = useState<any[]>([]);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [total, setTotal] = useState<number>(); // Valor fixo só como exemplo
+  const [total, setTotal] = useState<number>(); 
   const totalPages = Math.ceil(total / pageSize);
   const router = useRouter();
   const isFirstRender = useRef(true);
@@ -37,7 +33,6 @@ const Preview = () => {
 
   const formatColumns = () => {
     if (!results || results.length === 0) return [];
-
     const firstColumn = results[0];
 
     const listAux = Object.keys(firstColumn).map((key) => ({
@@ -53,8 +48,6 @@ const Preview = () => {
   };
 
   const columns = formatColumns();
-
-  // console.log(columns);
 
   const onClose = () => {
     setOpen(false)
@@ -74,6 +67,7 @@ const Preview = () => {
   };
 
   const options = {
+    responsive: 'scrollFullHeight',
     filterType: "checkbox",
     rowsPerPageOptions: [10, 25, 50, 100],
     pagination: false,
@@ -81,7 +75,7 @@ const Preview = () => {
     draggableColumns: {
       enabled: true,
     },
-    download: true, // <- isso é necessário!  ,
+    download: true, 
     fixedHeader: false,
     print: false,
     onDownload: () => {
@@ -104,16 +98,12 @@ const Preview = () => {
 
     const startDateParam = startDate ? `&created_after=${startDate}` : "";
     const endDateParam = endDate ? `&created_before=${endDate}` : "";
-
-    // const endpoint = `http://localhost:8000/api/${tag}/${section}?page=`;
     const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${item}${startDateParam}${endDateParam}`;
-    // console.log(endpoint);
 
     try {
       const res = await fetch(endpoint);
       if (!res.ok) throw new Error("Erro no fetch");
       const data = await res.json();
-      // console.log("Dados recebidos:", data);
 
       setResults(data.results); // salva os resultados
       // setResults(
@@ -154,7 +144,6 @@ const Preview = () => {
   };
 
   useEffect(() => {
-    // window.alert("vai dar fetch")
     fetchPreview();
   }, [itemId, startDate, endDate, page]);
 
@@ -184,7 +173,6 @@ const Preview = () => {
           <MUIDataTable
             title={""}
             data={results}
-            // columns={source == "github" ? columns : columnsJira}
             columns={columns}
             options={options}
           />

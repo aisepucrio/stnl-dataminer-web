@@ -56,7 +56,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       : "";
 
     endpoint = `${apiUrl}/api/${source}/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}${itemIdParam}`;
-    window.alert(endpoint);
+    // window.alert(endpoint);
     setLoading(true);
 
     try {
