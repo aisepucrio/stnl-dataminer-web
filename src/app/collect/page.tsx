@@ -15,9 +15,7 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/app/store";
-import { useRouter } from 'next/navigation'; 
-
-
+import { useRouter } from "next/navigation";
 
 const Collect = () => {
   const source = useSelector((state: RootState) => state.source.value);
@@ -34,32 +32,32 @@ const Collect = () => {
 
   const [checkedOptions, setCheckedOptions] = useState<string[]>(["metadata"]);
 
-  
-
-  const options = useMemo(() =>
-  source === "github" ? ["issue", "comment", "pull request", "commit"] : [],
-  [source]
-);
+  const options = useMemo(
+    () =>
+      source === "github" ? ["issue", "comment", "pull request", "commit"] : [],
+    [source]
+  );
 
   const displayOptions = ["select all", ...options];
-  const isAllSelected = options.every(option => checkedOptions.includes(option));
+  const isAllSelected = options.every((option) =>
+    checkedOptions.includes(option)
+  );
 
   const handleCheckboxChange = (option: string) => {
     if (option === "select all") {
       if (isAllSelected) {
-        setCheckedOptions(["metadata"]); 
+        setCheckedOptions(["metadata"]);
       } else {
-        setCheckedOptions([...options, "metadata", "select all"]); 
+        setCheckedOptions([...options, "metadata", "select all"]);
       }
     } else {
       setCheckedOptions((prev) =>
         prev.includes(option)
-          ? prev.filter((item) => item !== option) 
-          : [...prev, option] 
+          ? prev.filter((item) => item !== option)
+          : [...prev, option]
       );
     }
   };
-
 
   const handleAdd = () => {
     if (source === "github") {
@@ -86,7 +84,7 @@ const Collect = () => {
     comment: "comments",
     "pull request": "pull_requests",
     issue: "issues",
-    metadata: "metadata"
+    metadata: "metadata",
   };
 
   const formatDate = (dateStr: string): string => {
@@ -97,9 +95,9 @@ const Collect = () => {
   };
 
   useEffect(() => {
-      setLoading(false);
-      setTags([]); // zera as tags sempre que source muda
-      setCheckedOptions(["metadata"]);
+    setLoading(false);
+    setTags([]); // zera as tags sempre que source muda
+    setCheckedOptions(["metadata"]);
   }, [source]);
 
   if (loading) {
@@ -122,7 +120,9 @@ const Collect = () => {
     if (source === "github") {
       payload.repositories = tags;
       payload.depth = "basic";
-      payload.collect_types = checkedOptions.filter((opt) => opt !== "select all").map((opt) => collectTypeMap[opt]); 
+      payload.collect_types = checkedOptions
+        .filter((opt) => opt !== "select all")
+        .map((opt) => collectTypeMap[opt]);
     } else if (source === "jira") {
       payload.projects = tags;
     }
@@ -162,10 +162,10 @@ const Collect = () => {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          mt: -3
+          mt: -3,
         }}
       >
-        <Typography sx={{ fontSize: "24px", fontWeight: 600}}>
+        <Typography sx={{ fontSize: "24px", fontWeight: 600 }}>
           {source === "github" ? "Repository Name" : "Projects Name"}
         </Typography>
 
@@ -177,8 +177,9 @@ const Collect = () => {
             minHeight: 50,
             display: "flex",
             flexWrap: "wrap",
-            gap: 1,
+            // gap: 1,
             alignItems: "center",
+            gap: "20px"
           }}
         >
           {tags.map((tag, idx) => (
@@ -226,7 +227,7 @@ const Collect = () => {
             onClick={() => setOpen(true)}
             placeholder="+ Add"
             InputProps={{ readOnly: true }}
-            sx={{ width: 140, cursor: "pointer", ml: -1}}
+            sx={{ width: 140, cursor: "pointer", ml: -1 }}
           />
         </Box>
       </Box>
@@ -301,7 +302,9 @@ const Collect = () => {
       </Modal>
 
       {/* Box B - Datas */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "30px", mt: -2}}>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", gap: "30px", mt: -2 }}
+      >
         {!startDate && !endDate && (
           <Alert variant="outlined" severity="warning" sx={{ width: "40vw" }}>
             Leaving the date fields empty will mine data from the entire period.
@@ -340,49 +343,48 @@ const Collect = () => {
       </Box>
 
       {/* Box C - Checkboxes */}
-      {source === "github" && ( 
-      <Box sx={{ width: "50%", py: "40px", mt: -2, mb: -2}}>
-        <FormGroup
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: 1,
-          }}
-        >
-          {displayOptions.map((option : string) => (
-            <FormControlLabel
-              key={option}
-              label={option}
-              sx={
-                option === "select all"
-                  ? {
-                      color: "#1C4886",
-                    }
-                  : {
-                    color: "black"
-                  }
-              }
-              
-              control={
-                <Checkbox
-                  checked={checkedOptions.includes(option)}
-                  onChange={() => handleCheckboxChange(option)}
-                  sx={
-                    option === "select all"
-                      ? {
-                          color: "#1C4886",
-                          "&.Mui-checked": {
+      {source === "github" && (
+        <Box sx={{ width: "50%", py: "40px", mt: -2, mb: -2 }}>
+          <FormGroup
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "1fr",
+              gap: 1,
+            }}
+          >
+            {displayOptions.map((option: string) => (
+              <FormControlLabel
+                key={option}
+                label={option}
+                sx={
+                  option === "select all"
+                    ? {
+                        color: "#1C4886",
+                      }
+                    : {
+                        color: "black",
+                      }
+                }
+                control={
+                  <Checkbox
+                    checked={checkedOptions.includes(option)}
+                    onChange={() => handleCheckboxChange(option)}
+                    sx={
+                      option === "select all"
+                        ? {
                             color: "#1C4886",
-                          },
-                        }
-                      : {}
-                  }
-                />
-              }
-            />
-          ))}
-        </FormGroup>
-      </Box>
+                            "&.Mui-checked": {
+                              color: "#1C4886",
+                            },
+                          }
+                        : {}
+                    }
+                  />
+                }
+              />
+            ))}
+          </FormGroup>
+        </Box>
       )}
 
       {/* Botão Final */}

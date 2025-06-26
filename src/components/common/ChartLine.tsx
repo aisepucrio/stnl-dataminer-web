@@ -1,7 +1,4 @@
-import {
-  Box,
-  Typography,
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { ResponsiveLine } from "@nivo/line";
 import { useSelector } from "react-redux";
@@ -14,15 +11,14 @@ interface ChartLineProps {
   endDate: string;
 }
 
-
 const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const [loading, setLoading] = useState(false);
   const [interval, setInterval] = useState<string>("month");
   const source = useSelector((state: RootState) => state.source.value);
+  const item = useSelector((state: RootState) => state.item.value);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [lineData, setLineData] = useState<any>([]);
   const lineColors = ["#D81B60", "#1E88E5", "#FFC107", "#004D40"];
-
 
   const [options, setOptions] = useState<
     { key: string; label: string; color: string }[]
@@ -31,7 +27,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const [selected, setSelected] = useState<string[]>(options.map((o) => o.key));
 
   const formatLineData = (data: any) => {
-// ================================================================
+    // ================================================================
     const { time_series } = data;
     const { labels, ...otherSeries } = time_series;
 
@@ -50,8 +46,16 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
 
   const fetchData = async () => {
     let endpoint = "";
+
+    const itemIdParam =
+      source === "github"
+        ? `&repository_id=${item}`
+        : source === "jira"
+        ? `&project_id=${item}`
+        : "";
+
     endpoint = `${apiUrl}/api/${source}/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}`;
-    console.log(endpoint)
+    console.log(endpoint);
     setLoading(true);
 
     try {
@@ -68,7 +72,6 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       const formatted = formatLineData(data);
 
       setLineData(formatted);
-
     } catch (err) {
       console.error("Erro ao buscar dados do gráfico:", err);
     } finally {
@@ -78,7 +81,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
 
   useEffect(() => {
     if (!startDate || !endDate) return;
-    console.log("data ta mudando")
+    console.log("data ta mudando");
 
     if (source === "github") {
       const githubOptions = [
@@ -113,7 +116,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
     }
 
     fetchData();
-  }, [startDate, endDate, source]);
+  }, [startDate, endDate, source, item]);
 
   if (loading) {
     return <div> ... loading ...</div>;
