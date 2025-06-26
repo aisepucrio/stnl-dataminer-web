@@ -47,15 +47,16 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const fetchData = async () => {
     let endpoint = "";
 
-    const itemIdParam =
-      source === "github"
+    const itemIdParam = item
+      ? source === "github"
         ? `&repository_id=${item}`
         : source === "jira"
         ? `&project_id=${item}`
-        : "";
+        : ""
+      : "";
 
-    endpoint = `${apiUrl}/api/${source}/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}`;
-    console.log(endpoint);
+    endpoint = `${apiUrl}/api/${source}/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}${itemIdParam}`;
+    window.alert(endpoint);
     setLoading(true);
 
     try {

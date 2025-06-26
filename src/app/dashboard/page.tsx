@@ -66,6 +66,7 @@ export default function Dashboard() {
   const [qtyFork, setQtyFork] = useState<number | null>(0);
   const [qtyStar, setQtyStar] = useState<number | null>(0);
   const [qtySprint, setQtySprints] = useState<number | null>(0);
+  const [qtyUsers, setQtyUsers] = useState<number | null>(0);
 
   const fetchSource = async (source: string) => {
     setLoading(false);
@@ -101,6 +102,7 @@ export default function Dashboard() {
         commits_count = qtyCommit,
         repositories_count = qtyRepository,
         projects_count = qtyProject,
+        users_count = qtyUsers,
       } = data;
 
       if (source === "github") {
@@ -108,6 +110,7 @@ export default function Dashboard() {
         setQtyPullrequest(pull_requests_count);
         setQtyCommit(commits_count);
         setQtyRepository(repositories_count);
+        setQtyUsers(users_count);
 
         return;
       }
@@ -143,7 +146,7 @@ export default function Dashboard() {
     if (dateParams) {
       path += `&${dateParams}`;
     }
-    
+
     try {
       const response = await fetch(apiUrl + path);
       if (!response.ok) {
@@ -161,6 +164,7 @@ export default function Dashboard() {
         forks_count = qtyFork,
         stars_count = qtyStar,
         sprints_count = qtySprint,
+        users_count = qtyUsers,
       } = data;
 
       setQtyRepository(repositories_count);
@@ -171,6 +175,7 @@ export default function Dashboard() {
       setQtyComment(comments_count);
       setQtyFork(forks_count);
       setQtyStar(stars_count);
+      setQtyUsers(users_count);
       // time mined here
       setQtySprints(sprints_count);
 
@@ -180,7 +185,6 @@ export default function Dashboard() {
       return null;
     }
   };
-
 
   useEffect(() => {
     if (item) {
@@ -208,162 +212,163 @@ export default function Dashboard() {
         py: 3,
       }}
     >
-
-
+      <Box
+        sx={{
+          width: "72%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          height: "100%",
+          bgcolor: "",
+          gap: "20px",
+        }}
+      >
         <Box
           sx={{
-            width: "72%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            height: "100%",
             bgcolor: "",
-            gap: "20px",
+            ...column,
+            justifyContent: "center",
           }}
         >
-          <Box
-            sx={{
-              bgcolor: "",
-              ...column,
-              justifyContent: "center",
-            }}
-          >
-            {source == "github" ? (
-              <>
-                {item ? (
-                  <Box sx={{ gap: "20px", ...row }}>
-                    <InfoCard
-                      label="Issues"
-                      value={qtyIssue}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                    <InfoCard
-                      label="Pull Requests"
-                      value={qtyPullrequest}
-                      isLoading={loading}
-                      color={"#e6ecf5"}
-                    />
-                    <InfoCard
-                      label="Comments"
-                      value={qtyComment}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                    <InfoCard
-                      label="Users"
-                      value={qtyComment}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                    <InfoCard
-                      label="Forks"
-                      value={qtyFork}
-                      isLoading={loading}
-                      color={"#e6ecf5"}
-                    />
-                    <InfoCard
-                      label="Stars"
-                      value={qtyStar}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                  </Box>
-                ) : (
-                  <Box sx={{ gap: "20px", ...row }}>
-                    <InfoCard
-                      label="Repositories"
-                      value={qtyRepository}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                    <InfoCard
-                      label="Issues"
-                      value={qtyIssue}
-                      isLoading={loading}
-                      color={"#e6ecf5"}
-                    />
-                    <InfoCard
-                      label="Pull Requests"
-                      value={qtyPullrequest}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                    <InfoCard
-                      label="Commits"
-                      value={qtyCommit}
-                      isLoading={loading}
-                      color={"#e6ecf5"}
-                    />
-                    <InfoCard
-                      label="Users"
-                      value={qtyCommit}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                  </Box>
-                )}
-              </>
-            ) : source == "jira" ? (
-              <>
-                {item ? (
-                  <Box sx={{ gap: "20px", ...row }}>
-                    <InfoCard
-                      label="Issues"
-                      value={qtyIssue}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                    <InfoCard
-                      label="Comments"
-                      value={qtyComment}
-                      isLoading={loading}
-                      color={"#e6ecf5"}
-                    />
-                    <InfoCard
-                      label="Sprints"
-                      value={qtySprint}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                    <InfoCard
-                      label="Users"
-                      value={qtySprint}
-                      isLoading={loading}
-                      color={"#e6ecf5"}
-                    />
-                  </Box>
-                ) : (
-                  <Box sx={{ gap: "20px", ...row }}>
-                    <InfoCard
-                      label="Issues"
-                      value={qtyIssue}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                    <InfoCard
-                      label="Projects"
-                      value={qtyProject}
-                      isLoading={loading}
-                      color={"#e6ecf5"}
-                    />
-                    <InfoCard
-                      label="Users"
-                      value={qtyProject}
-                      isLoading={loading}
-                      color={"#e2edfe"}
-                    />
-                  </Box>
-                )}
-              </>
-            ) : (
-              <>"error"</>
-            )}
-          </Box>
-          <Box flexGrow={1} sx={{ bgcolor: "#f7f9fb", borderRadius: "16px", height: "100%" }}>
-            <ChartLine  startDate={startDate} endDate={endDate} />
-          </Box>
+          {source == "github" ? (
+            <>
+              {item ? (
+                <Box sx={{ gap: "20px", ...row }}>
+                  <InfoCard
+                    label="Commits"
+                    value={qtyCommit}
+                    isLoading={loading}
+                    color={"#e6ecf5"}
+                  />
+                  <InfoCard
+                    label="Issues"
+                    value={qtyIssue}
+                    isLoading={loading}
+                    color={"#e2edfe"}
+                  />
+                  <InfoCard
+                    label="Pull Requests"
+                    value={qtyPullrequest}
+                    isLoading={loading}
+                    color={"#e6ecf5"}
+                  />
+                  <InfoCard
+                    label="Users"
+                    value={qtyUsers}
+                    isLoading={loading}
+                    color={"#e2edfe"}
+                  />
+                  <InfoCard
+                    label="Forks"
+                    value={qtyFork}
+                    isLoading={loading}
+                    color={"#e6ecf5"}
+                  />
+                  <InfoCard
+                    label="Stars"
+                    value={qtyStar}
+                    isLoading={loading}
+                    color={"#e2edfe"}
+                  />
+                </Box>
+              ) : (
+                <Box sx={{ gap: "20px", ...row }}>
+                  <InfoCard
+                    label="Repositories"
+                    value={qtyRepository}
+                    isLoading={loading}
+                    color={"#e2edfe"}
+                  />
+                  <InfoCard
+                    label="Issues"
+                    value={qtyIssue}
+                    isLoading={loading}
+                    color={"#e6ecf5"}
+                  />
+                  <InfoCard
+                    label="Pull Requests"
+                    value={qtyPullrequest}
+                    isLoading={loading}
+                    color={"#e2edfe"}
+                  />
+                  <InfoCard
+                    label="Commits"
+                    value={qtyCommit}
+                    isLoading={loading}
+                    color={"#e6ecf5"}
+                  />
+                  <InfoCard
+                    label="Users"
+                    value={qtyCommit}
+                    isLoading={loading}
+                    color={"#e2edfe"}
+                  />
+                </Box>
+              )}
+            </>
+          ) : source == "jira" ? (
+            <>
+              {item ? (
+                <Box sx={{ gap: "20px", ...row }}>
+                  <InfoCard
+                    label="Issues"
+                    value={qtyIssue}
+                    isLoading={loading}
+                    color={"#e2edfe"}
+                  />
+                  <InfoCard
+                    label="Comments"
+                    value={qtyComment}
+                    isLoading={loading}
+                    color={"#e6ecf5"}
+                  />
+                  <InfoCard
+                    label="Sprints"
+                    value={qtySprint}
+                    isLoading={loading}
+                    color={"#e2edfe"}
+                  />
+                  <InfoCard
+                    label="Users"
+                    value={qtySprint}
+                    isLoading={loading}
+                    color={"#e6ecf5"}
+                  />
+                </Box>
+              ) : (
+                <Box sx={{ gap: "20px", ...row }}>
+                  <InfoCard
+                    label="Issues"
+                    value={qtyIssue}
+                    isLoading={loading}
+                    color={"#e2edfe"}
+                  />
+                  <InfoCard
+                    label="Projects"
+                    value={qtyProject}
+                    isLoading={loading}
+                    color={"#e6ecf5"}
+                  />
+                  <InfoCard
+                    label="Users"
+                    value={qtyUsers}
+                    isLoading={loading}
+                    color={"#e2edfe"}
+                  />
+                </Box>
+              )}
+            </>
+          ) : (
+            <>"error"</>
+          )}
         </Box>
+        <Box
+          flexGrow={1}
+          sx={{ bgcolor: "#f7f9fb", borderRadius: "16px", height: "100%" }}
+        >
+          <ChartLine startDate={startDate} endDate={endDate} />
+        </Box>
+      </Box>
 
       <Box
         sx={{
