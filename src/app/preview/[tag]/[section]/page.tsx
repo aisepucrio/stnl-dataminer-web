@@ -25,11 +25,11 @@ const Preview = () => {
   const [results, setResults] = useState<any[]>([]);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [total, setTotal] = useState<number>(); 
+  const [total, setTotal] = useState<number>();
   const totalPages = Math.ceil(total / pageSize);
   const router = useRouter();
   const isFirstRender = useRef(true);
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   const formatColumns = () => {
     if (!results || results.length === 0) return [];
@@ -50,8 +50,8 @@ const Preview = () => {
   const columns = formatColumns();
 
   const onClose = () => {
-    setOpen(false)
-  }
+    setOpen(false);
+  };
 
   const handlePrev = () => {
     setPage((prev) => Math.max(prev - 1, 1));
@@ -67,7 +67,7 @@ const Preview = () => {
   };
 
   const options = {
-    responsive: 'scrollFullHeight',
+    // responsive: 'scrollFullHeight',
     filterType: "checkbox",
     rowsPerPageOptions: [10, 25, 50, 100],
     pagination: false,
@@ -75,11 +75,11 @@ const Preview = () => {
     draggableColumns: {
       enabled: true,
     },
-    download: true, 
+    download: true,
     fixedHeader: false,
     print: false,
     onDownload: () => {
-      setOpen(true)
+      setOpen(true);
       return false;
     },
     elevation: 1,
@@ -87,9 +87,10 @@ const Preview = () => {
   };
 
   const fetchPreview = async () => {
+    // window.alert("fetch chamado");
     const tag = String(params.tag);
     const section = String(params.section);
-    const item =
+    const itemParam =
       itemId && source === "github"
         ? `&repository=${itemName}`
         : itemId && source === "jira"
@@ -98,7 +99,8 @@ const Preview = () => {
 
     const startDateParam = startDate ? `&created_after=${startDate}` : "";
     const endDateParam = endDate ? `&created_before=${endDate}` : "";
-    const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${item}${startDateParam}${endDateParam}`;
+    const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${itemParam}${startDateParam}${endDateParam}`;
+    // window.alert(endpoint);
 
     try {
       const res = await fetch(endpoint);
@@ -145,16 +147,17 @@ const Preview = () => {
 
   useEffect(() => {
     fetchPreview();
-  }, [itemId, startDate, endDate, page]);
+  }, [ startDate, endDate, page, itemId, itemName ]);
 
-   useEffect(() => {
+
+
+  useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
     }
     router.push("/");
   }, [source]);
-
 
   return (
     <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
@@ -220,7 +223,7 @@ const Preview = () => {
           setEndDate={setEndDate}
         />
       </Box>
-      <ModalDownload open={open} onClose={onClose} source={source}/>
+      <ModalDownload open={open} onClose={onClose} source={source} />
     </Box>
   );
 };
