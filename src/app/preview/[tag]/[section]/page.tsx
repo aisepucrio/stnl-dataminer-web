@@ -67,7 +67,7 @@ const Preview = () => {
   };
 
   const options = {
-    // responsive: 'scrollFullHeight',
+    responsive: 'scrollFullHeight',
     filterType: "checkbox",
     rowsPerPageOptions: [10, 25, 50, 100],
     pagination: false,
@@ -128,7 +128,9 @@ const Preview = () => {
             let value = item[key];
 
             if (typeof value === "object" && value !== null) {
-              value = "---Object---";
+              // value = "---Object---";
+              value = JSON.stringify(value);
+              // value = String(JSON.stringify(value)).slice(0, 60) + "...";
             } else if (String(value).length > 40) {
               value = String(value).slice(0, 40) + "...";
             }
