@@ -344,6 +344,7 @@ const Preview = () => {
           setEndDate={setEndDate}
         />
       </Box>
+      
       <ModalDownload open={open} onClose={onClose} source={source} section={section} />
     </Box>
   );
