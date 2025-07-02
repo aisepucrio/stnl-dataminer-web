@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Alert } from "@mui/material";
 import { useState, useEffect } from "react";
 import { ResponsiveLine } from "@nivo/line";
 import { useSelector } from "react-redux";
@@ -14,6 +14,7 @@ interface ChartLineProps {
 const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   const [loading, setLoading] = useState(false);
   const [interval, setInterval] = useState<string>("month");
+  const [noData, setNoData] = useState(false);
   const source = useSelector((state: RootState) => state.source.value);
   const item = useSelector((state: RootState) => state.item.value);
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -45,6 +46,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
   };
 
   const fetchData = async () => {
+    console.log("fetchData", startDate, endDate, source, item);
     let endpoint = "";
 
     const itemIdParam = item
@@ -55,7 +57,10 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
         : ""
       : "";
 
-    endpoint = `${apiUrl}/api/${source}/dashboard/graph?interval=${interval}&start_date=${startDate}&end_date=${endDate}${itemIdParam}`;
+    const startDateParam = startDate ? `&start_date=${startDate}` : "";
+    const endDateParam = endDate ? `&end_date=${endDate}` : "";
+
+    endpoint = `${apiUrl}/api/${source}/dashboard/graph?interval=${interval}${startDateParam}${endDateParam}${itemIdParam}`;
     // window.alert(endpoint);
     setLoading(true);
 
@@ -72,18 +77,19 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       const data = await response.json();
       const formatted = formatLineData(data);
 
+      // Check if data is empty
+      const hasData = formatted && formatted.length > 0 && formatted.some((series: any) => series.data && series.data.length > 0);
+      setNoData(!hasData);
       setLineData(formatted);
     } catch (err) {
       console.error("Erro ao buscar dados do gráfico:", err);
+      setNoData(true);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!startDate || !endDate) return;
-    console.log("data ta mudando");
-
     if (source === "github") {
       const githubOptions = [
         { key: "commits", label: "Commits", color: "#e9e29c" },
@@ -103,17 +109,22 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       setSelected(jiraOptions.map((o) => o.key));
     }
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const diffInMs = end.getTime() - start.getTime();
-    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const diffInMs = end.getTime() - start.getTime();
+      const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
 
-    if (diffInDays < 30) {
-      setInterval("day");
-    } else if (diffInDays < 366) {
+      if (diffInDays < 30) {
+        setInterval("day");
+      } else if (diffInDays < 366) {
+        setInterval("month");
+      } else {
+        setInterval("year");
+      }
+    }
+    else {
       setInterval("month");
-    } else {
-      setInterval("year");
     }
 
     fetchData();
@@ -121,6 +132,42 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
 
   if (loading) {
     return <div> ... loading ...</div>;
+  }
+
+  if (noData) {
+    return (
+      <>
+        <Box sx={{ ...row, justifyContent: "space-between", py: "24px" }}>
+          <Typography
+            sx={{
+              color,
+              fontSize: "18px",
+              px: "16px",
+              fontWeight: 600,
+              bgcolor: "",
+            }}
+          >
+            Charts (Cumulative)
+          </Typography>
+        </Box>
+        <Box 
+          sx={{ 
+            height: 450,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            px: "16px"
+          }}
+        >
+          <Alert severity="warning" 
+          sx={{
+            fontSize: "18px"
+          }}>
+            No data was available for the selected criteria.
+          </Alert>
+        </Box>
+      </>
+    );
   }
 
   return (
@@ -135,7 +182,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
             bgcolor: "",
           }}
         >
-          Charts Geral
+          Charts (Cumulative)
         </Typography>
       </Box>
 

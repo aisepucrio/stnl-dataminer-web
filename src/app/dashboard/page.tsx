@@ -10,10 +10,28 @@ import Filter from "@/components/common/Filter";
 
 // ---------------------------------------------------
 
+const formatTimeMined = (dateString: string | null) => {
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZoneName: "short",
+    });
+  } catch (error) {
+    return dateString;
+  }
+};
+
 const row = {
   display: "flex",
   flexDirection: "row",
 };
+
 const column = {
   display: "flex",
   flexDirection: "column",
@@ -38,16 +56,8 @@ export default function Dashboard() {
   const source = useSelector((state: RootState) => state.source.value);
   const item = useSelector((state: RootState) => state.item.value);
 
-  // date -----------------------------
-  const today = new Date();
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(today.getFullYear() - 1);
-
-  const formatDate = (date: Date) => date.toISOString().split("T")[0];
-
-  const [startDate, setStartDate] = useState<string>(formatDate(oneYearAgo));
-  const [endDate, setEndDate] = useState<string>(formatDate(today));
-  // date -----------------------------
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
   const [startHash, setStartHash] = useState<string>("");
   const [endHash, setEndHash] = useState<string>("");
@@ -67,132 +77,78 @@ export default function Dashboard() {
   const [qtyStar, setQtyStar] = useState<number | null>(0);
   const [qtySprint, setQtySprints] = useState<number | null>(0);
   const [qtyUsers, setQtyUsers] = useState<number | null>(0);
-
-  const fetchSource = async (source: string) => {
-    setLoading(false);
-    let stringDateInitial = "";
-    let stringDateFinal = "";
-
-    if (startDate) {
-      stringDateInitial = `start_date=${startDate}`;
-    }
-
-    if (endDate) {
-      stringDateFinal = `end_date=${endDate}`;
-    }
-
-    const dateParams = [stringDateInitial, stringDateFinal]
-      .filter(Boolean)
-      .join("&");
-    const url =
-      apiUrl + sources[source].fetchUrl + (dateParams ? `?${dateParams}` : "");
-
-    try {
-      const response = await fetch(url);
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(`Erro ao buscar dados de ${source}`);
-      }
-
-      const {
-        issues_count = qtyIssue,
-        pull_requests_count = qtyPullrequest,
-        commits_count = qtyCommit,
-        repositories_count = qtyRepository,
-        projects_count = qtyProject,
-        users_count = qtyUsers,
-      } = data;
-
-      if (source === "github") {
-        setQtyIssue(issues_count);
-        setQtyPullrequest(pull_requests_count);
-        setQtyCommit(commits_count);
-        setQtyRepository(repositories_count);
-        setQtyUsers(users_count);
-
-        return;
-      }
-
-      if (source === "jira") {
-        setQtyIssue(issues_count);
-        setQtyProject(projects_count);
-
-        return;
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados:", error);
-    }
-  };
-
-  const fetchItem = async (value: any) => {
-    let path = "";
-
-    if (source == "github") {
-      path = "/api/github/dashboard?repository_id=" + value;
-    } else if (source == "jira") {
-      path = "/api/jira/dashboard?project_id=" + value;
-    } else {
-      return;
-    }
-
-    const stringDateInitial = startDate ? `start_date=${startDate}` : "";
-    const stringDateFinal = endDate ? `end_date=${endDate}` : "";
-    const dateParams = [stringDateInitial, stringDateFinal]
-      .filter(Boolean)
-      .join("&");
-
-    if (dateParams) {
-      path += `&${dateParams}`;
-    }
-
-    try {
-      const response = await fetch(apiUrl + path);
-      if (!response.ok) {
-        throw new Error(`Erro ao buscar dados: ${response.status}`);
-      }
-      const data = await response.json();
-
-      const {
-        repositories_count = qtyRepository,
-        projects_count = qtyProject,
-        issues_count = qtyIssue,
-        pull_requests_count = qtyPullrequest,
-        commits_count = qtyCommit,
-        comments_count = qtyComment,
-        forks_count = qtyFork,
-        stars_count = qtyStar,
-        sprints_count = qtySprint,
-        users_count = qtyUsers,
-      } = data;
-
-      setQtyRepository(repositories_count);
-      setQtyProject(projects_count);
-      setQtyIssue(issues_count);
-      setQtyPullrequest(pull_requests_count);
-      setQtyCommit(commits_count);
-      setQtyComment(comments_count);
-      setQtyFork(forks_count);
-      setQtyStar(stars_count);
-      setQtyUsers(users_count);
-      // time mined here
-      setQtySprints(sprints_count);
-
-      return;
-    } catch (error) {
-      console.error("Erro ao buscar items:", error);
-      return null;
-    }
-  };
+  const [timeMined, setTimeMined] = useState<string | null>("");
 
   useEffect(() => {
-    if (item) {
-      fetchItem(item);
-    } else {
-      fetchSource(source);
-    }
-  }, [item, startDate, endDate]);
+    const fetchData = async () => {
+      setLoading(false);
+      
+      let path = "";
+      
+      // Build the API path based on whether we have an item selected
+      if (item) {
+        if (source === "github") {
+          path = `/api/github/dashboard?repository_id=${item}`;
+        } else if (source === "jira") {
+          path = `/api/jira/dashboard?project_id=${item}`;
+        } else {
+          return;
+        }
+      } else {
+        path = sources[source].fetchUrl;
+      }
+
+      // Build date parameters
+      const stringDateInitial = startDate ? `start_date=${startDate}` : "";
+      const stringDateFinal = endDate ? `end_date=${endDate}` : "";
+      const dateParams = [stringDateInitial, stringDateFinal]
+        .filter(Boolean)
+        .join("&");
+
+      // Append date parameters to the URL
+      if (dateParams) {
+        path += (path.includes("?") ? "&" : "?") + dateParams;
+      }
+
+      const url = apiUrl + path;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Erro ao buscar dados: ${response.status}`);
+        }
+        
+        const data = await response.json();
+
+        // Create a mapping of API fields to state setters
+        const stateUpdaters = {
+          repositories_count: setQtyRepository,
+          projects_count: setQtyProject,
+          issues_count: setQtyIssue,
+          pull_requests_count: setQtyPullrequest,
+          commits_count: setQtyCommit,
+          comments_count: setQtyComment,
+          forks_count: setQtyFork,
+          stars_count: setQtyStar,
+          sprints_count: setQtySprints,
+          users_count: setQtyUsers,
+          time_mined: setTimeMined,
+        };
+
+        // Update all states in one loop
+        Object.entries(stateUpdaters).forEach(([key, setter]) => {
+          if (data[key] !== undefined) {
+            setter(data[key]);
+          }
+        });
+
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+      }
+    };
+
+    fetchData();
+  }, [item, startDate, endDate, source, apiUrl]);
 
   if (loading) {
     return <div></div>;
@@ -263,12 +219,18 @@ export default function Dashboard() {
                     value={qtyFork}
                     isLoading={loading}
                     color={"#e6ecf5"}
+                    tooltip={`Number of times this repository has been forked by other users, at the time of mining (${formatTimeMined(
+                      timeMined
+                    )})`}
                   />
                   <InfoCard
                     label="Stars"
                     value={qtyStar}
                     isLoading={loading}
                     color={"#e2edfe"}
+                    tooltip={`Number of users who have starred this repository, at the time of mining (${formatTimeMined(
+                      timeMined
+                    )})`}
                   />
                 </Box>
               ) : (

@@ -1,12 +1,14 @@
 "use client";
 
-import { Box, Typography, Skeleton } from "@mui/material";
+import { Box, Typography, Skeleton, Tooltip, IconButton } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 type InfoCardProps = {
   label: string;
   value: number | null;
   isLoading?: boolean;
   color?: any;
+  tooltip?: string;
 };
 
 const InfoCard = ({
@@ -14,6 +16,7 @@ const InfoCard = ({
   value,
   isLoading = false,
   color,
+  tooltip = "",
 }: InfoCardProps) => {
   return (
     <>
@@ -38,8 +41,35 @@ const InfoCard = ({
               padding: "24px",
               borderRadius: "16px",
               gap: "8px",
+              position: "relative",
             }}
           >
+            {tooltip && (
+              <Tooltip 
+                title={tooltip} 
+                placement="bottom"
+                slotProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: '14px',
+                      maxWidth: '300px',
+                    },
+                  },
+                }}
+              >
+                <IconButton
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    padding: "4px",
+                  }}
+                >
+                  <InfoOutlinedIcon fontSize="medium" color="action" />
+                </IconButton>
+              </Tooltip>
+            )}
             <Box sx={{ bgcolor: "", width: "100%" }}>
               <Typography
                 sx={{ fontSize: "16px", bgcolor: "", fontWeight: 600 }}
