@@ -162,34 +162,36 @@ const Preview = () => {
         ? `&project=${itemId}`
         : "";
 
-    console.log(source)
+    const dateParamMap: any = {
+      github: {
+        commits: { start: "date__gte", end: "date__lte" },
+        users: { start: "date__gte", end: "date__lte" },
+        default: { start: "created_at__gte", end: "created_at__lte" },
+      },
+      jira: {
+        sprints: { start: "startDate__gte", end: "endDate__lte" },
+        users: { start: "updated_at__gte", end: "updated_at__lte" },
+        default: { start: "created__gte", end: "created__lte" },
+      },
+    };
+
     let startDateParam = "";
     let endDateParam = "";
-
     if (source === "github") {
-      startDateParam = startDate ? `&created_after=${startDate}` : "";
-      endDateParam = endDate ? `&created_before=${endDate}` : "";
-    }
-    else if (source === "jira") {
-      if (section === "sprints") {
-        startDateParam = startDate ? `&startDate__gte=${startDate}` : "";
-        endDateParam = endDate ? `&endDate__lte=${endDate}` : "";
-      }
-      if (section === "users") {
-        startDateParam = startDate ? `&updated_at__gte=${startDate}` : "";
-        endDateParam = endDate ? `&updated_at__lte=${endDate}` : "";
-      }
-      else {
-        startDateParam = startDate ? `&created__gte=${startDate}` : "";
-        endDateParam = endDate ? `&created__lte=${endDate}` : "";
-      }
+      const dateParams = dateParamMap.github[section] || dateParamMap.github.default;
+      const { start, end } = dateParams;
+      startDateParam = startDate ? `&${start}=${startDate}` : "";
+      endDateParam = endDate ? `&${end}=${endDate}` : "";
+    } else if (source === "jira") {
+      const dateParams = dateParamMap.jira[section] || dateParamMap.jira.default;
+      const { start, end } = dateParams;
+      startDateParam = startDate ? `&${start}=${startDate}` : "";
+      endDateParam = endDate ? `&${end}=${endDate}` : "";
     }
 
     const searchParam = searchText ? `&search=${searchText}` : "";
     const orderParam = sortOrder ? `&ordering=${sortOrder}` : "";
     const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${itemParam}${startDateParam}${endDateParam}${searchParam}${orderParam}`;
-    console.log("Endpoint:", endpoint);
-
     try {
       const res = await fetch(endpoint, { signal });
       if (!res.ok) throw new Error("Erro no fetch");
@@ -413,15 +415,14 @@ const Preview = () => {
           </Box>
         )}
       </Box>
-      <Box>
+      {String(params.section) !== "users" && <Box>
         <FilterPreview
           source={source}
           item={itemId}
           setStartDate={setStartDate}
           setEndDate={setEndDate}
         />
-      </Box>
-      
+      </Box>}
       <ModalDownload open={open} onClose={onClose} source={source} section={section} />
       <ModalCodeBlock 
         open={codeModalOpen} 
