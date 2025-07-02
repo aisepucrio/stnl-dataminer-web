@@ -11,23 +11,39 @@ import { useState } from "react";
 interface ModalDownloadProps {
   open: boolean;
   onClose: () => void;
-  source:string,
+  source: string;
+  section: string;
   // onDownload: (format: string) => void;
 }
 
-const ModalDownload = ({ open, onClose , source}: ModalDownloadProps) => {
+interface Payload {
+  format: string;
+  table?: string;
+  data_type?: string;
+}
+
+const ModalDownload = ({
+  open,
+  onClose,
+  source,
+  section,
+}: ModalDownloadProps) => {
   const [format, setFormat] = useState<string>(".CSV");
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const download = () => {
-    const endpoint = `${apiUrl}/api/${source}/export`;
-    window.alert(endpoint)
+    const endpoint = `${apiUrl}/api/${source}/export/`;
+    const payload: Payload = { format };
 
-    const payload = {
-      table: "githubcommit",
-      // ids: [0],
-      format,
-    };
+    if (section === "commit") {
+      payload.table = "githubcommit";
+    } else if (section === "issues") {
+      payload.table = "githubissuepullrequest";
+      payload.data_type = "issue";
+    } else if (section === "pull-requests") {
+      payload.table = "githubissuepullrequest";
+      payload.data_type = "pull_request";
+    }
 
     fetch(endpoint, {
       method: "POST",
@@ -71,8 +87,6 @@ const ModalDownload = ({ open, onClose , source}: ModalDownloadProps) => {
           flexDirection: "column",
           justifyContent: "space-between",
           borderRadius: 2,
-          // mx: "auto",
-          // my: "20vh",
         }}
       >
         <Box display="flex" alignItems="center" gap={2}>

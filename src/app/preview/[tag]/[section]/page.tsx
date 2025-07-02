@@ -36,6 +36,8 @@ const Preview = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const abortControllerRef = useRef<AbortController | null>(null);
+      const tag = String(params.tag);
+    const section = String(params.section);
 
   const formatColumns = () => {
     if (!results || results.length === 0) return [];
@@ -125,8 +127,7 @@ const Preview = () => {
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
 
-    const tag = String(params.tag);
-    const section = String(params.section);
+
     const itemParam =
       itemId && source === "github"
         ? `&repository=${itemName}`
@@ -343,7 +344,7 @@ const Preview = () => {
           setEndDate={setEndDate}
         />
       </Box>
-      <ModalDownload open={open} onClose={onClose} source={source} />
+      <ModalDownload open={open} onClose={onClose} source={source} section={section} />
     </Box>
   );
 };
