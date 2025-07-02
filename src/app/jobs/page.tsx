@@ -124,7 +124,6 @@ const Jobs = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell sx={headerCellStyle}>Job ID</TableCell>
                 <TableCell sx={headerCellStyle}>Project</TableCell>
                 <TableCell sx={headerCellStyle}>Description</TableCell>
                 <TableCell sx={headerCellStyle}>Date</TableCell>
@@ -138,9 +137,6 @@ const Jobs = () => {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((job) => (
                   <TableRow key={job.task_id}>
-                    <TableCell sx={{ fontSize: "1rem" }}>
-                      {job.task_id}
-                    </TableCell>
                     <TableCell sx={{ fontSize: "1rem" }}>
                       {job.repository}
                     </TableCell>
