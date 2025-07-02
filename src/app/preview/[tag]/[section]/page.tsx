@@ -253,9 +253,19 @@ const Preview = () => {
             ))}
           </Select>
 
-          <Typography>
-            {page} of {totalPages || 1}
-          </Typography>
+          <Select
+            size="small"
+            value={page}
+            onChange={(e) => setPage(Number(e.target.value))}
+            sx={{ minWidth: 60 }}
+          >
+            {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pageNum) => (
+              <MenuItem key={pageNum} value={pageNum}>
+                {pageNum}
+              </MenuItem>
+            ))}
+          </Select>
+          <Typography>of {totalPages || 1}</Typography>
 
           <IconButton onClick={handlePrev} disabled={page === 1}>
             <ChevronLeftIcon />
