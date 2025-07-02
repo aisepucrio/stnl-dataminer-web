@@ -299,7 +299,7 @@ export default function Dashboard() {
                   />
                   <InfoCard
                     label="Users"
-                    value={qtyCommit}
+                    value={qtyUsers}
                     isLoading={loading}
                     color={"#e2edfe"}
                   />
@@ -330,7 +330,7 @@ export default function Dashboard() {
                   />
                   <InfoCard
                     label="Users"
-                    value={qtySprint}
+                    value={qtyUsers}
                     isLoading={loading}
                     color={"#e6ecf5"}
                   />
