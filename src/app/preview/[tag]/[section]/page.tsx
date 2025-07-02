@@ -134,8 +134,29 @@ const Preview = () => {
         ? `&project=${itemId}`
         : "";
 
-    const startDateParam = startDate ? `&created_after=${startDate}` : "";
-    const endDateParam = endDate ? `&created_before=${endDate}` : "";
+    console.log(source)
+    let startDateParam = "";
+    let endDateParam = "";
+
+    if (source === "github") {
+      startDateParam = startDate ? `&created_after=${startDate}` : "";
+      endDateParam = endDate ? `&created_before=${endDate}` : "";
+    }
+    else if (source === "jira") {
+      if (section === "sprints") {
+        startDateParam = startDate ? `&startDate__gte=${startDate}` : "";
+        endDateParam = endDate ? `&endDate__lte=${endDate}` : "";
+      }
+      if (section === "users") {
+        startDateParam = startDate ? `&updated_at__gte=${startDate}` : "";
+        endDateParam = endDate ? `&updated_at__lte=${endDate}` : "";
+      }
+      else {
+        startDateParam = startDate ? `&created__gte=${startDate}` : "";
+        endDateParam = endDate ? `&created__lte=${endDate}` : "";
+      }
+    }
+
     const searchParam = searchText ? `&search=${searchText}` : "";
     const orderParam = sortOrder ? `&ordering=${sortOrder}` : "";
     const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${itemParam}${startDateParam}${endDateParam}${searchParam}${orderParam}`;
