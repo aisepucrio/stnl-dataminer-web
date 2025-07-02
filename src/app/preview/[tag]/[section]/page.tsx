@@ -1,13 +1,15 @@
 "use client";
-import { Box, IconButton, MenuItem, Select, Typography } from "@mui/material";
+import { Box, IconButton, MenuItem, Select, Typography, Tooltip } from "@mui/material";
 import type { RootState } from "@/app/store";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import MUIDataTable from "mui-datatables";
+import { debounceSearchRender } from "mui-datatables";
 import FilterPreview from "@/components/common/FilterPreview";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import DownloadIcon from "@mui/icons-material/Download";
 import { useRouter } from "next/navigation";
 import ModalDownload from "@/components/common/ModalDownload";
 
@@ -30,6 +32,9 @@ const Preview = () => {
   const router = useRouter();
   const isFirstRender = useRef(true);
   const [open, setOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>("");
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const formatColumns = () => {
     if (!results || results.length === 0) return [];
@@ -67,7 +72,6 @@ const Preview = () => {
   };
 
   const options = {
-    responsive: 'scrollFullHeight',
     filterType: "checkbox",
     rowsPerPageOptions: [10, 25, 50, 100],
     pagination: false,
@@ -75,19 +79,51 @@ const Preview = () => {
     draggableColumns: {
       enabled: true,
     },
-    download: true,
     fixedHeader: false,
     print: false,
-    onDownload: () => {
-      setOpen(true);
-      return false;
-    },
+    download: false,
     elevation: 1,
     filter: false,
+    customSearchRender: debounceSearchRender(500),
+    customToolbar: () => {
+      return (
+        <Tooltip title="Export">
+          <IconButton
+            onClick={() => {
+              setOpen(true);
+            }}
+          >
+            <DownloadIcon />
+          </IconButton>
+        </Tooltip>
+      );
+    },
+    serverSide: true,
+    onTableChange: (action: string, tableState: any) => {
+      switch (action) {
+        case "sort":
+          setSortOrder(tableState.sortOrder.direction === "desc" ? 
+            tableState.sortOrder.name : "-" + tableState.sortOrder.name);
+          setPage(1);
+          break;
+        case "search":
+          setSearchText(tableState.searchText);
+          setPage(1);
+          break;
+      }
+    },
   };
 
   const fetchPreview = async () => {
-    // window.alert("fetch chamado");
+    // Cancel previous request if it exists
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Create new AbortController for this request
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     const tag = String(params.tag);
     const section = String(params.section);
     const itemParam =
@@ -99,59 +135,65 @@ const Preview = () => {
 
     const startDateParam = startDate ? `&created_after=${startDate}` : "";
     const endDateParam = endDate ? `&created_before=${endDate}` : "";
-    const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${itemParam}${startDateParam}${endDateParam}`;
-    // window.alert(endpoint);
+    const searchParam = searchText ? `&search=${searchText}` : "";
+    const orderParam = sortOrder ? `&ordering=${sortOrder}` : "";
+    const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${itemParam}${startDateParam}${endDateParam}${searchParam}${orderParam}`;
+    console.log("Endpoint:", endpoint);
 
     try {
-      const res = await fetch(endpoint);
+      const res = await fetch(endpoint, { signal });
       if (!res.ok) throw new Error("Erro no fetch");
       const data = await res.json();
 
-      setResults(data.results); // salva os resultados
-      // setResults(
-      //   data.results.map((item) => {
-      //     const newItem: any = {};
-      //     Object.keys(item).forEach((key) => {
-      //       const value = item[key];
-      //       newItem[key] =
-      //         typeof value === "object" && value !== null
-      //           ?"---Object---"
-      //           : value;
-      //     });
-      //     return newItem;
-      //   })
-      // );
-      setResults(
-        data.results.map((item) => {
-          const newItem: any = {};
-          Object.keys(item).forEach((key) => {
-            let value = item[key];
+      // Only update state if the request wasn't aborted
+      if (!signal.aborted) {
+        setResults(data.results); // salva os resultados
+        // setResults(
+        //   data.results.map((item) => {
+        //     const newItem: any = {};
+        //     Object.keys(item).forEach((key) => {
+        //       const value = item[key];
+        //       newItem[key] =
+        //         typeof value === "object" && value !== null
+        //           ?"---Object---"
+        //           : value;
+        //     });
+        //     return newItem;
+        //   })
+        // );
+        setResults(
+          data.results.map((item) => {
+            const newItem: any = {};
+            Object.keys(item).forEach((key) => {
+              let value = item[key];
 
-            if (typeof value === "object" && value !== null) {
-              // value = "---Object---";
-              value = JSON.stringify(value);
-              // value = String(JSON.stringify(value)).slice(0, 60) + "...";
-            } else if (String(value).length > 40) {
-              value = String(value).slice(0, 40) + "...";
-            }
+              if (typeof value === "object" && value !== null) {
+                // value = "---Object---";
+                value = JSON.stringify(value);
+                // value = String(JSON.stringify(value)).slice(0, 60) + "...";
+              } else if (String(value).length > 40) {
+                value = String(value).slice(0, 40) + "...";
+              }
 
-            newItem[key] = value;
-          });
-          return newItem;
-        })
-      );
+              newItem[key] = value;
+            });
+            return newItem;
+          })
+        );
 
-      setTotal(data.count);
+        setTotal(data.count);
+      }
     } catch (err) {
-      console.error("Erro ao buscar preview:", err);
+      // Ignore AbortError as it's expected when requests are cancelled
+      if (err.name !== 'AbortError') {
+        console.error("Erro ao buscar preview:", err);
+      }
     }
   };
 
   useEffect(() => {
     fetchPreview();
-  }, [ startDate, endDate, page, itemId, itemName ]);
-
-
+  }, [ startDate, endDate, page, itemId, itemName , sortOrder, searchText]);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -160,6 +202,15 @@ const Preview = () => {
     }
     router.push("/");
   }, [source]);
+
+  // Cleanup function to cancel pending requests on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   return (
     <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
