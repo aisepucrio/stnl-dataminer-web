@@ -35,7 +35,7 @@ const MainMenu = () => {
         return [
           { title: "Issue", to: "/preview/github/issues" },
           { title: "Pull Request", to: "/preview/github/pull-requests" },
-          { title: "Comment", to: "/preview/github/comments" },
+          //{ title: "Comment", to: "/preview/github/comments" },
           { title: "Commit", to: "/preview/github/commits" },
           { title: "User", to: "/preview/github/users" },
 
