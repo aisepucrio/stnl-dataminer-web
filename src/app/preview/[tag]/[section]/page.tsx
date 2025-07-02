@@ -1,5 +1,5 @@
 "use client";
-import { Box, IconButton, MenuItem, Select, Typography, Tooltip } from "@mui/material";
+import { Box, IconButton, MenuItem, Select, Typography, Tooltip, Skeleton } from "@mui/material";
 import type { RootState } from "@/app/store";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
@@ -34,6 +34,7 @@ const Preview = () => {
   const [open, setOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<string>("");
   const [searchText, setSearchText] = useState<string>("");
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const formatColumns = () => {
@@ -182,11 +183,13 @@ const Preview = () => {
         );
 
         setTotal(data.count);
+        setIsInitialLoading(false);
       }
     } catch (err) {
       // Ignore AbortError as it's expected when requests are cancelled
       if (err.name !== 'AbortError') {
         console.error("Erro ao buscar preview:", err);
+        setIsInitialLoading(false);
       }
     }
   };
@@ -226,57 +229,90 @@ const Preview = () => {
         >
           {/* {source} <br />
         {itemId ? <>{itemId}</> : <>nao tem id selcionado</>} <br /> */}
-          <MUIDataTable
-            title={""}
-            data={results}
-            columns={columns}
-            options={options}
-          />
+          {isInitialLoading ? (
+            <Box sx={{ p: 2 }}>
+              {/* Table header skeleton */}
+              <Skeleton variant="rectangular" width="100%" height={56} sx={{ mb: 1 }} />
+              {/* Table rows skeleton */}
+              {Array.from({ length: 10 }).map((_, index) => (
+                <Skeleton
+                  key={index}
+                  variant="rectangular"
+                  width="100%"
+                  height={52}
+                  sx={{ mb: 1 }}
+                />
+              ))}
+            </Box>
+          ) : (
+            <MUIDataTable
+              title={""}
+              data={results}
+              columns={columns}
+              options={options}
+            />
+          )}
         </Box>
         <br />
-        <Box
-          display="flex"
-          alignItems="center"
-          gap={2}
-          sx={{ bgcolor: "", ...row, justifyContent: "flex-end" }}
-        >
-          <Typography>Rows per page:</Typography>
-          <Select
-            size="small"
-            value={pageSize}
-            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+        {isInitialLoading ? (
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={2}
+            sx={{ bgcolor: "", ...row, justifyContent: "flex-end" }}
           >
-            {[5, 10, 25, 50, 100].map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
+            <Skeleton variant="text" width={120} height={40} />
+            <Skeleton variant="rectangular" width={80} height={32} />
+            <Skeleton variant="rectangular" width={60} height={32} />
+            <Skeleton variant="text" width={60} height={40} />
+            <Skeleton variant="circular" width={40} height={40} />
+            <Skeleton variant="circular" width={40} height={40} />
+          </Box>
+        ) : (
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={2}
+            sx={{ bgcolor: "", ...row, justifyContent: "flex-end" }}
+          >
+            <Typography>Rows per page:</Typography>
+            <Select
+              size="small"
+              value={pageSize}
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+            >
+              {[5, 10, 25, 50, 100].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
 
-          <Select
-            size="small"
-            value={page}
-            onChange={(e) => setPage(Number(e.target.value))}
-            sx={{ minWidth: 60 }}
-          >
-            {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pageNum) => (
-              <MenuItem key={pageNum} value={pageNum}>
-                {pageNum}
-              </MenuItem>
-            ))}
-          </Select>
-          <Typography>of {totalPages || 1}</Typography>
+            <Select
+              size="small"
+              value={page}
+              onChange={(e) => setPage(Number(e.target.value))}
+              sx={{ minWidth: 60 }}
+            >
+              {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pageNum) => (
+                <MenuItem key={pageNum} value={pageNum}>
+                  {pageNum}
+                </MenuItem>
+              ))}
+            </Select>
+            <Typography>of {totalPages || 1}</Typography>
 
-          <IconButton onClick={handlePrev} disabled={page === 1}>
-            <ChevronLeftIcon />
-          </IconButton>
-          <IconButton
-            onClick={handleNext}
-            disabled={page === totalPages || totalPages === 0}
-          >
-            <ChevronRightIcon />
-          </IconButton>
-        </Box>
+            <IconButton onClick={handlePrev} disabled={page === 1}>
+              <ChevronLeftIcon />
+            </IconButton>
+            <IconButton
+              onClick={handleNext}
+              disabled={page === totalPages || totalPages === 0}
+            >
+              <ChevronRightIcon />
+            </IconButton>
+          </Box>
+        )}
       </Box>
       <Box>
         <FilterPreview
