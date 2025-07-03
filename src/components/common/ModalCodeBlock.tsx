@@ -9,7 +9,6 @@ interface ModalCodeBlockProps {
   open: boolean;
   onClose: () => void;
   code: object | string;
-  title?: string;
 }
 
 const style = {
@@ -26,21 +25,37 @@ const style = {
   outline: 'none',
 };
 
-const ModalCodeBlock: React.FC<ModalCodeBlockProps> = ({ open, onClose, code, title }) => {
+const ModalCodeBlock: React.FC<ModalCodeBlockProps> = ({ open, onClose, code }) => {
   return (
     <Modal open={open} onClose={onClose} aria-labelledby="modal-code-block-title">
-      <Box sx={style}>
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography id="modal-code-block-title" variant="h6" component="h2">
-            {title || 'JSON Preview'}
-          </Typography>
-          <IconButton onClick={onClose} size="small" sx={{ ml: 2 }}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Box sx={{ maxHeight: '60vh', overflow: 'auto', borderRadius: 1, background: '#222' }}>
+      <Box sx={{ ...style, position: 'relative', paddingTop: 5 }}>
+        <IconButton
+          onClick={onClose}
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            zIndex: 2,
+            background: 'background.paper',
+            boxShadow: 1,
+            '&:hover': { background: 'background.default' },
+          }}
+          aria-label="close"
+        >
+          <CloseIcon />
+        </IconButton>
+        <Box sx={{ maxHeight: '60vh', overflow: 'auto', borderRadius: 1, background: '#222', mt: 1 }}>
           <SyntaxHighlighter language="json" style={materialDark} customStyle={{ margin: 0, background: 'transparent' }}>
-            {typeof code === 'string' ? code : JSON.stringify(code, null, 2)}
+            {(() => {
+              let jsonString = typeof code === 'string' ? code : JSON.stringify(code, null, 2);
+              try {
+                const parsed = JSON.parse(jsonString);
+                return JSON.stringify(parsed, null, 2);
+              } catch {
+                return jsonString;
+              }
+            })()}
           </SyntaxHighlighter>
         </Box>
       </Box>

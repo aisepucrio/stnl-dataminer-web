@@ -1,5 +1,5 @@
 "use client";
-import { Box, IconButton, MenuItem, Select, Typography, Tooltip, Skeleton } from "@mui/material";
+import { Box, IconButton, MenuItem, Select, Typography, Tooltip, Skeleton, Button } from "@mui/material";
 import type { RootState } from "@/app/store";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
@@ -7,9 +7,11 @@ import { useParams } from "next/navigation";
 import MUIDataTable from "mui-datatables";
 import { debounceSearchRender } from "mui-datatables";
 import FilterPreview from "@/components/common/FilterPreview";
+import ModalCodeBlock from "@/components/common/ModalCodeBlock";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DownloadIcon from "@mui/icons-material/Download";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { useRouter } from "next/navigation";
 import ModalDownload from "@/components/common/ModalDownload";
 
@@ -32,6 +34,8 @@ const Preview = () => {
   const router = useRouter();
   const isFirstRender = useRef(true);
   const [open, setOpen] = useState(false);
+  const [codeModalOpen, setCodeModalOpen] = useState(false);
+  const [selectedCellData, setSelectedCellData] = useState<any>(null);
   const [sortOrder, setSortOrder] = useState<string>("");
   const [searchText, setSearchText] = useState<string>("");
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
@@ -59,6 +63,11 @@ const Preview = () => {
 
   const onClose = () => {
     setOpen(false);
+  };
+
+  const handleCodeModalClose = () => {
+    setCodeModalOpen(false);
+    setSelectedCellData(null);
   };
 
   const handlePrev = () => {
@@ -90,15 +99,23 @@ const Preview = () => {
     customSearchRender: debounceSearchRender(500),
     customToolbar: () => {
       return (
-        <Tooltip title="Export">
-          <IconButton
-            onClick={() => {
-              setOpen(true);
-            }}
-          >
-            <DownloadIcon />
-          </IconButton>
-        </Tooltip>
+        <>
+
+          <Tooltip title="Export">
+            <IconButton
+              onClick={() => {
+                setOpen(true);
+              }}
+            >
+              <DownloadIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Click any cell to view its full contents in a modal. For cells with long text or objects, click to expand and see the complete value. This is useful for inspecting truncated or complex data.">
+            <IconButton>
+              <HelpOutlineIcon />
+            </IconButton>
+          </Tooltip>
+        </>
       );
     },
     serverSide: true,
@@ -115,6 +132,15 @@ const Preview = () => {
           break;
       }
     },
+    onCellClick: (colData: any, cellMeta: { colIndex: number, rowIndex: number, dataIndex: number }) => {
+      if (colData && colData.__isShowItemButton) {
+        // Do nothing, handled by button
+        return;
+      }
+      const fullValue = results[cellMeta.dataIndex][columns[cellMeta.colIndex].name];
+      setSelectedCellData(fullValue);
+      setCodeModalOpen(true);
+    }
   };
 
   const fetchPreview = async () => {
@@ -170,40 +196,22 @@ const Preview = () => {
 
       // Only update state if the request wasn't aborted
       if (!signal.aborted) {
-        setResults(data.results); // salva os resultados
-        // setResults(
-        //   data.results.map((item) => {
-        //     const newItem: any = {};
-        //     Object.keys(item).forEach((key) => {
-        //       const value = item[key];
-        //       newItem[key] =
-        //         typeof value === "object" && value !== null
-        //           ?"---Object---"
-        //           : value;
-        //     });
-        //     return newItem;
-        //   })
-        // );
+        setResults(data.results);
         setResults(
           data.results.map((item) => {
             const newItem: any = {};
             Object.keys(item).forEach((key) => {
-              let value = item[key];
-
+              const value = item[key];
               if (typeof value === "object" && value !== null) {
-                // value = "---Object---";
-                value = JSON.stringify(value);
-                // value = String(JSON.stringify(value)).slice(0, 60) + "...";
-              } else if (String(value).length > 40) {
-                value = String(value).slice(0, 40) + "...";
+                // Instead of stringifying, show a button placeholder
+                newItem[key] = { __isShowItemButton: true, value };
+              } else {
+                newItem[key] = value;
               }
-
-              newItem[key] = value;
             });
             return newItem;
           })
         );
-
         setTotal(data.count);
         setIsInitialLoading(false);
       }
@@ -236,6 +244,74 @@ const Preview = () => {
       }
     };
   }, []);
+
+  // Custom render for cells: show button for objects, otherwise show value
+  // Helper to check if a string is an ISO date
+  const isIsoDateString = (str: string) => {
+    // Accepts 2025-03-17T13:36:54Z or 2025-01-02T16:53:26+00:00
+    return (
+      typeof str === 'string' &&
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?$/.test(str)
+    );
+  };
+
+  // Format ISO date string to human readable
+  const formatIsoDate = (str: string) => {
+    try {
+      const date = new Date(str);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleString();
+      }
+    } catch {}
+    return str;
+  };
+
+  const getColumnsWithShowButton = () => {
+    if (!results || results.length === 0) return columns;
+    return columns.map((col) => ({
+      ...col,
+      options: {
+        ...col.options,
+        customBodyRender: (value: any, tableMeta: any) => {
+          if (value && value.__isShowItemButton) {
+            // For objects, show button as before
+            return (
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={e => {
+                  e.stopPropagation();
+                  setSelectedCellData(value.value);
+                  setCodeModalOpen(true);
+                }}
+              >
+                Show
+              </Button>
+            );
+          }
+          // Detect and format ISO date strings
+          if (typeof value === 'string' && isIsoDateString(value)) {
+            return (
+              <span title={value}>{formatIsoDate(value)}</span>
+            );
+          }
+          // Truncate long primitive values for display, but keep full value for modal
+          if (typeof value === 'string' && value.length > 40) {
+            return (
+              <span
+                style={{ cursor: 'pointer' }}
+                title={value}
+              >
+                {value.slice(0, 40) + '...'}
+              </span>
+            );
+          }
+          return value;
+        },
+      },
+    }));
+  };
+  const columnsWithShowButton = getColumnsWithShowButton();
 
   return (
     <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
@@ -270,7 +346,7 @@ const Preview = () => {
             <MUIDataTable
               title={""}
               data={results}
-              columns={columns}
+              columns={columnsWithShowButton}
               options={options}
             />
           )}
@@ -346,6 +422,11 @@ const Preview = () => {
       </Box>
       
       <ModalDownload open={open} onClose={onClose} source={source} section={section} />
+      <ModalCodeBlock 
+        open={codeModalOpen} 
+        onClose={handleCodeModalClose} 
+        code={selectedCellData}
+      />
     </Box>
   );
 };
