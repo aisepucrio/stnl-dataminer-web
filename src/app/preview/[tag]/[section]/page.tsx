@@ -59,7 +59,7 @@ const Preview = () => {
     return listAux;
   };
 
-  const columns = formatColumns();
+  const baseColumns = formatColumns();
 
   const onClose = () => {
     setOpen(false);
@@ -266,9 +266,9 @@ const Preview = () => {
     return str;
   };
 
-  const getColumnsWithShowButton = () => {
-    if (!results || results.length === 0) return columns;
-    return columns.map((col) => ({
+  const getColumnsAndHandleSpecialCases = () => {
+    if (!results || results.length === 0) return baseColumns;
+    return baseColumns.map((col) => ({
       ...col,
       options: {
         ...col.options,
@@ -311,7 +311,7 @@ const Preview = () => {
       },
     }));
   };
-  const columnsWithShowButton = getColumnsWithShowButton();
+  const columns = getColumnsAndHandleSpecialCases();
 
   return (
     <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
@@ -346,7 +346,7 @@ const Preview = () => {
             <MUIDataTable
               title={""}
               data={results}
-              columns={columnsWithShowButton}
+              columns={columns}
               options={options}
             />
           )}
