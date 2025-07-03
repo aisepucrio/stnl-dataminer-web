@@ -104,7 +104,7 @@ const ModalDownload = ({
 
         <Box display="flex" justifyContent="flex-end" gap={2}>
           <Button variant="outlined" onClick={onClose}>
-            Cancelar
+            Cancel
           </Button>
           <Button variant="contained" onClick={() => download()}>
             Download
