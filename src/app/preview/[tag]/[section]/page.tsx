@@ -25,7 +25,7 @@ const Preview = () => {
   const itemName = useSelector((state: RootState) => state.item.itemName);
   const params = useParams();
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(100);
+  const [pageSize, setPageSize] = useState(5);
   const [results, setResults] = useState<any[]>([]);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -80,7 +80,8 @@ const Preview = () => {
 
   const handlePageSizeChange = (value: number) => {
     setPageSize(value);
-    setPage(1); // Resetar página ao mudar o tamanho
+    setPage(1); // Reset page to 1 when page size changes
+    setIsInitialLoading(true); // Trigger loading state
   };
 
   const options = {
@@ -226,7 +227,7 @@ const Preview = () => {
 
   useEffect(() => {
     fetchPreview();
-  }, [ startDate, endDate, page, itemId, itemName , sortOrder, searchText]);
+  }, [ startDate, endDate, page, pageSize, itemId, itemName , sortOrder, searchText]);
 
   useEffect(() => {
     if (isFirstRender.current) {
