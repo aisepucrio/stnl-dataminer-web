@@ -172,10 +172,10 @@ const ItemSwitcher = () => {
           const selectedItemObj = items.find((i) => i.id === selected);
           const label = !selected
             ? source === "github"
-              ? "Select repository"
+              ? "All repositories (click to filter)"
               : source === "jira"
-              ? "Select project"
-              : "Select item"
+              ? "All projects (click to filter)"
+              : "All items (click to filter)"
             : source === "github"
             ? selectedItemObj?.repository ?? selected
             : source === "jira"
