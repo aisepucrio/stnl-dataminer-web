@@ -39,22 +39,28 @@ type Job = {
   error: string;
 };
 
+
 const Jobs = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [jobs, setJobs] = useState<Job[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [lastInteraction, setLastInteraction] = useState(Date.now());
+  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
+
 
   const stopJob = async (taskId: string) => {
     try {
-      const response = await fetch(`${apiUrl}/api/jobs/tasks/${taskId}`, {
+      const response = await fetch(`${apiUrl}/api/jobs/tasks/${taskId}/`, {
         method: "DELETE",
       });
       if (response.ok) fetchJobs();
     } catch {
       console.error("Erro ao parar a task");
     }
+    setLastInteraction(Date.now());
   };
+
 
   const fetchJobs = async () => {
     try {
@@ -66,9 +72,21 @@ const Jobs = () => {
     }
   };
 
+
+  // Fetch jobs on mount
   useEffect(() => {
     fetchJobs();
   }, []);
+
+  // Auto-refresh logic
+  useEffect(() => {
+    if (timerId) clearTimeout(timerId);
+    const id = setTimeout(() => {
+      fetchJobs();
+    }, 5000);
+    setTimerId(id);
+    return () => clearTimeout(id);
+  }, [lastInteraction]);
 
   const headerCellStyle = {
     color: "#9e9e9e",
@@ -76,16 +94,25 @@ const Jobs = () => {
     fontSize: "1rem",
   };
 
+
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
+    setLastInteraction(Date.now());
   };
   const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(+e.target.value);
     setPage(0);
+    setLastInteraction(Date.now());
   };
 
   const [rev, setRev] = useState(false);
   const orderedJobs = rev ? [...jobs].reverse() : jobs;
+
+  // User interaction handler
+  const handleUserInteraction = () => {
+    setLastInteraction(Date.now());
+  };
+
 
   return (
     <Box
@@ -96,6 +123,9 @@ const Jobs = () => {
         m: "5vh 2vw 0",
         borderRadius: "10px",
       }}
+      onClick={handleUserInteraction}
+      onKeyDown={handleUserInteraction}
+      tabIndex={0}
     >
       <Box p={3}>
         <Box
@@ -105,15 +135,25 @@ const Jobs = () => {
             justifyContent: "flex-end",
           }}
         >
-
           <Box>
-            <IconButton onClick={() => setRev(!rev)} sx={{ color: "#1C4886" }}>
+            <IconButton
+              onClick={() => {
+                setRev(!rev);
+                setLastInteraction(Date.now());
+              }}
+              sx={{ color: "#1C4886" }}
+            >
               <SwapVertIcon
                 sx={{ color: "#1C4886", fontSize: 36, cursor: "pointer" }}
               />
             </IconButton>
-
-            <IconButton onClick={fetchJobs} sx={{ color: "#1C4886" }}>
+            <IconButton
+              onClick={() => {
+                fetchJobs();
+                setLastInteraction(Date.now());
+              }}
+              sx={{ color: "#1C4886" }}
+            >
               <RefreshOutlinedIcon
                 sx={{ color: "#1C4886", fontSize: 34, cursor: "pointer" }}
               />
@@ -131,7 +171,6 @@ const Jobs = () => {
                 <TableCell sx={headerCellStyle}></TableCell>
               </TableRow>
             </TableHead>
-
             <TableBody>
               {orderedJobs
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -145,7 +184,6 @@ const Jobs = () => {
                         .replace(/_/g, " ")
                         .replace(/^\w/, (c) => c.toUpperCase())}
                     </TableCell>
-
                     <TableCell sx={{ fontSize: "1rem" }}>
                       <Box display="flex" alignItems="center">
                         <CalendarTodayIcon fontSize="small" sx={{ mr: 1 }} />
@@ -159,7 +197,6 @@ const Jobs = () => {
                         )}
                       </Box>
                     </TableCell>
-
                     <TableCell>
                       <Box display="flex" alignItems="center">
                         <Box
@@ -186,7 +223,6 @@ const Jobs = () => {
                         </Typography>
                       </Box>
                     </TableCell>
-
                     <TableCell sx={{ width: "10%" }}>
                       {job.status === "STARTED" && (
                         <StopCircleOutlinedIcon
@@ -198,7 +234,6 @@ const Jobs = () => {
                   </TableRow>
                 ))}
             </TableBody>
-
             <TableFooter>
               <TableRow>
                 <TablePagination
