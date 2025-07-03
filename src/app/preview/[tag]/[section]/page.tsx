@@ -3,6 +3,8 @@ import { Box, IconButton, MenuItem, Select, Typography, Tooltip, Skeleton, Butto
 import type { RootState } from "@/app/store";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import { useParams } from "next/navigation";
 import MUIDataTable from "mui-datatables";
 import { debounceSearchRender } from "mui-datatables";
@@ -40,6 +42,7 @@ const Preview = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const [showUpdateToast, setShowUpdateToast] = useState(false);
       const tag = String(params.tag);
     const section = String(params.section);
 
@@ -229,6 +232,10 @@ const Preview = () => {
 
   useEffect(() => {
     fetchPreview();
+    // Show toast only when startDate or endDate changes (not on first render)
+    if (!isFirstRender.current && (startDate || endDate)) {
+      setShowUpdateToast(true);
+    }
   }, [ startDate, endDate, page, pageSize, itemId, itemName , sortOrder, searchText]);
 
   useEffect(() => {
@@ -429,6 +436,16 @@ const Preview = () => {
         onClose={handleCodeModalClose} 
         code={selectedCellData}
       />
+      <Snackbar
+        open={showUpdateToast}
+        autoHideDuration={1500}
+        onClose={() => setShowUpdateToast(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <MuiAlert onClose={() => setShowUpdateToast(false)} severity="success" sx={{ width: '100%' }} elevation={6} variant="filled">
+          Table filtered using new date range!
+        </MuiAlert>
+      </Snackbar>
     </Box>
   );
 };
