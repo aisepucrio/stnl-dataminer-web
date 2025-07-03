@@ -39,7 +39,6 @@ type Job = {
   error: string;
 };
 
-
 const Jobs = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -47,7 +46,7 @@ const Jobs = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [lastInteraction, setLastInteraction] = useState(Date.now());
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
-
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const stopJob = async (taskId: string) => {
     try {
@@ -61,17 +60,18 @@ const Jobs = () => {
     setLastInteraction(Date.now());
   };
 
-
   const fetchJobs = async () => {
+    setIsRefreshing(true);
     try {
       const resp = await fetch(`${apiUrl}/api/jobs/`);
       const data = await resp.json();
       setJobs(data.results);
     } catch (err) {
       console.error("Erro ao buscar tasks:", err);
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 600); // keep spinning for a short time
     }
   };
-
 
   // Fetch jobs on mount
   useEffect(() => {
@@ -81,11 +81,11 @@ const Jobs = () => {
   // Auto-refresh logic
   useEffect(() => {
     if (timerId) clearTimeout(timerId);
-    const id = setTimeout(() => {
+    const id = setInterval(() => {
       fetchJobs();
     }, 5000);
     setTimerId(id);
-    return () => clearTimeout(id);
+    return () => clearInterval(id);
   }, [lastInteraction]);
 
   const headerCellStyle = {
@@ -93,7 +93,6 @@ const Jobs = () => {
     fontWeight: 500,
     fontSize: "1rem",
   };
-
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
@@ -113,6 +112,17 @@ const Jobs = () => {
     setLastInteraction(Date.now());
   };
 
+  // Add spinning animation keyframes
+  useEffect(() => {
+    if (typeof window !== "undefined" && typeof document !== "undefined") {
+      if (!document.getElementById("refresh-spin-keyframes")) {
+        const style = document.createElement("style");
+        style.id = "refresh-spin-keyframes";
+        style.textContent = "@keyframes spin { 100% { transform: rotate(360deg); } }";
+        document.head.appendChild(style);
+      }
+    }
+  }, []);
 
   return (
     <Box
@@ -155,7 +165,13 @@ const Jobs = () => {
               sx={{ color: "#1C4886" }}
             >
               <RefreshOutlinedIcon
-                sx={{ color: "#1C4886", fontSize: 34, cursor: "pointer" }}
+                sx={{
+                  color: "#1C4886",
+                  fontSize: 34,
+                  cursor: "pointer",
+                  transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                  animation: isRefreshing ? "spin 0.7s linear infinite" : "none",
+                }}
               />
             </IconButton>
           </Box>
