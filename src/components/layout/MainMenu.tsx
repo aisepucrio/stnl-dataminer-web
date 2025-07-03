@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import {
   Box,
   List,
@@ -13,6 +13,7 @@ import {
   ListItemText,
   ListItemIcon,
   Icon,
+  CircularProgress,
 } from "@mui/material";
 import SourceSwitcher from "../ui/SourceSwitcher";
 import { useSelector } from "react-redux";
@@ -25,9 +26,32 @@ import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 const MainMenu = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const pathname = usePathname();
+  const router = useRouter();
   const source = useSelector((state: RootState) => state.source.value);
 
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+
+  // Reset navigation state when pathname changes (page load complete)
+  useEffect(() => {
+    setIsNavigating(false);
+    setNavigatingTo(null);
+  }, [pathname]);
+
+  const handleNavigation = (path: string, event?: React.MouseEvent) => {
+    if (event) {
+      event.preventDefault();
+    }
+    
+    if (isNavigating || path === pathname) {
+      return; // Block if already navigating or same page
+    }
+
+    setIsNavigating(true);
+    setNavigatingTo(path);
+    router.push(path);
+  };
 
   const getPreviewChildren = () => {
     switch (source) {
@@ -109,13 +133,15 @@ const MainMenu = () => {
                 <React.Fragment key={name}>
                   <ListItem disablePadding>
                     <ListItemButton
-                      onClick={() => {
+                      onClick={(event) => {
                         if (isPreview) {
                           setPreviewOpen(!previewOpen);
+                        } else {
+                          handleNavigation(path, event);
                         }
                       }}
-                      component={!isPreview ? "a" : "div"}
-                      href={!isPreview ? path : undefined}
+                      component={!isPreview ? "div" : "div"}
+                      disabled={isNavigating && !isPreview}
                       sx={{
                         width: isPreview? "70%" : "90%",
                         borderRadius: 2,
@@ -126,8 +152,9 @@ const MainMenu = () => {
                         backgroundColor: isActive? "#0000000D" : "transparent",
                         paddingRight: isPreview? 25 : 20,
                         paddingLeft: isPreview? 0 : 2.5,
+                        opacity: (isNavigating && !isPreview) ? 0.6 : 1,
                         "&:hover": {
-                          backgroundColor: "#0000000D",
+                          backgroundColor: (isNavigating && !isPreview) ? "transparent" : "#0000000D",
                         },
                       }}
                     >
@@ -137,7 +164,9 @@ const MainMenu = () => {
                         </Icon>
                       )}
                       <ListItemIcon sx={{ minWidth: 0, mr: 1, justifyContent: 'center' }}>
-                        {typeof icon === 'string' ? (
+                        {isNavigating && navigatingTo === path && !isPreview ? (
+                          <CircularProgress size={20} />
+                        ) : typeof icon === 'string' ? (
                           <Image
                             src={`/${icon}`} // caminho da imagem
                             alt={`${name} icon`}
@@ -165,23 +194,33 @@ const MainMenu = () => {
                   {/* Renderiza os filhos do Preview */}
                   {isPreview && previewOpen && children && (
                     <Box sx={{ ml: 5 }}>
-                      {children.map((child) => (
-                        <Link href={child.to} key={child.title} passHref legacyBehavior>
-                          <ListItem disablePadding>
+                      {children.map((child) => {
+                        const isChildActive = pathname === child.to;
+                        const isChildNavigating = navigatingTo === child.to;
+                        
+                        return (
+                          <ListItem disablePadding key={child.title}>
                             <ListItemButton
-                              component="a"
+                              onClick={(event) => handleNavigation(child.to, event)}
+                              disabled={isNavigating}
                               sx={{
                                 width: "100%",
                                 borderRadius: 2,
                                 marginY: 0.5,
                                 marginRight: 2,
                                 pl: 2, 
-                                backgroundColor: isActive? "#0000000D" : "transparent",
+                                backgroundColor: isChildActive? "#0000000D" : "transparent",
+                                opacity: isNavigating ? 0.6 : 1,
                                 "&:hover": {
-                                  backgroundColor: "#0000000D",
+                                  backgroundColor: isNavigating ? "transparent" : "#0000000D",
                                 },                         
                               }}
                             >
+                              {isChildNavigating && (
+                                <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                                  <CircularProgress size={14} />
+                                </Box>
+                              )}
                               <ListItemText
                                 primary={child.title}
                                 primaryTypographyProps={{
@@ -191,8 +230,8 @@ const MainMenu = () => {
                               />
                             </ListItemButton>
                           </ListItem>
-                        </Link>
-                      ))}
+                        );
+                      })}
                     </Box>
                   )}
                 </React.Fragment>
