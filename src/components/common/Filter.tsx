@@ -96,6 +96,15 @@ const Filter = ({
     setEndDate(localEndDate);
   };
 
+  const isDateChanged = localStartDate !== startDate || localEndDate !== endDate;
+
+  const buttonStyle = {
+    ...button,
+    bgcolor: isDateChanged ? '#1c4886' : '#bdbdbd',
+    cursor: isDateChanged ? 'pointer' : 'not-allowed',
+    transition: 'background 0.2s',
+  };
+
   return (
     <Box sx={filter}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -258,7 +267,7 @@ const Filter = ({
       <br />
       <br />
       <Box>
-        <Button sx={button} onClick={handleApply}>
+        <Button sx={buttonStyle} onClick={handleApply} disabled={!isDateChanged}>
           Apply filters
         </Button>
       </Box>

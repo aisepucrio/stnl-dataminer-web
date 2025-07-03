@@ -43,8 +43,10 @@ const Preview = () => {
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const abortControllerRef = useRef<AbortController | null>(null);
   const [showUpdateToast, setShowUpdateToast] = useState(false);
-      const tag = String(params.tag);
-    const section = String(params.section);
+  const [prevDateRange, setPrevDateRange] = useState<{startDate: string, endDate: string}>({startDate: "", endDate: ""});
+      
+  const tag = String(params.tag);
+  const section = String(params.section);
 
   const formatColumns = () => {
     if (!results || results.length === 0) return [];
@@ -232,10 +234,13 @@ const Preview = () => {
 
   useEffect(() => {
     fetchPreview();
-    // Show toast only when startDate or endDate changes (not on first render)
-    if (!isFirstRender.current && (startDate || endDate)) {
+    // Show toast only when date range changes (not on first render)
+    if (!isFirstRender.current && 
+        (startDate !== prevDateRange.startDate || endDate !== prevDateRange.endDate)) {
       setShowUpdateToast(true);
     }
+    // Update previous date range
+    setPrevDateRange({startDate, endDate});
   }, [ startDate, endDate, page, pageSize, itemId, itemName , sortOrder, searchText]);
 
   useEffect(() => {
@@ -426,6 +431,8 @@ const Preview = () => {
         <FilterPreview
           source={source}
           item={itemId}
+          startDate={startDate}
+          endDate={endDate}
           setStartDate={setStartDate}
           setEndDate={setEndDate}
         />

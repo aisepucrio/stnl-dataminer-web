@@ -73,9 +73,14 @@ const FilterPreview = ({
   // const [endSprint, setEndSprint] = useState<string>("");
 
   const handleApply = () => {
-    setStartDate(localStartDate);
-    setEndDate(localEndDate);
+    if (setStartDate) setStartDate(localStartDate);
+    if (setEndDate) setEndDate(localEndDate);
   };
+
+  // Check if there are any changes - normalize undefined/null to empty string
+  const originalStartDate = startDate || "";
+  const originalEndDate = endDate || "";
+  const hasChanges = localStartDate !== originalStartDate || localEndDate !== originalEndDate;
 
   return (
     <Box sx={filter}>
@@ -135,7 +140,17 @@ const FilterPreview = ({
       <br />
       <br />
       <Box>
-        <Button sx={button} onClick={handleApply}>
+        <Button 
+          sx={{
+            ...button,
+            bgcolor: hasChanges ? "#1c4886" : "#9e9e9e",
+            "&:hover": {
+              bgcolor: hasChanges ? "#1a4077" : "#9e9e9e",
+            }
+          }}
+          onClick={handleApply}
+          disabled={!hasChanges}
+        >
           Apply filters
         </Button>
       </Box>
