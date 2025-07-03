@@ -28,14 +28,14 @@ const ModalDownload = ({
   source,
   section,
 }: ModalDownloadProps) => {
-  const [format, setFormat] = useState<string>(".CSV");
+  const [format, setFormat] = useState<string>("json");
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const download = () => {
     const endpoint = `${apiUrl}/api/${source}/export/`;
     const payload: Payload = { format };
 
-    if (section === "commit") {
+    if (section === "commits") {
       payload.table = "githubcommit";
     } else if (section === "issues") {
       payload.table = "githubissuepullrequest";
@@ -97,7 +97,7 @@ const ModalDownload = ({
             onChange={(e) => setFormat(e.target.value)}
             size="small"
           >
-            <MenuItem value="csv">CSV</MenuItem>
+            {/* <MenuItem value="csv">CSV</MenuItem> */}
             <MenuItem value="json">JSON</MenuItem>
           </Select>
         </Box>
