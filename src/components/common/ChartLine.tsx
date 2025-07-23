@@ -78,7 +78,10 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       const formatted = formatLineData(data);
 
       // Check if data is empty
-      const hasData = formatted && formatted.length > 0 && formatted.some((series: any) => series.data && series.data.length > 0);
+      const hasData =
+        formatted &&
+        formatted.length > 0 &&
+        formatted.some((series: any) => series.data && series.data.length > 0);
       setNoData(!hasData);
       setLineData(formatted);
     } catch (err) {
@@ -122,8 +125,7 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       } else {
         setInterval("year");
       }
-    }
-    else {
+    } else {
       setInterval("month");
     }
 
@@ -150,19 +152,21 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
             Charts (Cumulative)
           </Typography>
         </Box>
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             height: 450,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            px: "16px"
+            px: "16px",
           }}
         >
-          <Alert severity="warning" 
-          sx={{
-            fontSize: "18px"
-          }}>
+          <Alert
+            severity="warning"
+            sx={{
+              fontSize: "18px",
+            }}
+          >
             No data was available for the selected criteria.
           </Alert>
         </Box>
