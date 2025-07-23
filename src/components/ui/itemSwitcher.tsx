@@ -125,7 +125,10 @@ const ItemSwitcher = () => {
         setLoading(false);
       }
 
-      dispatch(setItem(""));
+      if (prevSource !== null) {
+        dispatch(setItem(""));
+      }
+
       fetchSource(source);
     }
 
