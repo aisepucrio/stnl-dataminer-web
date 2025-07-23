@@ -87,11 +87,21 @@ const Collect = () => {
     metadata: "metadata",
   };
 
-  const formatDate = (dateStr: string): string => {
+  const formatDateGitHub = (dateStr: string): string => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
     date.setHours(13, 42, 0, 888);
     return date.toISOString();
+  };
+
+  const formatDateJira = (dateStr: string): string => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    // Retorna no formato 'yyyy-MM-dd'
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   useEffect(() => {
@@ -112,10 +122,18 @@ const Collect = () => {
     }
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    const payload: any = {
-      ...(startDate && { start_date: formatDate(startDate) }),
-      ...(endDate && { end_date: formatDate(endDate) }),
-    };
+    let payload: any = {};
+    if (source === "github") {
+      payload = {
+        ...(startDate && { start_date: formatDateGitHub(startDate) }),
+        ...(endDate && { end_date: formatDateGitHub(endDate) }),
+      };
+    } else if (source === "jira") {
+      payload = {
+        ...(startDate && { start_date: formatDateJira(startDate) }),
+        ...(endDate && { end_date: formatDateJira(endDate) }),
+      };
+    }
 
     if (source === "github") {
       payload.repositories = tags;
@@ -179,7 +197,7 @@ const Collect = () => {
             flexWrap: "wrap",
             // gap: 1,
             alignItems: "center",
-            gap: "20px"
+            gap: "20px",
           }}
         >
           {tags.map((tag, idx) => (
