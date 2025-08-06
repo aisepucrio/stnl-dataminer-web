@@ -108,7 +108,9 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       setOptions(jiraOptions);
       setSelected(jiraOptions.map((o) => o.key));
     }
+  }, [source, item]);
 
+  useEffect(() => {
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -122,13 +124,14 @@ const ChartLine = ({ startDate, endDate }: ChartLineProps) => {
       } else {
         setInterval("year");
       }
-    }
-    else {
+    } else {
       setInterval("month");
     }
-
-    fetchData();
   }, [startDate, endDate, source, item]);
+
+  useEffect(() => {
+    fetchData();
+  }, [interval]);
 
   if (loading) {
     return <div> ... loading ...</div>;
