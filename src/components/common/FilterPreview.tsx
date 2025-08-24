@@ -15,6 +15,8 @@ interface FilterProps {
   setStartDate?: (value: string) => void;
   endDate?: string;
   setEndDate?: (value: string) => void;
+  minDate?: string;
+  maxDate?: string;
 }
 
 const filter = {
@@ -62,6 +64,8 @@ const FilterPreview = ({
   endDate,
   setStartDate,
   setEndDate,
+  minDate,
+  maxDate,
 }: FilterProps) => {
   const [localStartDate, setLocalStartDate] = useState(startDate || "");
   const [localEndDate, setLocalEndDate] = useState(endDate || "");
@@ -76,6 +80,32 @@ const FilterPreview = ({
     if (setStartDate) setStartDate(localStartDate);
     if (setEndDate) setEndDate(localEndDate);
   };
+
+  const DateField = ({
+    value,
+    onChange,
+  }: {
+    value: string;
+    onChange: (v: string) => void;
+  }) => (
+    <input
+      type="date"
+      min={minDate || undefined}
+      max={maxDate || undefined}
+      style={{
+        ...input,
+        marginLeft: "6.5%",
+      }}
+      value={value}
+      onChange={(e) => {
+        const v = e.target.value;
+        if (!v) return onChange(v);
+        if (minDate && v < minDate) return onChange(minDate);
+        if (maxDate && v > maxDate) return onChange(maxDate);
+        onChange(v);
+      }}
+    />
+  );
 
   // Check if there are any changes - normalize undefined/null to empty string
   const originalStartDate = startDate || "";
@@ -96,16 +126,7 @@ const FilterPreview = ({
           }}
         >
           <Typography sx={label}>Start</Typography>
-          <input
-            type="date"
-            style={{
-              ...input,
-              marginLeft: "6.5%",
-              
-            }}
-            value={localStartDate}
-            onChange={(e) => setLocalStartDate(e.target.value)}
-          />
+          <DateField value={localStartDate} onChange={setLocalStartDate} />
 
           {/* ... seus outros TextField para hash/tag e sprint ... */}
        
@@ -121,17 +142,7 @@ const FilterPreview = ({
           }}
         >
           <Typography sx={label}>Finish</Typography>
-          <input
-          type="date"
-            style={{
-              ...input,
-              marginLeft: "6.5%"
-              
-            }}
-            
-            value={localEndDate}
-            onChange={(e) => setLocalEndDate(e.target.value)}
-          />
+          <DateField value={localEndDate} onChange={setLocalEndDate} />
 
           {/* ... seus outros TextField para hash/tag e sprint ... */}
        

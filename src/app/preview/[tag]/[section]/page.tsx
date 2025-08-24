@@ -162,7 +162,7 @@ const Preview = () => {
 
     const itemParam =
       itemId && source === "github"
-        ? `&repository=${itemName}`
+        ? `&repository=${itemId}`
         : itemId && source === "jira"
         ? `&project=${itemId}`
         : "";
@@ -197,8 +197,9 @@ const Preview = () => {
     const searchParam = searchText ? `&search=${searchText}` : "";
     const orderParam = sortOrder ? `&ordering=${sortOrder}` : "";
     const endpoint = `${apiUrl}/api/${tag}/${section}?page=${page}&page_size=${pageSize}${itemParam}${startDateParam}${endDateParam}${searchParam}${orderParam}`;
-    try {
-      const res = await fetch(endpoint, { signal });
+      try {
+        console.log("preview fetch endpoint:", { endpoint, page, pageSize, itemId, itemName, startDate, endDate });
+        const res = await fetch(endpoint, { signal });
       if (!res.ok) throw new Error("Erro no fetch");
       const data = await res.json();
 
@@ -328,6 +329,43 @@ const Preview = () => {
   };
   const columns = getColumnsAndHandleSpecialCases();
 
+  // min/max date are undefined by default; backend will provide per-item range
+  const [minDate, setMinDate] = useState<string>("");
+  const [maxDate, setMaxDate] = useState<string>("");
+  
+  // Fetch real date range from backend when an item is selected
+  useEffect(() => {
+    const fetchDateRange = async () => {
+      if (!apiUrl) return;
+      if (!itemId) return;
+
+      let param = "";
+      if (source === "github") param = `repository_id=${itemId}`;
+      else if (source === "jira") param = `project_id=${itemId}`;
+      else param = `id=${itemId}`;
+
+      try {
+        const url = `${apiUrl}/api/${source}/date-range?${param}`;
+        console.log("date-range request (preview):", { source, param, itemId, itemName, url });
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.min_date) {
+          const d = new Date(data.min_date);
+          if (!isNaN(d.getTime())) setMinDate(d.toISOString().slice(0, 10));
+        }
+        if (data.max_date) {
+          const d = new Date(data.max_date);
+          if (!isNaN(d.getTime())) setMaxDate(d.toISOString().slice(0, 10));
+        }
+      } catch (err) {
+        console.error("Erro ao buscar date-range:", err);
+      }
+    };
+
+    fetchDateRange();
+  }, [itemId, source, apiUrl]);
+
   return (
     <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
       <Box>
@@ -435,6 +473,8 @@ const Preview = () => {
           endDate={endDate}
           setStartDate={setStartDate}
           setEndDate={setEndDate}
+          minDate={minDate}
+          maxDate={maxDate}
         />
       </Box>}
       <ModalDownload open={open} onClose={onClose} source={source} section={section} />

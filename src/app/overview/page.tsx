@@ -65,7 +65,6 @@ export default function Dashboard() {
   const [startSprint, setStartSprint] = useState<string>("");
   const [endSprint, setEndSprint] = useState<string>("");
 
-
   const [loading, setLoading] = useState(true);
   const [showSnackbar, setShowSnackbar] = useState(false);
 
@@ -148,7 +147,6 @@ export default function Dashboard() {
         if (startDate || endDate) {
           setShowSnackbar(true);
         }
-
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
       }
@@ -157,6 +155,45 @@ export default function Dashboard() {
     fetchData();
   }, [item, startDate, endDate, source, apiUrl]);
 
+  // min/max date are undefined by default; backend will provide per-item range
+  const [minDate, setMinDate] = useState<string>("");
+  const [maxDate, setMaxDate] = useState<string>("");
+
+  // Fetch real date range from backend when an item is selected
+  useEffect(() => {
+    const fetchDateRange = async () => {
+      if (!apiUrl) return;
+      // when there is no specific item selected, clear any min/max
+      if (!item) {
+        setMinDate("");
+        setMaxDate("");
+        return;
+      }
+console.log("store.item:", item);
+      let param = "";
+      if (source === "github") param = `repository_id=${item}`;
+      else if (source === "jira") param = `project_id=${item}`;
+      else param = `id=${item}`;
+
+      try {
+        const res = await fetch(`${apiUrl}/api/${source}/date-range?${param}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.min_date) {
+          const d = new Date(data.min_date);
+          if (!isNaN(d.getTime())) setMinDate(d.toISOString().slice(0, 10));
+        }
+        if (data.max_date) {
+          const d = new Date(data.max_date);
+          if (!isNaN(d.getTime())) setMaxDate(d.toISOString().slice(0, 10));
+        }
+      } catch (err) {
+        console.error("Erro ao buscar date-range:", err);
+      }
+    };
+
+    fetchDateRange();
+  }, [item, source, apiUrl]);
 
   if (loading) {
     return <div></div>;
@@ -365,6 +402,8 @@ export default function Dashboard() {
             setStartSprint={setStartSprint}
             endSprint={endSprint}
             setEndSprint={setEndSprint}
+            minDate={minDate}
+            maxDate={maxDate}
           />
         </Box>
       </Box>
@@ -374,7 +413,7 @@ export default function Dashboard() {
         onClose={() => setShowSnackbar(false)}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert severity="success" sx={{ width: '100%' }}>
+        <Alert severity="success" sx={{ width: "100%" }}>
           Table filtered using new date range!
         </Alert>
       </Snackbar>
