@@ -15,6 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import StopCircleOutlinedIcon from "@mui/icons-material/StopCircleOutlined";
+import ReplayIcon from "@mui/icons-material/Replay";
 import { darken } from "@mui/material/styles";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
@@ -56,6 +57,24 @@ const Jobs = () => {
       if (response.ok) fetchJobs();
     } catch {
       console.error("Erro ao parar a task");
+    }
+    setLastInteraction(Date.now());
+  };
+
+  const retryJob = async (taskId: string) => {
+    try {
+      const response = await fetch(
+        `${apiUrl}/api/jobs/restart-collection/${taskId}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) fetchJobs();
+    } catch {
+      console.error("Erro ao reiniciar a task");
     }
     setLastInteraction(Date.now());
   };
@@ -118,7 +137,8 @@ const Jobs = () => {
       if (!document.getElementById("refresh-spin-keyframes")) {
         const style = document.createElement("style");
         style.id = "refresh-spin-keyframes";
-        style.textContent = "@keyframes spin { 100% { transform: rotate(360deg); } }";
+        style.textContent =
+          "@keyframes spin { 100% { transform: rotate(360deg); } }";
         document.head.appendChild(style);
       }
     }
@@ -170,7 +190,9 @@ const Jobs = () => {
                   fontSize: 34,
                   cursor: "pointer",
                   transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-                  animation: isRefreshing ? "spin 0.7s linear infinite" : "none",
+                  animation: isRefreshing
+                    ? "spin 0.7s linear infinite"
+                    : "none",
                 }}
               />
             </IconButton>
@@ -243,7 +265,14 @@ const Jobs = () => {
                       {job.status === "STARTED" && (
                         <StopCircleOutlinedIcon
                           onClick={() => stopJob(job.task_id)}
-                          sx={{ cursor: "pointer" }}
+                          sx={{ cursor: "pointer", color: "#d44747ff" }}
+                        />
+                      )}
+                      {(job.status === "FAILURE" ||
+                        job.status === "REVOKED") && (
+                        <ReplayIcon
+                          onClick={() => retryJob(job.task_id)}
+                          sx={{ cursor: "pointer", color: "#7e7e7eff" }}
                         />
                       )}
                     </TableCell>
