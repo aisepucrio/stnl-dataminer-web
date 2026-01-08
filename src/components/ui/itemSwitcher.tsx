@@ -24,7 +24,16 @@ const sources = {
     value: "github",
     fetchUrl: "/api/github/dashboard",
   },
-  jira: { name: "Jira", value: "jira", fetchUrl: "/api/jira/dashboard" },
+  jira: { 
+    name: "Jira", 
+    value: "jira", 
+    fetchUrl: "/api/jira/dashboard" 
+  },
+  stackoverflow: { 
+    name: "Stack Overflow", 
+    value: "stackoverflow", 
+    fetchUrl: "/api/stackoverflow/dashboard" 
+  },
 };
 
 // Select estilizado
@@ -108,7 +117,10 @@ const ItemSwitcher = () => {
         setItems(data.repositories);
       } else if (source === "jira") {
         setItems(data.projects);
+      } else if (source === "stackoverflow") {
+        setItems(data.items);
       }
+
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
       setItems([]);
@@ -116,6 +128,7 @@ const ItemSwitcher = () => {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     const prevSource = prevSourceRef.current;
@@ -178,11 +191,15 @@ const ItemSwitcher = () => {
               ? "All repositories (click to filter)"
               : source === "jira"
               ? "All projects (click to filter)"
+              : source === "stackoverflow"
+              ? "All questions (click to filter)"
               : "All items (click to filter)"
             : source === "github"
             ? selectedItemObj?.repository ?? selected
             : source === "jira"
             ? selectedItemObj?.name ?? selected
+            : source === "stackoverflow"
+            ? selectedItemObj?.title ?? selected
             : selected;
 
           return (
@@ -198,6 +215,8 @@ const ItemSwitcher = () => {
             ? "Select repository"
             : source === "jira"
             ? "Select project"
+            : source === "stackoverflow"
+            ? "Select question"
             : "Select item"}
         </MenuItem>
 
@@ -212,6 +231,13 @@ const ItemSwitcher = () => {
           items.map((item) => (
             <MenuItem key={item.id} value={item.id}>
               {item.name}
+            </MenuItem>
+          ))}
+
+        {source === "stackoverflow" &&
+          items.map((item) => (
+            <MenuItem key={item.id} value={item.id}>
+              {item.title}
             </MenuItem>
           ))}
       </CustomSelect>

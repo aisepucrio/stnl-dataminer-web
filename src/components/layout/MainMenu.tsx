@@ -71,6 +71,10 @@ const MainMenu = () => {
           { title: "Comment", to: "/preview/jira/comments" },
           { title: "Sprints", to: "/preview/jira/sprints" },
         ];
+      case "stackoverflow":
+        return [
+          { title: "Questions", to: "/preview/stackoverflow/questions" },
+        ];
       default:
         return null;
     }
