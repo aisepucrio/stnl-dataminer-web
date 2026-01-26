@@ -131,6 +131,16 @@ const Jobs = () => {
     setLastInteraction(Date.now());
   };
 
+  const formatOperation = (operation: string) => {
+    if (operation.includes("collect_questions")) {
+      return "Completed StackOverflow questions collection";
+    }
+    if (operation.includes("Collection completed successfully")) {
+      return "Completed StackOverflow questions collection";
+    }
+    return operation.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+  };
+
   // Add spinning animation keyframes
   useEffect(() => {
     if (typeof window !== "undefined" && typeof document !== "undefined") {
@@ -218,9 +228,7 @@ const Jobs = () => {
                       {job.repository}
                     </TableCell>
                     <TableCell sx={{ fontSize: "1rem" }}>
-                      {job.operation
-                        .replace(/_/g, " ")
-                        .replace(/^\w/, (c) => c.toUpperCase())}
+                      {formatOperation(job.operation)}
                     </TableCell>
                     <TableCell sx={{ fontSize: "1rem" }}>
                       <Box display="flex" alignItems="center">

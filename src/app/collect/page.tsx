@@ -10,6 +10,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  MenuItem,
   Alert,
   colors,
 } from "@mui/material";
@@ -31,20 +32,26 @@ const Collect = () => {
   const [endDate, setEndDate] = useState<string>("");
 
   const [checkedOptions, setCheckedOptions] = useState<string[]>(["metadata"]);
+  const stackOverflowTagOptions = ["python", "django"];
 
   const options = useMemo(
     () =>
-      source === "github" ? ["issue", "comment", "pull request", "commit"] : [],
+      source === "github"
+        ? ["issue", "comment", "pull request", "commit"]
+        : source === "stackoverflow"
+        ? ["collect questions"]
+        : [],
     [source]
   );
 
-  const displayOptions = ["select all", ...options];
-  const isAllSelected = options.every((option) =>
-    checkedOptions.includes(option)
-  );
+  const displayOptions =
+    source === "github" ? ["select all", ...options] : options;
+  const isAllSelected =
+    source === "github" &&
+    options.every((option) => checkedOptions.includes(option));
 
   const handleCheckboxChange = (option: string) => {
-    if (option === "select all") {
+    if (source === "github" && option === "select all") {
       if (isAllSelected) {
         setCheckedOptions(["metadata"]);
       } else {
@@ -76,6 +83,13 @@ const Collect = () => {
         setInputValue("");
         setOpen(false);
       }
+    } else if (source === "stackoverflow") {
+      const raw = inputValue.trim();
+      if (raw && stackOverflowTagOptions.includes(raw)) {
+        setTags((prev) => (prev.includes(raw) ? prev : [...prev, raw]));
+        setInputValue("");
+        setOpen(false);
+      }
     }
   };
 
@@ -85,6 +99,7 @@ const Collect = () => {
     "pull request": "pull_requests",
     issue: "issues",
     metadata: "metadata",
+    "collect questions": "collect_questions",
   };
 
   const formatDateGitHub = (dateStr: string): string => {
@@ -104,10 +119,25 @@ const Collect = () => {
     return `${year}-${month}-${day}`;
   };
 
+  const formatDateStackOverflow = (dateStr: string): string => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   useEffect(() => {
     setLoading(false);
     setTags([]); // zera as tags sempre que source muda
-    setCheckedOptions(["metadata"]);
+    setCheckedOptions(
+      source === "github"
+        ? ["metadata"]
+        : source === "stackoverflow"
+        ? ["collect questions"]
+        : ["metadata"]
+    );
   }, [source]);
 
   if (loading) {
@@ -116,8 +146,12 @@ const Collect = () => {
 
   const handleCollect = () => {
     // Validação
-    if (tags.length === 0) {
+    if ((source === "github" || source === "jira") && tags.length === 0) {
       alert("Adicione ao menos uma tag antes de coletar.");
+      return;
+    }
+    if (source === "stackoverflow" && (!startDate || !endDate)) {
+      alert("Para Stack Overflow, selecione start e end date.");
       return;
     }
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -133,6 +167,11 @@ const Collect = () => {
         ...(startDate && { start_date: formatDateJira(startDate) }),
         ...(endDate && { end_date: formatDateJira(endDate) }),
       };
+    } else if (source === "stackoverflow") {
+      payload = {
+        start_date: formatDateStackOverflow(startDate),
+        end_date: formatDateStackOverflow(endDate),
+      };
     }
 
     if (source === "github") {
@@ -143,6 +182,11 @@ const Collect = () => {
         .map((opt) => collectTypeMap[opt]);
     } else if (source === "jira") {
       payload.projects = tags;
+    } else if (source === "stackoverflow") {
+      payload.options = ["collect_questions"];
+      if (tags.length > 0) {
+        payload.tags = tags.join(";");
+      }
     }
 
     const endpoint =
@@ -150,6 +194,8 @@ const Collect = () => {
         ? `${apiUrl}/api/github/collect-all/`
         : source === "jira"
         ? `${apiUrl}/api/jira/issues/collect/`
+        : source === "stackoverflow"
+        ? `${apiUrl}/api/stackoverflow/collect/`
         : "";
 
     fetch(endpoint, {
@@ -184,7 +230,11 @@ const Collect = () => {
         }}
       >
         <Typography sx={{ fontSize: "24px", fontWeight: 600 }}>
-          {source === "github" ? "Repository Name" : "Projects Name"}
+          {source === "github"
+            ? "Repository Name"
+            : source === "jira"
+            ? "Projects Name"
+            : "Tags"}
         </Typography>
 
         <Box
@@ -206,7 +256,9 @@ const Collect = () => {
               label={
                 source === "github"
                   ? tag
-                  : `${tag.jira_domain}/${tag.project_key}`
+                  : source === "jira"
+                  ? `${tag.jira_domain}/${tag.project_key}`
+                  : tag
               }
               onDelete={() =>
                 setTags((prev) => prev.filter((_, i) => i !== idx))
@@ -290,7 +342,7 @@ const Collect = () => {
                 </Button>
               </Box>
             </>
-          ) : (
+          ) : source === "jira" ? (
             <>
               <Box mb={3} display="flex" flexDirection="column" gap={2}>
                 <TextField
@@ -315,6 +367,32 @@ const Collect = () => {
                 </Button>
               </Box>
             </>
+          ) : (
+            <>
+              <Box mb={3}>
+                <TextField
+                  fullWidth
+                  select
+                  label="Tag"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                >
+                  {stackOverflowTagOptions.map((tag) => (
+                    <MenuItem key={tag} value={tag}>
+                      {tag}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Box>
+              <Box display="flex" justifyContent="flex-end" gap={1}>
+                <Button variant="outlined" onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button variant="contained" onClick={handleAdd}>
+                  Add
+                </Button>
+              </Box>
+            </>
           )}
         </Box>
       </Modal>
@@ -325,7 +403,9 @@ const Collect = () => {
       >
         {!startDate && !endDate && (
           <Alert variant="outlined" severity="warning" sx={{ width: "40vw" }}>
-            Leaving the date fields empty will mine data from the entire period.
+            {source === "stackoverflow"
+              ? "Start and Finish are required for Stack Overflow."
+              : "Leaving the date fields empty will mine data from the entire period."}
           </Alert>
         )}
         <TextField
@@ -410,7 +490,13 @@ const Collect = () => {
         <Button
           onClick={handleCollect}
           variant="contained"
-          disabled={tags.length === 0}
+          disabled={
+            (source === "github" || source === "jira") && tags.length === 0
+              ? true
+              : source === "stackoverflow" && (!startDate || !endDate)
+              ? true
+              : false
+          }
           sx={{
             color: "white",
             bgcolor: "#1C4886",
