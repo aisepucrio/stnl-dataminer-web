@@ -22,7 +22,6 @@ const row = { display: "flex", flexDirection: "row" };
 
 const Preview = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const stackOverflowAllowedSections = ["questions"];
   const source = useSelector((state: RootState) => state.source.value);
   const itemId = useSelector((state: RootState) => state.item.value);
   const itemName = useSelector((state: RootState) => state.item.itemName);
@@ -384,7 +383,7 @@ const Preview = () => {
     };
 
     fetchDateRange();
-  }, [itemId, source, apiUrl, tag]);
+  }, [itemId, source, apiUrl]);
 
   return (
     <Box sx={{ ...row, gap: "20px", px: "20px", pt: 3 }}>
@@ -400,13 +399,7 @@ const Preview = () => {
         >
           {/* {source} <br />
         {itemId ? <>{itemId}</> : <>nao tem id selcionado</>} <br /> */}
-          {tag === "stackoverflow" && !stackOverflowAllowedSections.includes(section) ? (
-            <Box sx={{ p: 2 }}>
-              <Typography variant="body1">
-                This section is not available for Stack Overflow. Use Questions.
-              </Typography>
-            </Box>
-          ) : isInitialLoading ? (
+          {isInitialLoading ? (
             <Box sx={{ p: 2 }}>
               {/* Table header skeleton */}
               <Skeleton variant="rectangular" width="100%" height={56} sx={{ mb: 1 }} />
