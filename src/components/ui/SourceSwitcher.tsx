@@ -55,8 +55,7 @@ const SourceSwitcher = () => {
   const handleChange = (event: SelectChangeEvent) => {
     dispatch(
       setSource(
-        event.target.value as "github" | "jira"
-        // | "stackoverflow"
+        event.target.value as "github" | "jira" | "stackoverflow"
       )
     );
   };
@@ -89,7 +88,7 @@ const SourceSwitcher = () => {
       >
         <MenuItem value="github">GitHub</MenuItem>
         <MenuItem value="jira">Jira</MenuItem>
-        {/* <MenuItem value="stackoverflow">Stack Overflow</MenuItem> */}
+        {<MenuItem value="stackoverflow">Stack Overflow</MenuItem>}
       </CustomSelect>
     </FormControl>
   );

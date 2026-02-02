@@ -32,7 +32,7 @@ const Preview = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [total, setTotal] = useState<number>();
-  const totalPages = Math.ceil(total / pageSize);
+  const totalPages = Math.ceil((total ?? 0) / pageSize);
   const router = useRouter();
   const isFirstRender = useRef(true);
   const [open, setOpen] = useState(false);
@@ -143,7 +143,11 @@ const Preview = () => {
         // Do nothing, handled by button
         return;
       }
-      const fullValue = results[cellMeta.dataIndex][columns[cellMeta.colIndex].name];
+      const col = columns?.[cellMeta.colIndex];
+      if (!col) return;
+      const row = results?.[cellMeta.dataIndex];
+      if (!row) return;
+      const fullValue = row[col.name];
       setSelectedCellData(fullValue);
       setCodeModalOpen(true);
     }
@@ -165,6 +169,8 @@ const Preview = () => {
         ? `&repository=${itemId}`
         : itemId && source === "jira"
         ? `&project=${itemId}`
+        : itemId && source === "stackoverflow"
+        ? `&question_id=${itemId}`
         : "";
 
     const dateParamMap: any = {
@@ -178,6 +184,10 @@ const Preview = () => {
         users: { start: "updated_at__gte", end: "updated_at__lte" },
         default: { start: "created__gte", end: "created__lte" },
       },
+      stackoverflow: {
+        default: { start: "creation_date__gte", end: "creation_date__lte" }
+      },
+
     };
 
     let startDateParam = "";
@@ -192,7 +202,13 @@ const Preview = () => {
       const { start, end } = dateParams;
       startDateParam = startDate ? `&${start}=${startDate}` : "";
       endDateParam = endDate ? `&${end}=${endDate}` : "";
+    } else if (source === "stackoverflow") {
+      const dateParams = dateParamMap.stackoverflow[section] || dateParamMap.stackoverflow.default;
+      const { start, end } = dateParams;
+      startDateParam = startDate ? `&${start}=${startDate}` : "";
+      endDateParam = endDate ? `&${end}=${endDate}` : "";
     }
+
 
     const searchParam = searchText ? `&search=${searchText}` : "";
     const orderParam = sortOrder ? `&ordering=${sortOrder}` : "";
@@ -221,6 +237,7 @@ const Preview = () => {
             return newItem;
           })
         );
+        
         setTotal(data.count);
         setIsInitialLoading(false);
       }
@@ -336,12 +353,14 @@ const Preview = () => {
   // Fetch real date range from backend when an item is selected
   useEffect(() => {
     const fetchDateRange = async () => {
+
       if (!apiUrl) return;
       if (!itemId) return;
 
       let param = "";
       if (source === "github") param = `repository_id=${itemId}`;
       else if (source === "jira") param = `project_id=${itemId}`;
+      else if (source === "stackoverflow") param = `question_id=${itemId}`;
       else param = `id=${itemId}`;
 
       try {

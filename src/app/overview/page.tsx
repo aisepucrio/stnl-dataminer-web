@@ -43,12 +43,16 @@ const sources = {
     value: "github",
     fetchUrl: "/api/github/dashboard",
   },
-  jira: { name: "Jira", value: "jira", fetchUrl: "/api/jira/dashboard/" },
-  // stackoverflow: {
-  //   name: "Stack Overflow",
-  //   value: "stackoverflow",
-  //   fetchUrl: "/api/stackoverflow",
-  // },
+  jira: { 
+    name: "Jira", 
+    value: "jira", 
+    fetchUrl: "/api/jira/dashboard/" 
+  },
+   stackoverflow: {
+     name: "Stack Overflow",
+     value: "stackoverflow",
+     fetchUrl: "/api/stackoverflow/dashboard/",
+  },
 };
 
 export default function Dashboard() {
@@ -92,7 +96,9 @@ export default function Dashboard() {
           path = `/api/github/dashboard?repository_id=${item}`;
         } else if (source === "jira") {
           path = `/api/jira/dashboard?project_id=${item}`;
-        } else {
+        } else if (source === "stackoverflow") {
+          path = `/api/stackoverflow/dashboard?question_id=${item}`;
+        }else {
           return;
         }
       } else {
@@ -133,6 +139,10 @@ export default function Dashboard() {
           stars_count: setQtyStar,
           sprints_count: setQtySprints,
           users_count: setQtyUsers,
+            // StackOverflow
+          questions_count: setQtyIssue,
+          answers_count: setQtyPullrequest,
+
           time_mined: setTimeMined,
         };
 
@@ -173,6 +183,7 @@ console.log("store.item:", item);
       let param = "";
       if (source === "github") param = `repository_id=${item}`;
       else if (source === "jira") param = `project_id=${item}`;
+      else if (source === "stackoverflow") param = `question_id=${item}`;
       else param = `id=${item}`;
 
       try {
@@ -363,6 +374,21 @@ console.log("store.item:", item);
                       isLoading={loading}
                       color={"#e2edfe"}
                     />
+                  </Box>
+                )}
+              </>
+            ) : source == "stackoverflow" ? (
+              <> 
+                {item ? (
+                  <Box sx={{ gap: "20px", ...row }}>
+                    <InfoCard label="Questions" value={qtyIssue} isLoading={loading} color={"#e2edfe"} />
+                    <InfoCard label="Comments" value={qtyComment} isLoading={loading} color={"#e6ecf5"} />
+                    <InfoCard label="Users" value={qtyUsers} isLoading={loading} color={"#e2edfe"} />
+                  </Box>
+                ) : (
+                  <Box sx={{ gap: "20px", ...row }}>
+                    <InfoCard label="Questions" value={qtyIssue} isLoading={loading} color={"#e2edfe"} />
+                    <InfoCard label="Users" value={qtyUsers} isLoading={loading} color={"#e2edfe"} />
                   </Box>
                 )}
               </>
